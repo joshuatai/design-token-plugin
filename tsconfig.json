@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "jsx": "react",
+    "moduleResolution": "node",
+    "lib": [
+      "es2017",
+      "dom",
+      "scripthost"
+    ]
+  }
+}

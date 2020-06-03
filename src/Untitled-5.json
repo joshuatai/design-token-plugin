@@ -1,0 +1,127 @@
+[
+  {
+    "id": "537068cb-a42b-4313-9024-a3121b8e2b34",
+    "name": "Palette",
+    "tokens": [
+      {
+        "id": "dec096af-t110-4adc-ac5f-0b547e5c5b73",
+        "name": "red:10",
+        "key": "@red:10",
+        "description": "This is one color of the red serious.",
+        "type": "FILLS",
+        "properties": [
+          {
+            "propType": "FILLS",
+            "type": "SOLID",
+            "value": {
+              "colorMode": "HEX",
+              "colorCode": "#fee1e2",
+              "opacity": 0.92
+            }
+          }
+        ]
+      },
+      {
+        "id": "b6081840-ad59-4a18-8ab1-340fb2812aae",
+        "name": "red:20",
+        "key": "@red:20",
+        "description": "This is one color of the red serious.",
+        "type": "FILLS",
+        "properties": [
+          {
+            "propType": "FILLS",
+            "type": "SOLID",
+            "value": {
+              "colorMode": "HEX",
+              "colorCode": "#fcc3c4",
+              "opacity": 0.92
+            }
+          }
+        ]
+      },
+      {
+        "id": "75178759-dee3-4afc-a5ca-3ab7789f14e2",
+        "name": "red:30",
+        "key": "@red:30",
+        "description": "This is one color of the red serious.",
+        "type": "FILLS",
+        "properties": [
+          {
+            "propType": "FILLS",
+            "type": "SOLID",
+            "value": {
+              "colorMode": "HEX",
+              "colorCode": "#fd999a",
+              "opacity": 0.92
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "19ad13ba-7210-41e5-8b55-98844b9ec482",
+    "name": "Border radius",
+    "tokens": []
+  },
+  {
+    "id": "48ace0d9-728f-4319-aac5-d54b5a2c16b7",
+    "name": "Border style",
+    "tokens": []
+  },
+  {
+    "id": "25915c16-51ef-4adc-9a34-7e2e04e6ca31",
+    "name": "Border width",
+    "tokens": []
+  },
+  {
+    "id": "8bd8481e-f62b-4aa1-85dd-509699714114",
+    "name": "Form control",
+    "tokens": [
+        {
+          "id": "e984303f-8e35-4091-a43d-9dad22373b9e",
+          "name": "form-control-border-color",
+          "key": "@form-control-border-color",
+          "description": "This is the border color for the form control components.",
+          "type": "STROKE",
+          "properties": [
+            {
+              "propType": "SOLID",
+              "type": "TOKEN",
+              "value": {
+                 "": "@gray:60" 
+              }
+            }
+          ]
+        },
+        {
+          "id": "389dbb88-6606-4bb2-8565-40656d6f2de3",
+          "name": "form-control-border-color-hover",
+          "key": "@form-control-border-color-hover",
+          "description": "This is the border color for the hovered form control components.",
+          "type": "FILLS",
+          "properties": [
+            {
+              "propType": "FILLS",
+              "type": "TOKEN",
+              "value": "@blue:50"
+            }
+          ]
+        },
+        {
+            "id": "d5135584-a477-431f-b6da-254e3223e18f",
+            "name": "form-control-border-color-focus",
+            "key": "@form-control-border-color-focus",
+            "description": "This is the border color for the focused form control components.",
+            "type": "FILLS",
+            "properties": [
+              {
+                "propType": "FILLS",
+                "type": "TOKEN",
+                "value": "@blue:60"
+              }
+            ]
+          },
+      ]
+  }
+]

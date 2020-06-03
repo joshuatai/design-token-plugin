@@ -1,0 +1,7 @@
+{
+  "name": "Design Tokens",
+  "id": "840775213530328959",
+  "api": "1.0.0",
+  "main": "dist/code.js",
+  "ui": "dist/ui.html"
+}
