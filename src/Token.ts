@@ -1,9 +1,9 @@
 class Token {
+    type: string = 'Token';
     id: string = '';
     name: string = '';
     description: string = '';
     parent: string = '';
-    type: string = '';
     properties: object[] = [];
 }
 

@@ -1,6 +1,6 @@
 import MessageTypes from './MessageType';
 import ColorMode from './ColorMode';
-import TokenTypes from './TokenTypes';
+import PropertyTypes from './PropertyTypes';
 
 function clone(val) {
   const type = typeof val
@@ -35,13 +35,13 @@ figma.ui.onmessage = async (msg) => {
     postMessage(type, JSON.parse(figma.root.getPluginData('Tokens')));    
   }
   if (type === MessageTypes.SET_TOKENS) {
-    figma.root.setPluginData('Tokens', JSON.stringify(message));
+    figma.root.setPluginData('Tokens', message);
   }
   if (type === MessageTypes.ASSIGN_TOKEN) {
     const { type: assignType, properties }  = message;
     const selection = figma.currentPage.selection.slice();
     console.log(selection);
-    if (assignType === TokenTypes.FILL_COLOR) {
+    if (assignType === PropertyTypes.FILL_COLOR) {
       properties.map(property => {
         console.log(property);
       });

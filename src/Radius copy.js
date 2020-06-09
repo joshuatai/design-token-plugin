@@ -4,23 +4,6 @@ import camelize from './utils/camelize';
 import BrowserEvents from './BrowserEvents';
 import { Mixed } from './symbols';
 //<div>
-//       <div className="custom-val">
-//         <button id="separator-toggle" type="button" className="btn separator-icon" data-toggle="button" aria-pressed="false" autoComplete="off"></button>
-//         <div className="val-container">
-//           <div className="corner-radius-icon"></div>
-//           <span className="corner-radius-val">0</span>
-//           <div className="use-token"></div>
-//         </div>
-//         <div className="separator-vals">
-//           
-//           <div className="btn-group">
-//             <div className="btn" data-separate-type="top-left">0</div>
-//             <div className="btn" data-separate-type="top-right">0</div>
-//             <div className="btn" data-separate-type="bottom-right">0</div>
-//             <div className="btn" data-separate-type="bottom-left">0</div>
-//           </div>
-//         </div>
-//       </div>
 //       <div className="token-val">
 //         <div className="corner-radius-icon"></div>
 //         <div className="use-token"></div>
@@ -29,8 +12,8 @@ import { Mixed } from './symbols';
 const separators = ['top-left', 'top-right', 'bottom-right', 'bottom-left'];
 export default function ($) {
     const NAME = 'radius';
-    const DEFAULTS = new CornerRadius();
     var Radius = function (element, options) {
+        this.options = new CornerRadius(options);
         this.$element = $(element).attr('property-component', NAME).addClass('show');
         this.$customVal = $('<div class="custom-val"></div>');
         this.$valContainer = $('<div class="val-container"></div>');
@@ -42,18 +25,19 @@ export default function ($) {
         this.$separateIcon = $('<i class="separator-mode-sign" separate-type="top-left"></i>');
         this.$separatorGroup = $('<div class="btn-group"></div>');
         this.$separateRadius;
-        this.options = $.extend({}, DEFAULTS, options);
-        this.$element.append(this.$customVal
+        this.$element
+            .append(this.$customVal
             .append(this.$separateToggle)
             .append(this.$valContainer
             .append(this.$radiusIcon)
-            .append(this.$radiusValue.text(options.radius).data('target', this))
+            .append(this.$radiusValue.text(this.options.radius).data('target', this))
             .append(this.$useToken))
             .append(this.$separateSetting
             .append(this.$separateIcon)
             .append(this.$separatorGroup.append((this.$separateRadius = separators.reduce((calc, separator) => {
             return calc.add($(`<div class="btn" data-separate-type="${separator}" contenteditable="true">${this.options[camelize(separator)]}</div>`).data('target', this));
         }, $()))))));
+        this.$element.data('value', this.options);
     };
     Radius.prototype.destroy = function () {
         return this.$element.removeAttr('property-component').empty();
@@ -67,8 +51,6 @@ export default function ($) {
                 data.destroy(), data = undefined;
             if (!data)
                 $this.data('radius', (data = new Radius(this, options)));
-            // if (option == 'toggle') data.toggle()
-            // else if (option) data.setState(option)
         });
     }
     var old = $.fn.radius;
@@ -85,8 +67,6 @@ export default function ($) {
         const separateBtn = $(this);
         const { target } = separateBtn.data();
         target.$separateIcon.attr('separate-type', separateBtn.data('separate-type'));
-    });
-    $(document).on(BrowserEvents.BLUR, `[property-component="${NAME}"] .corner-radius-val`, function () {
     });
     $(document).on(BrowserEvents.BLUR, `[property-component="${NAME}"] .separator-vals [data-separate-type], [property-component="${NAME}"] .corner-radius-val`, function () {
         const $this = $(this);
@@ -132,20 +112,5 @@ export default function ($) {
             }
         }
     });
-    // $(document)
-    //   .on('click.bs.button.data-api', '[data-toggle^="button"]', function (e) {
-    //     var $btn = $(e.target).closest('.btn')
-    //     Plugin.call($btn, 'toggle')
-    //     if (!($(e.target).is('input[type="radio"], input[type="checkbox"]'))) {
-    //       // Prevent double click on radios, and the double selections (so cancellation) on checkboxes
-    //       e.preventDefault()
-    //       // The target component still receive the focus
-    //       if ($btn.is('input,button')) $btn.trigger('focus')
-    //       else $btn.find('input:visible,button:visible').first().trigger('focus')
-    //     }
-    //   })
-    //   .on('focus.bs.button.data-api blur.bs.button.data-api', '[data-toggle^="button"]', function (e) {
-    //     $(e.target).closest('.btn').toggleClass('focus', /^focus(in)?$/.test(e.type))
-    //   })
 }
 (jQuery);

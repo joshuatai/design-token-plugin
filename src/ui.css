@@ -181,13 +181,13 @@
   align-items: center;
   justify-content: center;
   height: 32px;
+  margin-right: 8px;
 }
-.panel-header-text {
+#token-setting h6 {
   flex: 1;
-  font-weight: bold;
   font-size: 12px;
   line-height: 20px;
-  padding-left: 8px;
+  color: #333333;
 }
 #token-setting [contenteditable="true"] {
   width: 100%;
@@ -225,7 +225,34 @@
   height: 100px;
   background: #F5F5F5;
 }
-
+#property-list {
+  flex-wrap: wrap;
+  display: none;
+}
+#property-list ul {
+  margin: 0;
+  padding: 0;
+  flex-basis: 100%;
+}
+#property-list ul li {
+  display: flex;
+  align-items: center;
+}
+#property-list ul li .property-name {
+  width: 100px;
+}
+#property-list ul li .property-value {
+  flex: 1;
+}
+#property-list ul li .remove-property {
+  display: flex;
+  width: 16px;
+  height: 16px;
+  align-items: center;
+  justify-content: center;
+  margin: 6px;
+  cursor: pointer;
+}
 #add-property {
   border: 1px dashed #aaa;
   outline: none;
@@ -258,6 +285,7 @@
   width: auto;
 }
 #add-property .show,
+#property-list .show,
 #property-setting .show {
   display: block;
 }
@@ -334,8 +362,8 @@
   border-top-style: solid;
   border-top-width: 1px;
   border-left-width: 1px;
+  border-top-left-radius: 3px;
   border-left-style: solid;
-  border-radius: 3px;
 }
 .corner-radius-val {
   flex: 1;

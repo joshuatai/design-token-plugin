@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import MessageTypes from './MessageType';
-import TokenTypes from './TokenTypes';
+import PropertyTypes from './PropertyTypes';
 function clone(val) {
     const type = typeof val;
     if (val === null) {
@@ -44,13 +44,13 @@ figma.ui.onmessage = (msg) => __awaiter(this, void 0, void 0, function* () {
         postMessage(type, JSON.parse(figma.root.getPluginData('Tokens')));
     }
     if (type === MessageTypes.SET_TOKENS) {
-        figma.root.setPluginData('Tokens', JSON.stringify(message));
+        figma.root.setPluginData('Tokens', message);
     }
     if (type === MessageTypes.ASSIGN_TOKEN) {
         const { type: assignType, properties } = message;
         const selection = figma.currentPage.selection.slice();
         console.log(selection);
-        if (assignType === TokenTypes.FILL_COLOR) {
+        if (assignType === PropertyTypes.FILL_COLOR) {
             properties.map(property => {
                 console.log(property);
             });

@@ -2,24 +2,23 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { v4 } from 'uuid';
 import MessageTypes from './MessageType';
-import TokenTypes from './TokenTypes';
+import PropertyTypes from './PropertyTypes';
 import BrowserEvents from './BrowserEvents';
 import FillType from './FillType';
 import ColorMode from './ColorMode';
 import Token from './Token';
-import CornerRadius from './CornerRadius';
-import Radius from './Radius';
+import CornerRadius from './property-components/CornerRadius';
 import SelectText from './SelectText';
+import PropertyList from './PropertyList';
+import PluginDestroy from './PluginDestroy';
 import './ui.css';
 
 declare var $: any;
 
-Radius(jQuery);
+CornerRadius(jQuery);
 SelectText(jQuery);
-
-interface JQuery {
-  $name: string;
-}
+PropertyList(jQuery);
+PluginDestroy(jQuery);
 
 var Color = require('color');
 const { useEffect } = React;
@@ -28,7 +27,7 @@ declare function require(path: string): any
 
 
 let pluginData = [], pluginDataMap = {}, tokenDataMap = {};
-let $tokenContainer,$tokenSetting, $groupCreator, $tokenSettingGroupName, $tokenSettingTokenName, $tokenSettingDescription, $addProperty, $propertySetting, $propertyTypeContainer, $propertyType, $propertyChooseType, $propertySettingCancel, $propertySettingCreate, $propertySettingSections, $separatorToggle, $separatorModeSign;
+let $tokenContainer,$tokenSetting, $groupCreator, $tokenSettingGroupName, $tokenSettingTokenName, $tokenSettingDescription, $propertyList, $addProperty, $propertySetting, $propertyTypeContainer, $propertyType, $propertyChooseType, $propertySettingCancel, $propertySettingCreate, $propertySettingSections, $separatorToggle, $separatorModeSign;
 const groupPanel = '<div class="panel panel-default panel-collapse-shown"></div>';
 const groupPanelHeading = '<div class="panel-heading" data-toggle="collapse" aria-expanded="true"></div>';
 const groupPanelTitle = '<h6 class="panel-title"></h6>';
@@ -51,10 +50,10 @@ const percentToHex = (p) => {
   const hexValue = intValue.toString(16); // get hexadecimal representation
   return hexValue.padStart(2, '0').toUpperCase(); // format with leading 0 and upper case characters
 }
-function sendMessage (type: MessageTypes | String, message?: String | Object) {
+function sendMessage (type: MessageTypes | String, message: String | object = "") {
   parent.postMessage({ pluginMessage: {
     type,
-    message
+    message: JSON.stringify(message)
   } }, '*');
 }
 function init (data: Array<Object>) {
@@ -72,13 +71,20 @@ function init (data: Array<Object>) {
   $tokenContainer
 }
 function save () {
+  console.log(pluginData);
   sendMessage(MessageTypes.SET_TOKENS, pluginData.map(({ id, name, tokens }) => ({ id, name, tokens })));
 }
 function getGroup (id) {
   return pluginDataMap[id];
 }
-function getToken (id): Token {
-  return tokenDataMap[id];
+function getToken (id?): Token | Object {
+  let val;
+  if (id) {
+    val = tokenDataMap[id];
+  } else {
+    val = tokenDataMap;
+  }
+  return val;
 }
 function countGroupNumber () {
   return $('.group-name')
@@ -129,12 +135,12 @@ function renderToken (token: Token) {
   const $tokenName = $(tokenName).text(token.name);
   let $tokenThumbnails;
 
-  const thumbnailsCSS = thumbnailsBuilder(token.properties);
-  // console.log(token.type, TokenTypes.FILLS);
-  // if (token.type === TokenTypes.FILLS) {
+  // const thumbnailsCSS = thumbnailsBuilder(token.properties);
+  // console.log(token.type, PropertyTypes.FILLS);
+  // if (token.type === PropertyTypes.FILLS) {
   //   $tokenThumbnails = $(thumbnailsColor).attr('style', thumbnailsCSS);
   // }
-  // if (token.type === TokenTypes.STROKE) {
+  // if (token.type === PropertyTypes.STROKE) {
     
   // }
   return $(tokenItem)
@@ -151,7 +157,7 @@ function thumbnailsBuilder (properties) {
   const backgrounds = [];
   properties.forEach(property => {
     const { colorMode, colorCode, opacity } = property.value;
-    if (property.propType === TokenTypes.FILL_COLOR) {
+    if (property.propType === PropertyTypes.FILL_COLOR) {
       if (property.type === FillType.SOLID) {
         if (colorMode === ColorMode.HEX) {
           backgrounds.push(`${colorCode}${percentToHex(opacity * 100)}`);
@@ -163,6 +169,22 @@ function thumbnailsBuilder (properties) {
   return `background-color: ${backgrounds.join(',')}`;
 }
 
+function setToken (token: Token) {
+  if (!getToken(token.id)) {
+    tokenDataMap[token.id] = token;
+    getGroup(token.parent).tokens.push(token);
+  }
+}
+function unsetToken (token: Token) {
+  if (getToken(token.id)) {
+    delete tokenDataMap[token.id];
+    const tokens = getGroup(token.parent).tokens;
+    const index = tokens.findIndex(_token => {
+      return _token.id === token.id;
+    });
+    tokens.splice(index, 1);
+  }
+}
 function checkText (editable, data, propName) {
   const orgVal = data[propName];
   const newVal = editable.text();
@@ -179,7 +201,7 @@ function checkText (editable, data, propName) {
   } else {
     data[propName] = newVal;
     editable.text(newVal);
-    
+    // console.log(data);
     if (data instanceof Token) {
       if (data.properties.length > 0) {
         getGroup(data.parent).tokens.push(data);
@@ -193,7 +215,6 @@ function checkText (editable, data, propName) {
 function changeVal () {
   const $target = $(this);
   const id = $target.data('id');
-  console.log($target, id);
   let data;
   $target.removeAttr('invalid');
   if ($target.is('.group-name')) {
@@ -216,19 +237,28 @@ function inputVal (event) {
     return;
   }
   if (isRequired) {
-    !newVal ? $target.attr('invalid', "true") && $addProperty.attr('disabled', true) : $target.removeAttr('invalid') && $addProperty.removeAttr('disabled');
+    !newVal ? $target.attr('invalid', "true") && $addProperty.attr('disabled', true) && $propertySettingCreate.attr('disabled', true) : $target.removeAttr('invalid') && $addProperty.removeAttr('disabled') && $propertySettingCreate.removeAttr('disabled', true);
   }
 }
-
+function renderProperties () {
+  const { token } = $tokenSetting.data();
+  $propertyList.propertyList(token.properties);
+}
+function resetAddProperty () {
+  $addProperty.addClass('show');
+  $propertySetting.removeClass('show');
+  $propertySettingSections.destroy();
+}
 const Root = () => {
   useEffect(function () {
     $tokenContainer = $('#design-tokens-container');
     $tokenSetting = $('#token-setting');
     $groupCreator = $('#group-creator');
-    $tokenSettingGroupName = $('.panel-header-text');
+    $tokenSettingGroupName = $('#panel-group-name');
     $tokenSettingTokenName = $('#token-setting .token-name').attr('contenteditable', "true");
     $tokenSettingDescription = $('.token-description').attr('contenteditable', "true");
     $addProperty = $('#add-property');
+    $propertyList = $('#property-list');
     $propertySetting = $('#property-setting');
     $propertyTypeContainer = $('#property-type-row');
     $propertyType = $('#property-type');
@@ -268,8 +298,7 @@ const Root = () => {
       $tokenSetting
         .data({
           group: getGroup(group),
-          token: token ? getToken(token) : undefined,
-          properties: token ? getToken(token).properties : []
+          token: token ? getToken(token) : undefined
         })
         .addClass('show')
         .trigger('show');
@@ -310,7 +339,6 @@ const Root = () => {
       event.stopPropagation();
     });
     $(document).on(BrowserEvents.CLICK, '#turn-back-btn', function (event) {
-      
       $tokenSetting.removeData().removeClass('show');
       $tokenContainer.addClass('show');
     });
@@ -330,7 +358,8 @@ const Root = () => {
       token.name ? $addProperty.removeAttr('disabled') : $addProperty.attr('disabled', true);
       $tokenSettingDescription.text(token.description);
       $tokenSettingGroupName.text(group.name);
-      $tokenSettingTokenName.text(token.name).removeAttr('invalid').selectText();
+      $tokenSettingTokenName.text(token.name).removeAttr('invalid').data('id', token.id).selectText();
+      $propertyList.destroy();
       $propertySetting.removeClass('show');
 
     });
@@ -340,33 +369,40 @@ const Root = () => {
       $propertyTypeContainer.css('display', 'flex');
       $propertyChooseType.val(0).children('span').text('Choose a type of property');
       $propertySettingCreate.removeClass('show');
-      $('.property-setting-section').removeClass('show');
+      $propertySettingSections.removeClass('show');
     });
     $(document).on(BrowserEvents.CLICK, '#property-type li a', function (event) {
       const $option = $(this);
-      const __uuid = v4();
-      const { group, token, properties } = $tokenSetting.data();
-
-      const { type } = $option.data();
-      let data;
-      $propertyChooseType.val(type).children('span').text($option.text());
-      $propertySettingCreate.addClass('show');
-      $propertySettingSections.removeClass('show');
-
-      const $setting = $(`#property-${type.toLowerCase()}-setting`);
+      const type = $option.text();
       
-      if (type === TokenTypes.CORNER_RADIUS) {
-        data = new CornerRadius();
-        data.id = __uuid;
-        data.parent = token.id;
-        $setting.radius(data);
+      $propertyChooseType.val(type).children('span').text(type);
+      $propertySettingCreate.addClass('show');
+      $propertySettingSections.destroy();
+
+      if (type === PropertyTypes.CORNER_RADIUS) {
+        $propertySettingSections.radius();
       }
     });
-    $(document).on(BrowserEvents.CLICK, '#property-setting-cancel', function (event) {
-      $addProperty.addClass('show');
-      $propertySetting.removeClass('show');
+    $(document).on(BrowserEvents.CLICK, '#property-setting-cancel', resetAddProperty);
+    $(document).on(BrowserEvents.CLICK, '#property-setting-create', function () {
+      const { token } = $tokenSetting.data();
+      const { value } = $propertySettingSections.data();
+      value.parent = token.id;
+      token.properties.push(value);
+      $propertySettingSections.destroy();
+      setToken(token);
+      resetAddProperty();
+      save();
+      renderProperties();
     });
-    
+    $(document).on('property-remove', '#property-list', function () {
+      const { token } = $tokenSetting.data();
+      if (token.properties.length === 0) {
+        unsetToken(token);
+      }
+      save();
+      renderProperties();
+    })
     sendMessage(MessageTypes.GET_TOKENS);
   });
   return <div>
@@ -376,9 +412,9 @@ const Root = () => {
     <div id="token-setting" className="plugin-panel">
       <div className="property-setting-row">
         <div id="turn-back-btn">
-          <i className="tmicon tmicon-chevron-left"></i>
+          <svg className="svg" width="8" height="13" viewBox="0 0 8 13" xmlns="http://www.w3.org/2000/svg"><path d="M1 6.5l-.353-.354-.354.354.354.354L1 6.5zM6.647.146l-6 6 .707.708 6-6-.707-.708zm-6 6.708l6 6 .707-.708-6-6-.707.708z" fillRule="nonzero" fillOpacity="1" fill="inherit" stroke="none"></path></svg>
         </div>
-        <span className="panel-header-text"></span>
+        <h6 id="panel-group-name"></h6>
       </div>
       <div className="property-setting-row">
         <span className="token-name" prop-name="name" placeholder="Token Name" is-required="true"></span>
@@ -389,9 +425,7 @@ const Root = () => {
       <div className="property-setting-row preview-area">
         <div className="preview-box"></div>
       </div>
-      <div id="property-list" className="property-setting-row">
-
-      </div>
+      <div id="property-list" className="property-setting-row"></div>
       <div className="property-setting-row">
         <button id="add-property" type="button">Create New Property</button>
       </div>
@@ -403,17 +437,17 @@ const Root = () => {
               <span>Choose a type of property</span>
             </button>
             <ul className="dropdown-menu">
-              <li><a data-type={TokenTypes.CORNER_RADIUS} href="javascript:;">Corner Radius</a></li>
-              <li><a data-type={TokenTypes.EFFECT} href="javascript:;">Effect</a></li>
-              <li><a data-type={TokenTypes.FILL_COLOR} href="javascript:;">Fill Color</a></li>
-              <li><a data-type={TokenTypes.OPACITY} href="javascript:;">Opacity</a></li>
-              <li><a data-type={TokenTypes.STROKE_COLOR} href="javascript:;">Stroke Color</a></li>
-              <li><a data-type={TokenTypes.STROKE_DASH} href="javascript:;">Stroke Dash Pattern</a></li>
-              <li><a data-type={TokenTypes.STROKE_WIDTH_ALIGH} href="javascript:;">Stroke Width/Align</a></li>
+              <li><a href="javascript:;">{PropertyTypes.CORNER_RADIUS}</a></li>
+              <li><a href="javascript:;">{PropertyTypes.EFFECT}</a></li>
+              <li><a href="javascript:;">{PropertyTypes.FILL_COLOR}</a></li>
+              <li><a href="javascript:;">{PropertyTypes.OPACITY}</a></li>
+              <li><a href="javascript:;">{PropertyTypes.STROKE_COLOR}</a></li>
+              <li><a href="javascript:;">{PropertyTypes.STROKE_DASH}</a></li>
+              <li><a href="javascript:;">{PropertyTypes.STROKE_WIDTH_ALIGH}</a></li>
             </ul>
           </div>
         </div>
-        <div id="property-corner_radius-setting" className="property-setting-row property-setting-section"></div>
+        <div className="property-setting-row property-setting-section"></div>
         <div className="property-setting-row">
           <button id="property-setting-cancel" type="button" className="btn btn-sm btn-border">Cancel</button> <button id="property-setting-create" type="button" className="btn btn-sm btn-primary">Create</button>
         </div>
