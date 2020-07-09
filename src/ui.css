@@ -5,6 +5,9 @@
   font-weight: normal;
   font-style: normal;
 } */
+body {
+  background: #fff;
+}
 .plugin-panel {
   height: 100%;
   background: #ffffff;
@@ -168,12 +171,13 @@
   box-shadow: 0 0 0 1px #fff;
 }
 
-.property-setting-row {
+.setting-row {
   display: flex;
   padding-left: 8px;
   padding-right: 8px;
   align-items: center;
   box-sizing: border-box;
+  white-space: initial;
 }
 #turn-back-btn {
   width: 20px;
@@ -188,6 +192,7 @@
   font-size: 12px;
   line-height: 20px;
   color: #333333;
+  margin: 0;
 }
 #token-setting [contenteditable="true"] {
   width: 100%;
@@ -195,9 +200,6 @@
 [contenteditable="true"][placeholder]:empty:before {
   content: attr(placeholder);
   color: #aaa; 
-}
-.property-setting-row {
-  white-space: initial;
 }
 .token-name,
 .token-discribtion {
@@ -261,7 +263,6 @@
   width: 100%;
   margin: 8px 0;
   color: #999;
-  display: none;;
 }
 #add-property:hover {
   background: #E7F5FF;
@@ -289,10 +290,11 @@
 #property-setting .show {
   display: block;
 }
-#property-setting .property-setting-row ~ .property-setting-row {
+#property-setting .setting-row ~ .setting-row {
   margin-top: 8px;
 }
 #property-type-row {
+  display: flex;
   margin-top: 8px;
 }
 #property-type-row.active {

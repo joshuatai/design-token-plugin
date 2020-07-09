@@ -1,8 +1,8 @@
 import validator from 'validator';
 import camelize from './utils/camelize';
-import BrowserEvents from './BrowserEvents';
+import BrowserEvents from './enums/BrowserEvents';
 import { Mixed } from './symbols';
-import PropertyTypes from './PropertyTypes';
+import PropertyTypes from './enums/PropertyTypes';
 import { icon as CornerRadiusIcon } from './property-components/CornerRadius';
 
 const icons = {
@@ -76,7 +76,7 @@ export default function ($) {
     if ($target.options && $target.options.length > 0) {
       $target.options.splice(index, 1);
     }
-    console.log($target.options);
+    // console.log($target.options);
     $target.$element.trigger('property-remove');
   });
 

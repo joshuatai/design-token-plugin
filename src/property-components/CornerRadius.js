@@ -1,7 +1,7 @@
 import validator from 'validator';
 import CornerRadius from '../CornerRadius';
 import camelize from '../utils/camelize';
-import BrowserEvents from '../BrowserEvents';
+import BrowserEvents from '../enums/BrowserEvents';
 import { Mixed } from '../symbols';
 //<div>
 //       <div className="token-val">

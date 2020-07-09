@@ -1,6 +1,6 @@
-import MessageTypes from './MessageType';
-import ColorMode from './ColorMode';
-import PropertyTypes from './PropertyTypes';
+import MessageTypes from './enums/MessageType';
+import ColorMode from './enums/ColorMode';
+import PropertyTypes from './enums/PropertyTypes';
 
 function clone(val) {
   const type = typeof val
@@ -40,7 +40,7 @@ figma.ui.onmessage = async (msg) => {
   if (type === MessageTypes.ASSIGN_TOKEN) {
     const { type: assignType, properties }  = message;
     const selection = figma.currentPage.selection.slice();
-    console.log(selection);
+    // console.log(selection);
     if (assignType === PropertyTypes.FILL_COLOR) {
       properties.map(property => {
         console.log(property);

@@ -1,4 +1,4 @@
-import PropertyTypes from './PropertyTypes';
+import PropertyTypes from './enums/PropertyTypes';
 import { icon as CornerRadiusIcon } from './property-components/CornerRadius';
 const icons = {
     [PropertyTypes.CORNER_RADIUS]: CornerRadiusIcon
@@ -64,7 +64,7 @@ export default function ($) {
         if ($target.options && $target.options.length > 0) {
             $target.options.splice(index, 1);
         }
-        console.log($target.options);
+        // console.log($target.options);
         $target.$element.trigger('property-remove');
     });
 }

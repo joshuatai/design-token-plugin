@@ -1,5 +1,5 @@
 import { v4 } from 'uuid';
-import PropertyType from './PropertyTypes';
+import PropertyType from './enums/PropertyTypes';
 class CornerRadius {
     constructor(options) {
         this.type = PropertyType.CORNER_RADIUS;

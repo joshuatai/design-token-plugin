@@ -9,6 +9,7 @@
         "key": "@red:10",
         "description": "This is one color of the red serious.",
         "type": "FILLS",
+        "parent": "537068cb-a42b-4313-9024-a3121b8e2b34",
         "properties": [
           {
             "propType": "FILLS",
@@ -27,6 +28,7 @@
         "key": "@red:20",
         "description": "This is one color of the red serious.",
         "type": "FILLS",
+        "parent": "537068cb-a42b-4313-9024-a3121b8e2b34",
         "properties": [
           {
             "propType": "FILLS",
@@ -45,6 +47,7 @@
         "key": "@red:30",
         "description": "This is one color of the red serious.",
         "type": "FILLS",
+        "parent": "537068cb-a42b-4313-9024-a3121b8e2b34",
         "properties": [
           {
             "propType": "FILLS",
@@ -84,6 +87,7 @@
           "key": "@form-control-border-color",
           "description": "This is the border color for the form control components.",
           "type": "STROKE",
+          "parent": "8bd8481e-f62b-4aa1-85dd-509699714114",
           "properties": [
             {
               "propType": "SOLID",
@@ -100,6 +104,7 @@
           "key": "@form-control-border-color-hover",
           "description": "This is the border color for the hovered form control components.",
           "type": "FILLS",
+          "parent": "8bd8481e-f62b-4aa1-85dd-509699714114",
           "properties": [
             {
               "propType": "FILLS",
@@ -114,6 +119,7 @@
             "key": "@form-control-border-color-focus",
             "description": "This is the border color for the focused form control components.",
             "type": "FILLS",
+            "parent": "8bd8481e-f62b-4aa1-85dd-509699714114",
             "properties": [
               {
                 "propType": "FILLS",
@@ -121,7 +127,7 @@
                 "value": "@blue:60"
               }
             ]
-          },
+          }
       ]
   }
 ]

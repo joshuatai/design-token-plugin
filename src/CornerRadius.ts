@@ -1,5 +1,5 @@
 import { v4 } from 'uuid';
-import PropertyType from './PropertyTypes';
+import PropertyType from './enums/PropertyTypes';
 class CornerRadius {
   private type: string = PropertyType.CORNER_RADIUS;
   private _id: string = v4();
