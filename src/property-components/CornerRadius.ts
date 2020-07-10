@@ -1,5 +1,5 @@
 import validator from 'validator';
-import CornerRadius from '../CornerRadius';
+import CornerRadius from '../model/CornerRadius';
 import camelize from '../utils/camelize';
 import BrowserEvents from '../enums/BrowserEvents';
 import { Mixed } from '../symbols';
@@ -16,6 +16,7 @@ export default function ($) {
   const NAME = 'radius';
   var Radius = function (element, options) {
     this.options   = new CornerRadius(options);
+    console.log(this.options);
     this.$element  = $(element).attr('property-component', NAME).addClass('show');
     this.$customVal = $('<div class="custom-val"></div>');
     this.$valContainer = $('<div class="val-container"></div>');

@@ -10,16 +10,18 @@ import percentToHex from './utils/percentToHex';
 import preventEvent from  './utils/preventEvent';
 import Group from './model/Group';
 import Token from './model/Token';
+import Properties from './model/Properties';
 import { inputCheck, valChange } from './utils/inputValidator';
-import CornerRadius from './property-components/CornerRadius';
+import CornerRadiusComponent from './property-components/CornerRadius';
 import SelectText from './SelectText';
 import PluginDestroy from './PluginDestroy';
+import camelize from './utils/camelize';
 import './ui.css';
 
 declare var $: any;
 
 TokenSetting(jQuery);
-CornerRadius(jQuery);
+CornerRadiusComponent(jQuery);
 SelectText(jQuery);
 PluginDestroy(jQuery);
 
@@ -68,6 +70,7 @@ const Renderer = {
       )
       .data({
         data: group,
+        $heading,
         $name: $name,
         $tokenList,
         $expend
@@ -77,7 +80,7 @@ const Renderer = {
     return $group;
   },
   token: function (token: Token) {
-    const { $tokenList } = $(`#${token.parent}`).data();
+    const { $tokenList, $expend } = $(`#${token.parent}`).data();
     const $token = $(`<li id="${token.id}" class="token-item"></li>`)
       .data({
         'group': token.parent,
@@ -96,18 +99,29 @@ const Renderer = {
     // }
     $token.data = token;
     $tokenList.append($token);
+    $expend.show();
 
     return $token
       .append($tokenThumbnails)
       .append($tokenName);
   },
   updateToken: function (token: Token) {
+    const { $expend, $heading } = $(`#${token.parent}`).data();
     const $token = $(`#${token.id}`);
     $('.token-key', $token).text(token.name);
-
     if ($token.length === 0) {
       this.token(token);
     }
+    if ($heading.is('[aria-expanded="false"]')) {
+      $expend.trigger('click');
+    }
+  },
+  removeToken: function (token: Token) {
+    const group = getGroup(token.parent);
+    const { $expend } = $(`#${token.parent}`).data();
+
+    $(`#${token.id}`).remove();
+    if (group.tokens.length === 1) $expend.hide();
   }
 };
 
@@ -122,16 +136,22 @@ function init (groups: Array<Object>) {
     setGroup(data);
     if (group.tokens.length > 0) {
       group.tokens.forEach(token => {
+        token.properties = token.properties.map((property: any) => {
+          if (property._type) {
+            return new Properties[property._type.replace(' ', '')](property);
+          }
+          return property;
+        });
         const $token = Renderer.token(new Token(token));
         setToken($token.data);
       });
-      $expend.show();
       if (!isTokenOpen) {
         isTokenOpen = true;
         $expend.trigger('click');
       }
     }
   });
+  console.log(getData());
 }
 
 function createGroup () {
@@ -229,23 +249,12 @@ const Root = () => {
         Renderer.updateToken(token);
       } else {
         //need to chaeck if there is a token or component already refer this token
-        removeToken(token)
+        Renderer.removeToken(token);
+        removeToken(token);
       }
       save();
       $tokenContainer.addClass('show');
     });
-    
-    
-    //
-    
-    // $(document).on('property-remove', '#property-list', function () {
-    //   const { token } = $tokenSetting.data();
-    //   if (token.properties.length === 0) {
-    //     unsetToken(token);
-    //   }
-    //   save();
-    //   Renderer.properties();
-    // });
     fetch();
   });
   return (

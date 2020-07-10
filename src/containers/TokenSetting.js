@@ -4,7 +4,7 @@ import Token from '../model/Token';
 import { inputCheck, valChange } from '../utils/inputValidator';
 import PropertyTypes from '../enums/PropertyTypes';
 import PropertyList from '../PropertyList';
-let $host;
+let hostData;
 const backIcon = `
   <div id="turn-back-btn">
     <svg
@@ -28,6 +28,7 @@ PropertyList(jQuery);
 export default function ($) {
     const NAME = 'TokenSetting';
     var TokenSetting = function (element, { group, token }) {
+        hostData = this;
         this.group = getGroup(group);
         this.token = getToken(token) || setToken(new Token({ parent: group }));
         const $headerRow = $(`
@@ -84,7 +85,7 @@ export default function ($) {
         const $settingButtonsRow = $('<div class="setting-row" />');
         const $settingCreateBtn = $(`<button id="property-setting-create" type="button" class="btn btn-sm btn-primary">Create</button>`);
         const $settingCancelBtn = $(`<button id="property-setting-cancel" type="button" class="btn btn-sm btn-border">Cancel</button>`);
-        $host = this.$element = $(element)
+        this.$element = $(element)
             .append($headerRow)
             .append($tokenNameRow.append($tokenName.append(this.token.name)))
             .append($descriptionRow.append($description.append(this.token.description)))
@@ -113,6 +114,9 @@ export default function ($) {
             $tokenName.selectText();
             $createProperty.attr('disabled', true);
         }
+        if (this.token.properties.length > 0) {
+            this.$propertyList.propertyList(this.token.properties);
+        }
     };
     TokenSetting.prototype.canAddProperty = function () {
         this.$createProperty.add(this.$settingCreateBtn).attr('disabled', !this.$tokenName.text());
@@ -137,9 +141,25 @@ export default function ($) {
         value.parent = this.token.id;
         this.token.properties.push(value);
         this.$propertySettingSections.destroy();
-        this.propertyEditToggle();
         this.$propertyList.propertyList(this.token.properties);
+        this.propertyEditToggle();
         save();
+    };
+    TokenSetting.prototype.removeProperty = function (property) {
+        $.each(this.token.properties, (i, prop) => {
+            if (prop && prop.id === property.id) {
+                this.token.properties.splice(i, 1);
+            }
+        });
+        this.updateProperty();
+    };
+    TokenSetting.prototype.updateProperty = function () {
+        if (this.token.properties.length > 0) {
+            this.$propertyList.propertyList(this.token.properties);
+        }
+        else {
+            this.$propertyList.destroy();
+        }
     };
     TokenSetting.prototype.destroy = function () {
         return this.$element.empty().removeData();
@@ -165,27 +185,32 @@ export default function ($) {
     function canAddProperty(callback) {
         return function (e) {
             callback.call(this, e);
-            $host.data('TokenSetting').canAddProperty();
+            hostData.canAddProperty();
         };
     }
     // done
     $(document).on(BrowserEvents.CLICK, '#turn-back-btn', $.debounce(260, function () {
-        const { token } = $host.data('TokenSetting');
-        $host.trigger('destroy:TokenSetting', [token]).destroy();
+        const { token } = hostData;
+        hostData.$element.trigger('destroy:TokenSetting', [token]).destroy();
     }));
     $(document).on(`${BrowserEvents.KEY_UP}`, '.token-name, .token-description', canAddProperty(inputCheck));
     $(document).on(`${BrowserEvents.BLUR}`, '.token-name, .token-description', canAddProperty(valChange));
     $(document).on(BrowserEvents.CLICK, '#add-property, #property-setting-cancel', function () {
-        const { TokenSetting } = $host.data();
-        TokenSetting.propertyEditToggle();
+        hostData.propertyEditToggle();
     });
     $(document).on(BrowserEvents.CLICK, '#property-type a', function (event) {
-        const { TokenSetting } = $host.data();
-        TokenSetting.choosePropertyType($(this).text());
+        hostData.choosePropertyType($(this).text());
     });
     $(document).on(BrowserEvents.CLICK, '#property-setting-create', function () {
-        const { TokenSetting } = $host.data();
-        TokenSetting.createProperty();
+        hostData.createProperty();
+    });
+    $(document).on('property-remove', '#property-list', function (event, property) {
+        hostData.removeProperty(property);
+        hostData.propertyEditToggle();
+    });
+    $(document).on('property-sort', '#property-list', function (event, properties) {
+        hostData.token.properties = properties;
+        save();
     });
 }
 (jQuery);

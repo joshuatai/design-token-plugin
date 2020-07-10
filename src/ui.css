@@ -230,15 +230,53 @@ body {
 #property-list {
   flex-wrap: wrap;
   display: none;
+  margin-top: 8px;
 }
 #property-list ul {
-  margin: 0;
+  margin: 0 -8px;
   padding: 0;
   flex-basis: 100%;
 }
 #property-list ul li {
   display: flex;
+  position: relative;
   align-items: center;
+  cursor: pointer;
+  padding: 0 8px;
+}
+#property-list ul.sortable li {
+  padding-left: 12px;
+}
+.ui-sortable-placeholder {
+  background: #f4f4f4;
+  height: 28px;
+}
+.ui-sortable-handle {
+  width: 8px;
+  height: 26px;
+  top: 1px;
+  left: 2px;
+  cursor: move;
+  position: absolute;
+  background-image: url(icon_indicator.png);
+  background-repeat: no-repeat;
+  background-position: center center;
+  display: none;
+}
+#property-list ul li:hover {
+  background: #f4f4f4;
+}
+#property-list ul li.ui-sortable-helper:hover {
+  background: #ffffff;
+  border: 1px solid #ccc;
+}
+#property-list ul.sortable li:hover .ui-sortable-handle {
+  display: block;
+}
+.dragged {
+  position: absolute;
+  opacity: 0.5;
+  z-index: 2000;
 }
 #property-list ul li .property-name {
   width: 100px;
