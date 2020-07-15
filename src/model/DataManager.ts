@@ -1,15 +1,23 @@
-import MessageTypes from '../enums/MessageType';
+import _cloneDeep from 'lodash/cloneDeep'
+import MessageTypes from 'enums/MessageTypes';
+import PropertyTypes from 'enums/PropertyTypes';
+import { Mixed } from 'symbols/index';
 import Group from './Group';
 import Token from './Token';
 
 const data: Array<Group> = [];
 const groupMap = {};
 const tokenMap = {};
-
+const propertiesMap = {};
+const pureToken = {
+  [PropertyTypes.CORNER_RADIUS]: {}
+};
 const fetch = () => sendMessage(MessageTypes.GET_TOKENS);
-const getData = (): Array<Group> => data;
+const getAllGroup = (): Array<Group> => data;
 const getGroup = (id): Group => groupMap[id];
-const getToken = (id?): Token => tokenMap[id];
+const getToken = (id): Token => tokenMap[id];
+const getAllToken = (): Array<Token> => Object.values(tokenMap);
+const getPureToken = (type): Object => pureToken[type];
 const setGroup = (group: Group): Group => {
   data.push(group);
   groupMap[group.id] = group;
@@ -30,11 +38,28 @@ const removeToken = (token: Token) => {
     tokens.splice(index, 1);
   }
 };
+const setProperty = property => propertiesMap[property.id] = property;
+const getProperty = id => propertiesMap[id];
+const clearProperty = () => Object.keys(propertiesMap).forEach(key => delete propertiesMap[key]);
+const setPureToken = (token: Token) => token.propertyType && token.propertyType !== Mixed && (pureToken[token.propertyType][token.id] = token);
 const save = () => {
-  // console.log("save", data);
-  sendMessage (
+  const _data = _cloneDeep(data);
+  clearProperty();
+  sendMessage(
     MessageTypes.SET_TOKENS,
-    data.map(({ id, name, tokens }) => ({ id, name, tokens }))
+    _data.map(({ id, name, tokens }) => {
+      tokens.forEach((token: Token) => {
+        setPureToken(token);
+        if (token.propertyType === Mixed) token.propertyType = String(Mixed);
+        token.properties.forEach((property: any) => {
+          setProperty(property);
+          if (property.type === PropertyTypes.CORNER_RADIUS && property.radius === Mixed) {
+            property.radius = String(Mixed);
+          }
+        })
+      });
+      return { id, name, tokens };
+    })
   );
 };
 const sendMessage = (type: MessageTypes | String, message: String | object = "") => parent.postMessage(
@@ -49,11 +74,16 @@ const sendMessage = (type: MessageTypes | String, message: String | object = "")
 
 export {
   fetch,
-  getData,
+  getAllGroup,
   getGroup,
+  getAllToken,
   getToken,
+  getPureToken,
+  getProperty,
   setGroup,
   setToken,
+  setPureToken,
   removeToken,
-  save
+  save,
+  sendMessage
 };

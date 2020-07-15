@@ -95,7 +95,7 @@ body {
   margin: 0;
   padding: 0;
 }
-.token-item {
+.token-list .token-item {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -196,6 +196,7 @@ body {
 }
 #token-setting [contenteditable="true"] {
   width: 100%;
+  transition: all .2s;
 }
 [contenteditable="true"][placeholder]:empty:before {
   content: attr(placeholder);
@@ -208,9 +209,11 @@ body {
   text-overflow: ellipsis;
 }
 .token-name:focus,
-.token-discribtion:focus {
+.token-description:focus {
   text-overflow: initial;
   white-space: initial;
+  font-size: 16px;
+  line-height: 20px;
 }
 .token-discribtion {
   color: #aaa;
@@ -222,29 +225,34 @@ body {
   text-decoration: none;
   color: inherit;
 }
-.preview-area {
+#property-view {
   margin-top: 8px;
+  padding: 20px;
   height: 100px;
-  background: #F5F5F5;
+  background: #cccccc;
+}
+#property-view .preview-box {
+  width: 100%;
+  height: 100%;
 }
 #property-list {
   flex-wrap: wrap;
   display: none;
   margin-top: 8px;
 }
-#property-list ul {
+#property-list > ul {
   margin: 0 -8px;
   padding: 0;
   flex-basis: 100%;
 }
-#property-list ul li {
+#property-list > ul > li {
   display: flex;
   position: relative;
   align-items: center;
   cursor: pointer;
   padding: 0 8px;
 }
-#property-list ul.sortable li {
+#property-list > ul.sortable > li {
   padding-left: 12px;
 }
 .ui-sortable-placeholder {
@@ -258,19 +266,19 @@ body {
   left: 2px;
   cursor: move;
   position: absolute;
-  background-image: url(icon_indicator.png);
+  background-image: url(./img/icon_indicator.png);
   background-repeat: no-repeat;
   background-position: center center;
   display: none;
 }
-#property-list ul li:hover {
+#property-list > ul > li:hover {
   background: #f4f4f4;
 }
-#property-list ul li.ui-sortable-helper:hover {
+#property-list > ul > li.ui-sortable-helper:hover {
   background: #ffffff;
   border: 1px solid #ccc;
 }
-#property-list ul.sortable li:hover .ui-sortable-handle {
+#property-list > ul.sortable > li:hover .ui-sortable-handle {
   display: block;
 }
 .dragged {
@@ -278,13 +286,17 @@ body {
   opacity: 0.5;
   z-index: 2000;
 }
-#property-list ul li .property-name {
-  width: 100px;
+#property-list > ul > li .property-name {
+  width: 80px;
 }
-#property-list ul li .property-value {
+#property-list > ul > li .property-value {
   flex: 1;
+  white-space: nowrap;
+  width: 10px;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
-#property-list ul li .remove-property {
+#property-list > ul > li .remove-property {
   display: flex;
   width: 16px;
   height: 16px;
@@ -292,6 +304,10 @@ body {
   justify-content: center;
   margin: 6px;
   cursor: pointer;
+}
+#property-list > ul > li .remove-property[disabled] {
+  opacity: 0.3;
+  cursor: not-allowed;
 }
 #add-property {
   border: 1px dashed #aaa;
@@ -319,6 +335,7 @@ body {
 }
 #property-setting {
   display: none;
+  margin-bottom: 8px;
 }
 #property-setting [contenteditable="true"] {
   width: auto;
@@ -407,7 +424,14 @@ body {
 }
 .corner-radius-val {
   flex: 1;
+  padding-left: 0;
+  padding-right: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  width: 10px;
+  text-overflow: ellipsis;
 }
+.detach-token,
 .use-token,
 .separator-icon {
   width: 28px;
@@ -417,6 +441,7 @@ body {
   justify-content: center;
   border-radius: 3px;
 }
+.detach-token:hover,
 .use-token:hover {
   background: rgba(0,0,0,.06);
 }

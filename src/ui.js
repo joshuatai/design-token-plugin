@@ -9,22 +9,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { fetch, getData, getGroup, setGroup, setToken, removeToken, save } from './model/DataManager';
+import { fetch, getAllGroup, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, save, sendMessage } from './model/DataManager';
 import TokenSetting from './containers/TokenSetting';
-import PropertyTypes from './enums/PropertyTypes';
-import BrowserEvents from './enums/BrowserEvents';
-import FillType from './enums/FillType';
-import ColorMode from './enums/ColorMode';
-import percentToHex from './utils/percentToHex';
-import preventEvent from './utils/preventEvent';
-import Group from './model/Group';
-import Token from './model/Token';
-import Properties from './model/Properties';
-import { inputCheck, valChange } from './utils/inputValidator';
-import CornerRadiusComponent from './property-components/CornerRadius';
-import SelectText from './SelectText';
-import PluginDestroy from './PluginDestroy';
+import PropertyTypes from 'enums/PropertyTypes';
+import BrowserEvents from 'enums/BrowserEvents';
+import FillType from 'enums/FillType';
+import ColorMode from 'enums/ColorMode';
+import percentToHex from 'utils/percentToHex';
+import preventEvent from 'utils/preventEvent';
+import Group from 'model/Group';
+import Token from 'model/Token';
+import Properties from 'model/Properties';
+import { inputCheck, valChange } from 'utils/inputValidator';
+import CornerRadiusComponent from './containers/property-components/CornerRadius';
+import SelectText from 'utils/selectText';
+import PluginDestroy from 'utils/PluginDestroy';
 import './ui.css';
+import MessageTypes from 'enums/MessageTypes';
+import { Mixed } from './symbols';
 TokenSetting(jQuery);
 CornerRadiusComponent(jQuery);
 SelectText(jQuery);
@@ -36,7 +38,7 @@ const thumbnailsColor = '<span class="token-icon color-token-icon"></span>';
 const $tokenEditBtn = $('<button type="button" class="token-edit-btn"><svg class="svg" width="12" height="14" viewBox="0 0 12 14" xmlns="http://www.w3.org/2000/svg"><path d="M2 7.05V0h1v7.05c1.141.232 2 1.24 2 2.45 0 1.21-.859 2.218-2 2.45V14H2v-2.05c-1.141-.232-2-1.24-2-2.45 0-1.21.859-2.218 2-2.45zM4 9.5c0 .828-.672 1.5-1.5 1.5-.828 0-1.5-.672-1.5-1.5C1 8.672 1.672 8 2.5 8 3.328 8 4 8.672 4 9.5zM9 14h1V6.95c1.141-.232 2-1.24 2-2.45 0-1.21-.859-2.218-2-2.45V0H9v2.05c-1.141.232-2 1.24-2 2.45 0 1.21.859 2.218 2 2.45V14zm2-9.5c0-.828-.672-1.5-1.5-1.5C8.672 3 8 3.672 8 4.5 8 5.328 8.672 6 9.5 6c.828 0 1.5-.672 1.5-1.5z" fill-rule="evenodd" fill-opacity="1" fill="#000" stroke="none"></path></svg></button>');
 const Utils = {
     newGroupName: () => {
-        const lastNumber = getData()
+        const lastNumber = getAllGroup()
             .filter((group) => (group.name.match(/^Group \d+$/) ? true : false))
             .map(group => (Number(group.name.replace('Group ', ''))))
             .sort()
@@ -81,7 +83,6 @@ const Renderer = {
         const $tokenName = $('<span class="token-key"></span>').text(token.name);
         let $tokenThumbnails;
         // const thumbnailsCSS = thumbnailsBuilder(token.properties);
-        // console.log(token.type, PropertyTypes.FILLS);
         // if (token.type === PropertyTypes.FILLS) {
         //   $tokenThumbnails = $(thumbnailsColor).attr('style', thumbnailsCSS);
         // }
@@ -125,13 +126,13 @@ function init(groups) {
         if (group.tokens.length > 0) {
             group.tokens.forEach(token => {
                 token.properties = token.properties.map((property) => {
-                    if (property._type) {
-                        return new Properties[property._type.replace(' ', '')](property);
-                    }
-                    return property;
+                    return new Properties[property._type.replace(' ', '')](property);
                 });
+                if (token.propertyType === String(Mixed))
+                    token.propertyType = Mixed;
                 const $token = Renderer.token(new Token(token));
                 setToken($token.data);
+                setPureToken($token.data);
             });
             if (!isTokenOpen) {
                 isTokenOpen = true;
@@ -139,7 +140,6 @@ function init(groups) {
             }
         }
     });
-    console.log(getData());
 }
 function createGroup() {
     const $group = Renderer.group(new Group({
@@ -175,7 +175,7 @@ const Root = () => {
             if (type === BrowserEvents.CLICK) {
                 $('.token-item-selected').removeClass('token-item-selected');
                 $tokenItem.addClass('token-item-selected');
-                // DataManager.sendMessage(MessageTypes.ASSIGN_TOKEN ,tokenItem.data('token'));
+                sendMessage(MessageTypes.ASSIGN_TOKEN, getToken($tokenItem.data('token')));
             }
             if (type === BrowserEvents.MOUSE_OVER) {
                 $tokenItem.append($tokenEditBtn);
@@ -249,5 +249,10 @@ class App extends React.Component {
 ReactDOM.render(React.createElement(App, null), document.getElementById('react-page'));
 window.onmessage = (event) => __awaiter(void 0, void 0, void 0, function* () {
     const msg = event.data.pluginMessage;
-    init(msg.message);
+    if (msg.type === MessageTypes.GET_TOKENS) {
+        init(msg.message);
+    }
+    if (msg.type === MessageTypes.SELECTION_CHANGE) {
+        $('#design-tokens-container').trigger('click');
+    }
 });

@@ -1,22 +1,23 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { fetch, getData, getGroup, setGroup, getToken, setToken, removeToken, save } from './model/DataManager';
+import { fetch, getAllGroup, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, save, sendMessage } from './model/DataManager';
 import TokenSetting from './containers/TokenSetting';
-import PropertyTypes from './enums/PropertyTypes';
-import BrowserEvents from './enums/BrowserEvents';
-import FillType from './enums/FillType';
-import ColorMode from './enums/ColorMode';
-import percentToHex from './utils/percentToHex';
-import preventEvent from  './utils/preventEvent';
-import Group from './model/Group';
-import Token from './model/Token';
-import Properties from './model/Properties';
-import { inputCheck, valChange } from './utils/inputValidator';
-import CornerRadiusComponent from './property-components/CornerRadius';
-import SelectText from './SelectText';
-import PluginDestroy from './PluginDestroy';
-import camelize from './utils/camelize';
+import PropertyTypes from 'enums/PropertyTypes';
+import BrowserEvents from 'enums/BrowserEvents';
+import FillType from 'enums/FillType';
+import ColorMode from 'enums/ColorMode';
+import percentToHex from 'utils/percentToHex';
+import preventEvent from  'utils/preventEvent';
+import Group from 'model/Group';
+import Token from 'model/Token';
+import Properties from 'model/Properties';
+import { inputCheck, valChange } from 'utils/inputValidator';
+import CornerRadiusComponent from './containers/property-components/CornerRadius';
+import SelectText from 'utils/selectText';
+import PluginDestroy from 'utils/PluginDestroy';
 import './ui.css';
+import MessageTypes from 'enums/MessageTypes';
+import { Mixed } from './symbols';
 
 declare var $: any;
 
@@ -36,7 +37,7 @@ const $tokenEditBtn = $('<button type="button" class="token-edit-btn"><svg class
 
 const Utils = {
   newGroupName: (): string => {
-    const lastNumber = getData()
+    const lastNumber = getAllGroup()
       .filter((group) => (group.name.match(/^Group \d+$/) ? true : false))
       .map(group => (Number(group.name.replace('Group ', ''))))
       .sort()
@@ -90,7 +91,6 @@ const Renderer = {
     const $tokenName = $('<span class="token-key"></span>').text(token.name);
     let $tokenThumbnails;
     // const thumbnailsCSS = thumbnailsBuilder(token.properties);
-    // console.log(token.type, PropertyTypes.FILLS);
     // if (token.type === PropertyTypes.FILLS) {
     //   $tokenThumbnails = $(thumbnailsColor).attr('style', thumbnailsCSS);
     // }
@@ -137,13 +137,12 @@ function init (groups: Array<Object>) {
     if (group.tokens.length > 0) {
       group.tokens.forEach(token => {
         token.properties = token.properties.map((property: any) => {
-          if (property._type) {
-            return new Properties[property._type.replace(' ', '')](property);
-          }
-          return property;
+          return new Properties[property._type.replace(' ', '')](property);
         });
+        if (token.propertyType === String(Mixed)) token.propertyType = Mixed;
         const $token = Renderer.token(new Token(token));
         setToken($token.data);
+        setPureToken($token.data);
       });
       if (!isTokenOpen) {
         isTokenOpen = true;
@@ -151,7 +150,6 @@ function init (groups: Array<Object>) {
       }
     }
   });
-  console.log(getData());
 }
 
 function createGroup () {
@@ -193,7 +191,7 @@ const Root = () => {
         if ( type === BrowserEvents.CLICK) {
           $('.token-item-selected').removeClass('token-item-selected');
           $tokenItem.addClass('token-item-selected');
-          // DataManager.sendMessage(MessageTypes.ASSIGN_TOKEN ,tokenItem.data('token'));
+          sendMessage(MessageTypes.ASSIGN_TOKEN ,getToken($tokenItem.data('token')));
         }
         if (type === BrowserEvents.MOUSE_OVER) {
           $tokenItem.append($tokenEditBtn);
@@ -276,5 +274,10 @@ ReactDOM.render(<App />, document.getElementById('react-page'));
 
 window.onmessage = async (event) => {
   const msg = event.data.pluginMessage;
-  init(msg.message);
+  if (msg.type === MessageTypes.GET_TOKENS) {
+    init(msg.message);
+  }
+  if (msg.type === MessageTypes.SELECTION_CHANGE) {
+    $('#design-tokens-container').trigger('click');
+  }
 }

@@ -1,12 +1,23 @@
 {
   "compilerOptions": {
     "target": "es6",
+    "baseUrl": ".",
+    "paths": {
+      "model/*": ["src/model/*"],
+      "utils/*": ["src/utils/*"],
+      "enums/*": ["src/enums/*"],
+      "symbols/*": ["src/symbols/*"]
+    },
     "jsx": "react",
     "moduleResolution": "node",
     "lib": [
       "es2017",
       "dom",
       "scripthost"
+    ],
+    "typeRoots": [
+      "./node_modules/@types",
+      "./node_modules/@figma"
     ]
   }
 }

@@ -1,6 +1,7 @@
-import MessageTypes from './enums/MessageType';
-import ColorMode from './enums/ColorMode';
-import PropertyTypes from './enums/PropertyTypes';
+import NodeTypes from 'enums/NodeTypes';
+import MessageTypes from 'enums/MessageTypes';
+import PropertyTypes from 'enums/PropertyTypes';
+import Token from 'model/Token';
 
 function clone(val) {
   const type = typeof val
@@ -27,6 +28,58 @@ function clone(val) {
 function postMessage (type: String, message: String | Object): void {
   figma.ui.postMessage({ type, message });
 }
+
+function supportsChildren(node: SceneNode):
+  node is FrameNode | ComponentNode | InstanceNode | BooleanOperationNode
+{
+  const { FRAME, GROUP, COMPONENT, INSTANCE, BOOLEAN_OPERATION } = NodeTypes;
+  return node.type === FRAME ||
+         node.type === GROUP ||
+         node.type === COMPONENT ||
+         node.type === INSTANCE ||
+         node.type === BOOLEAN_OPERATION
+}
+// function nonSupportsChildren(node: SceneNode):
+//   node is RectangleNode | LineNode | EllipseNode | PolygonNode | StarNode | VectorNode | TextNode {
+//     const { RECTANGLE, LINE, ELLIPSE, POLYGON, STAR, VECTOR, TEXT } = NodeTypes;
+//     return node.type == RECTANGLE ||
+//            node.type == LINE ||
+//            node.type == ELLIPSE ||
+//            node.type == POLYGON ||
+//            node.type == STAR ||
+//            node.type == VECTOR ||
+//            node.type == TEXT
+// }
+function hasMixedCornerNode (node):
+  node is RectangleNode {
+    return node.type === NodeTypes.RECTANGLE;
+}
+function hasCornerNode (node):
+  node is RectangleNode | PolygonNode | StarNode | VectorNode {
+    const { RECTANGLE, POLYGON, STAR, VECTOR } = NodeTypes;
+    return node.type === RECTANGLE ||
+           node.type === POLYGON ||
+           node.type === STAR ||
+           node.type === VECTOR
+}
+function assignProperty (properties, node) {
+  const cornerRadius = properties[PropertyTypes.CORNER_RADIUS];
+  if (cornerRadius) {
+    const { radius, topLeft, topRight, bottomRight, bottomLeft } = cornerRadius;
+    node.type === NodeTypes.GROUP && node.children.forEach(child => {
+      assignProperty(properties, child);
+    });
+    console.log(properties);
+    if (radius !== undefined && hasCornerNode(node)) {
+      node.cornerRadius = radius;
+    } else if (hasMixedCornerNode(node)) {
+      node.topLeftRadius = topLeft;
+      node.topRightRadius = topRight;
+      node.bottomRightRadius = bottomRight;
+      node.bottomLeftRadius = bottomLeft;
+    } 
+  }
+}
 figma.showUI(__html__, { visible: true, width: 240, height: 500 });
 
 figma.ui.onmessage = async (msg) => {
@@ -38,21 +91,19 @@ figma.ui.onmessage = async (msg) => {
     figma.root.setPluginData('Tokens', message);
   }
   if (type === MessageTypes.ASSIGN_TOKEN) {
-    const { type: assignType, properties }  = message;
-    const selection = figma.currentPage.selection.slice();
-    // console.log(selection);
-    if (assignType === PropertyTypes.FILL_COLOR) {
-      properties.map(property => {
-        console.log(property);
-      });
-    }
+    const { id, properties } = JSON.parse(message);
+    const _properties = properties.reduce((calc, property) => {
+      if (property._type === PropertyTypes.CORNER_RADIUS) calc[PropertyTypes.CORNER_RADIUS] = property;
+      return calc;
+    }, {});
 
-    for (const node of selection) {
-      
-        // properties
-        // const fills = clone(node.fills);
-        // console.log(fills);
-      
-    }
+    const selection = figma.currentPage.selection.slice();
+    selection.forEach((node: any) => {
+      assignProperty(_properties, node);
+    });
   }
-}
+};
+figma.on("selectionchange", () => {
+  console.log(figma.currentPage.selection);
+  postMessage(MessageTypes.SELECTION_CHANGE, figma.currentPage.selection);
+});

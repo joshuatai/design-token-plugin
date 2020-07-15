@@ -1,6 +1,8 @@
-import BrowserEvents from './enums/BrowserEvents';
-import PropertyTypes from './enums/PropertyTypes';
+import preventEvent from 'utils/preventEvent';
+import BrowserEvents from 'enums/BrowserEvents';
+import PropertyTypes from 'enums/PropertyTypes';
 import { icon as CornerRadiusIcon } from './property-components/CornerRadius';
+import { getToken } from 'model/DataManager';
 const icons = {
     [PropertyTypes.CORNER_RADIUS]: CornerRadiusIcon
 };
@@ -18,15 +20,27 @@ export default function ($) {
                 .append($title)
                 .append(this.$propertyContainer
                 .append(options.map((property, index) => {
+                const parent = getToken(property.parent);
                 const icon = icons[property.type];
+                const $remove = $(`<span class="remove-property">${removeIcon}</span>`);
                 let value;
                 let title;
                 if (property.type === PropertyTypes.CORNER_RADIUS) {
-                    value = property.radius;
                     if (typeof property.radius === 'symbol') {
                         value = 'Mixed';
                         title = `top-left: ${property.topLeft}; top-right: ${property.topRight}; bottom-right: ${property.bottomRight}; bottom-left: ${property.bottomLeft};`;
                     }
+                    else {
+                        value = property.radius;
+                        title = `corner radius: ${property.radius}`;
+                    }
+                    if (property.useToken) {
+                        value = getToken(property.useToken).name;
+                    }
+                    // parent.usedBy.length > 0 && $remove.attr({
+                    //   'disabled': true,
+                    //   'title': `This token has been linked by token: ${parent.usedBy.map(id => getToken(id).name)}`
+                    // })
                 }
                 return $(`
                 <li class="property-item">
@@ -36,7 +50,7 @@ export default function ($) {
                   <span class="property-value" ${title ? 'title="' + title + '"' : ''}>${value}</span>
                 </li>
               `)
-                    .append($(`<span class="remove-property">${removeIcon}</span>`))
+                    .append($remove)
                     .data('property', property);
             })));
         }
@@ -49,7 +63,7 @@ export default function ($) {
         }
     };
     PropertyList.prototype.destroy = function () {
-        return this.$element.empty().removeData().removeClass('show');
+        return this.$element.empty().removeData().hide();
     };
     function Plugin(option) {
         return this.each(function () {
@@ -70,14 +84,16 @@ export default function ($) {
         return this;
     };
     $(document).on(BrowserEvents.CLICK, '.property-item', function () {
+        $host.trigger('property-edit', [$(this).data('property')]);
     });
-    $(document).on(BrowserEvents.CLICK, `#${NAME} .remove-property`, function () {
-        $host.trigger('property-remove', $(this).parent().data('property'));
+    $(document).on(BrowserEvents.CLICK, `#${NAME} .remove-property`, function (event) {
+        !$(this).is('[disabled]') && $host.trigger('property-remove', $(this).parent().data('property'));
+        preventEvent(event);
     });
     $(document).on("sortupdate", '.property-item-container', function (event, ui) {
         const { $propertyContainer } = $host.data('property-list');
         const data = $.makeArray($propertyContainer.children().map((i, prop) => $(prop).data('property')));
-        $host.trigger('property-sort', data);
+        $host.trigger('property-sort', [data]);
     });
 }
 (jQuery);

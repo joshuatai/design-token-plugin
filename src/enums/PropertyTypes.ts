@@ -5,7 +5,8 @@ enum PropertyTypes {
     OPACITY = 'Opacity',
     STROKE_COLOR = 'Stroke Color',
     STROKE_DASH = 'Stroke Dash Pattern',
-    STROKE_WIDTH_ALIGH = 'Stroke Width/Align'
+    STROKE_WIDTH_ALIGH = 'Stroke Width/Align',
+    MIXED = 'Mixed'
 }
 
 export default PropertyTypes;
