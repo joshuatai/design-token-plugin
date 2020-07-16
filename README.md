@@ -1,13 +1,14 @@
-# React 
+# Design Token for the Figma plugin 
 
 <img src="../_screenshots/webpack.png" width="400" />
 
-Creates rectangles (same as the [Webpack sample plugin][webpack]).
+Provide design token system to improve the deveopement processes
 
 This demonstrates:
 
+- pull the source code into your plugin folder
 - bundling plugin code using Webpack, and
-- using React with TSX.
+- using React with TSX and TypeScript
 
 The main plugin code is in `src/code.ts`. The HTML for the UI is in
 `src/ui.html`, while the embedded JavaScript is in `src/ui.tsx`.
@@ -20,4 +21,3 @@ To build:
     $ npm install
     $ npx webpack
 
-[webpack]: ../webpack/
