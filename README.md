@@ -1,4 +1,4 @@
-# React 
+# Design Token for the Figma plugin 
 
 <img src="../_screenshots/webpack.png" width="400" />
 
