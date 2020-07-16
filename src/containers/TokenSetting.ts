@@ -1,7 +1,7 @@
 import _cloneDeep from 'lodash/cloneDeep';
 import _findIndex from 'lodash/findIndex';
 import BrowserEvents from '../enums/BrowserEvents';
-import { getGroup, getToken, setToken, save } from '../model/DataManager';
+import { getGroup, getToken, setToken, syncToken, save } from '../model/DataManager';
 import Token from '../model/Token';
 import { inputCheck, valChange } from '../utils/inputValidator';
 import PropertyTypes from '../enums/PropertyTypes';
@@ -214,6 +214,8 @@ export default function ($) {
     }
     this.propertyEdit(false);
     this.$propertyView.propertyView(this.token.properties);
+    
+    syncToken(this.token);
     save();
   };
   TokenSetting.prototype.propertyView = function (property) {

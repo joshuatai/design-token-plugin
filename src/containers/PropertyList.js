@@ -2,7 +2,7 @@ import preventEvent from 'utils/preventEvent';
 import BrowserEvents from 'enums/BrowserEvents';
 import PropertyTypes from 'enums/PropertyTypes';
 import { icon as CornerRadiusIcon } from './property-components/CornerRadius';
-import { getToken } from 'model/DataManager';
+import { getToken, referByToken } from 'model/DataManager';
 const icons = {
     [PropertyTypes.CORNER_RADIUS]: CornerRadiusIcon
 };
@@ -20,9 +20,14 @@ export default function ($) {
                 .append($title)
                 .append(this.$propertyContainer
                 .append(options.map((property, index) => {
-                const parent = getToken(property.parent);
+                const token = getToken(property.parent);
                 const icon = icons[property.type];
+                const referTokens = referByToken(token);
                 const $remove = $(`<span class="remove-property">${removeIcon}</span>`);
+                referTokens.length > 0 && $remove.attr({
+                    'disabled': true,
+                    'title': `This token has been linked by token: ${referTokens.map(token => token.name)}`
+                });
                 let value;
                 let title;
                 if (property.type === PropertyTypes.CORNER_RADIUS) {
@@ -37,10 +42,6 @@ export default function ($) {
                     if (property.useToken) {
                         value = getToken(property.useToken).name;
                     }
-                    // parent.usedBy.length > 0 && $remove.attr({
-                    //   'disabled': true,
-                    //   'title': `This token has been linked by token: ${parent.usedBy.map(id => getToken(id).name)}`
-                    // })
                 }
                 return $(`
                 <li class="property-item">

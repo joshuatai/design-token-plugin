@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { fetch, getAllGroup, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, save, sendMessage } from './model/DataManager';
+import { fetch, getAllGroup, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage } from './model/DataManager';
 import TokenSetting from './containers/TokenSetting';
 import PropertyTypes from 'enums/PropertyTypes';
 import BrowserEvents from 'enums/BrowserEvents';
@@ -126,7 +126,9 @@ function init(groups) {
         if (group.tokens.length > 0) {
             group.tokens.forEach(token => {
                 token.properties = token.properties.map((property) => {
-                    return new Properties[property._type.replace(' ', '')](property);
+                    const data = new Properties[property._type.replace(' ', '')](property);
+                    setProperty(data);
+                    return data;
                 });
                 if (token.propertyType === String(Mixed))
                     token.propertyType = Mixed;

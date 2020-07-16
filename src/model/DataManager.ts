@@ -8,16 +8,24 @@ import Token from './Token';
 const data: Array<Group> = [];
 const groupMap = {};
 const tokenMap = {};
-const propertiesMap = {};
+let propertiesMap = {};
 const pureToken = {
   [PropertyTypes.CORNER_RADIUS]: {}
+};
+const clearPureToken = () => {
+  Object.keys(pureToken).forEach(key => {
+    pureToken[key] = {};
+  });
 };
 const fetch = () => sendMessage(MessageTypes.GET_TOKENS);
 const getAllGroup = (): Array<Group> => data;
 const getGroup = (id): Group => groupMap[id];
 const getToken = (id): Token => tokenMap[id];
 const getAllToken = (): Array<Token> => Object.values(tokenMap);
+const getProperty = id => propertiesMap[id];
+const getAllProperty = () => Object.values(propertiesMap);
 const getPureToken = (type): Object => pureToken[type];
+
 const setGroup = (group: Group): Group => {
   data.push(group);
   groupMap[group.id] = group;
@@ -39,20 +47,18 @@ const removeToken = (token: Token) => {
   }
 };
 const setProperty = property => propertiesMap[property.id] = property;
-const getProperty = id => propertiesMap[id];
-const clearProperty = () => Object.keys(propertiesMap).forEach(key => delete propertiesMap[key]);
 const setPureToken = (token: Token) => token.propertyType && token.propertyType !== Mixed && (pureToken[token.propertyType][token.id] = token);
 const save = () => {
   const _data = _cloneDeep(data);
-  clearProperty();
+  propertiesMap = {};
+  clearPureToken();
   sendMessage(
     MessageTypes.SET_TOKENS,
-    _data.map(({ id, name, tokens }) => {
-      tokens.forEach((token: Token) => {
+    _data.map(({ id, name, tokens }, groupIndex) => {
+      tokens.forEach((token: Token, tokenIndex) => {
         setPureToken(token);
         if (token.propertyType === Mixed) token.propertyType = String(Mixed);
-        token.properties.forEach((property: any) => {
-          setProperty(property);
+        token.properties.forEach((property: any, propIndex) => {setProperty(data[groupIndex].tokens[tokenIndex].properties[propIndex]);
           if (property.type === PropertyTypes.CORNER_RADIUS && property.radius === Mixed) {
             property.radius = String(Mixed);
           }
@@ -62,6 +68,26 @@ const save = () => {
     })
   );
 };
+const syncToken = (token: Token) => {
+  const refer: any = token.properties[0];
+  getAllProperty().forEach((property: any) => {
+    const hostToken = getToken(property.parent);
+    if (property.useToken === token.id) {
+      if (property.type === PropertyTypes.CORNER_RADIUS) {
+        property.topLeft = refer.topLeft;
+        property.topRight = refer.topRight;
+        property.bottomRight = refer.bottomRight;
+        property.bottomLeft = refer.bottomLeft;
+        property.radius = refer.radius;
+      } 
+      if (hostToken.properties.length === 1) syncToken(hostToken);
+    }
+  });
+};
+const referByToken = (token: Token): Array<Token> =>
+  getAllProperty()
+    .filter((property: any) => property.useToken === token.id)
+    .map((property: any) => getToken(property.parent));
 const sendMessage = (type: MessageTypes | String, message: String | object = "") => parent.postMessage(
   {
     pluginMessage: {
@@ -78,12 +104,16 @@ export {
   getGroup,
   getAllToken,
   getToken,
-  getPureToken,
   getProperty,
+  getPureToken,
+
   setGroup,
   setToken,
+  setProperty,
   setPureToken,
   removeToken,
   save,
+  syncToken,
+  referByToken,
   sendMessage
 };
