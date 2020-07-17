@@ -4,6 +4,7 @@ import BrowserEvents from '../enums/BrowserEvents';
 import { getGroup, getToken, setToken, syncToken, save } from '../model/DataManager';
 import Token from '../model/Token';
 import { inputCheck, valChange } from '../utils/inputValidator';
+import propertyConponents from './property-components';
 import PropertyTypes from '../enums/PropertyTypes';
 import PropertyView from './PropertyView';
 import PropertyList from './PropertyList';
@@ -29,7 +30,7 @@ const backIcon = `
     </svg>
   </div>
 `;
-
+const PropertyConponents = propertyConponents(jQuery);
 PropertyView(jQuery);
 PropertyList(jQuery);
 
@@ -177,13 +178,13 @@ export default function ($) {
       this.$settingCreateBtn.show();
     }
     this.$propertyTypeBtn.val(type).children('span').text(type);
-    this.$propertySettingSections.destroy();
-    if (type === PropertyTypes.CORNER_RADIUS) {
-      this.$propertySettingSections.data({
+    this.$propertySettingSections
+      .destroy()
+      .data({
         token: this.token,
         propertyView: this.$propertyView
-      }).radius(param);
-    }
+      });
+    this.$propertySettingSections[PropertyConponents[type]](param);
   };
   TokenSetting.prototype.createProperty = function () {
     const { value } = this.$propertySettingSections.data();
@@ -225,7 +226,6 @@ export default function ($) {
       const existIndex = _findIndex(tmpProperties, prop => prop.id === property.id);
       existIndex > -1 ? tmpProperties[existIndex] = property : tmpProperties.push(property);
     }
-
     this.$propertyView.propertyView(tmpProperties);
   }
   TokenSetting.prototype.destroy = function () {

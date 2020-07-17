@@ -6,9 +6,7 @@ const data = [];
 const groupMap = {};
 const tokenMap = {};
 let propertiesMap = {};
-const pureToken = {
-    [PropertyTypes.CORNER_RADIUS]: {}
-};
+const pureToken = Object.keys(PropertyTypes).reduce((calc, type) => (calc[PropertyTypes[type]] = {}, calc), {});
 const clearPureToken = () => {
     Object.keys(pureToken).forEach(key => {
         pureToken[key] = {};

@@ -12,7 +12,7 @@ import Group from 'model/Group';
 import Token from 'model/Token';
 import Properties from 'model/Properties';
 import { inputCheck, valChange } from 'utils/inputValidator';
-import CornerRadiusComponent from './containers/property-components/CornerRadius';
+
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
 import './ui.css';
@@ -20,9 +20,7 @@ import MessageTypes from 'enums/MessageTypes';
 import { Mixed } from './symbols';
 
 declare var $: any;
-
 TokenSetting(jQuery);
-CornerRadiusComponent(jQuery);
 SelectText(jQuery);
 PluginDestroy(jQuery);
 
@@ -137,7 +135,7 @@ function init (groups: Array<Object>) {
     if (group.tokens.length > 0) {
       group.tokens.forEach(token => {
         token.properties = token.properties.map((property: any) => {
-          const data = new Properties[property._type.replace(' ', '')](property);
+          const data = new Properties[property._type.replace(/[^A-Za-z]/g, '')](property);
           setProperty(data);
           return data;
         });

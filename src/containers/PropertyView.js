@@ -6,6 +6,11 @@ const consolidateProperties = (properties) => (properties.reduce((calc, property
         calc['border-bottom-right-radius'] = property.bottomRight;
         calc['border-bottom-left-radius'] = property.bottomLeft;
     }
+    if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
+        calc['border-width'] = `${property.width}px`;
+        calc['border-style'] = 'solid';
+        calc['border-color'] = '#000000';
+    }
     return calc;
 }, {}));
 export default function ($) {

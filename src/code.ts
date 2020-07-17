@@ -39,20 +39,10 @@ function supportsChildren(node: SceneNode):
          node.type === INSTANCE ||
          node.type === BOOLEAN_OPERATION
 }
-// function nonSupportsChildren(node: SceneNode):
-//   node is RectangleNode | LineNode | EllipseNode | PolygonNode | StarNode | VectorNode | TextNode {
-//     const { RECTANGLE, LINE, ELLIPSE, POLYGON, STAR, VECTOR, TEXT } = NodeTypes;
-//     return node.type == RECTANGLE ||
-//            node.type == LINE ||
-//            node.type == ELLIPSE ||
-//            node.type == POLYGON ||
-//            node.type == STAR ||
-//            node.type == VECTOR ||
-//            node.type == TEXT
-// }
 function hasMixedCornerNode (node):
-  node is RectangleNode {
-    return node.type === NodeTypes.RECTANGLE;
+  node is ComponentNode | RectangleNode {
+    return node.type === NodeTypes.RECTANGLE ||
+           node.type === NodeTypes.COMPONENT;
 }
 function hasCornerNode (node):
   node is RectangleNode | PolygonNode | StarNode | VectorNode {
@@ -62,14 +52,23 @@ function hasCornerNode (node):
            node.type === STAR ||
            node.type === VECTOR
 }
+function hasStrokeNode (node):
+  node is EllipseNode | LineNode | RectangleNode | PolygonNode | StarNode | TextNode
+{
+  const { ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR } = NodeTypes;
+  return [ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR].includes(node.type);
+}
 function assignProperty (properties, node) {
   const cornerRadius = properties[PropertyTypes.CORNER_RADIUS];
+  const strokeWidthAlign = properties[PropertyTypes.STROKE_WIDTH_ALIGN];
+
+  node.type === NodeTypes.GROUP && node.children.forEach(child => {
+    assignProperty(properties, child);
+  });
+
   if (cornerRadius) {
     const { radius, topLeft, topRight, bottomRight, bottomLeft } = cornerRadius;
-    node.type === NodeTypes.GROUP && node.children.forEach(child => {
-      assignProperty(properties, child);
-    });
-    console.log(properties);
+    
     if (radius !== undefined && hasCornerNode(node)) {
       node.cornerRadius = radius;
     } else if (hasMixedCornerNode(node)) {
@@ -79,6 +78,14 @@ function assignProperty (properties, node) {
       node.bottomLeftRadius = bottomLeft;
     } 
   }
+  if (strokeWidthAlign) {
+    const { width, align } = strokeWidthAlign;
+    if (width && hasStrokeNode(node)) {
+      node.strokeWeight = width;
+      console.log(node.strokes);
+    }
+  }
+
 }
 figma.showUI(__html__, { visible: true, width: 240, height: 500 });
 
@@ -93,7 +100,11 @@ figma.ui.onmessage = async (msg) => {
   if (type === MessageTypes.ASSIGN_TOKEN) {
     const { id, properties } = JSON.parse(message);
     const _properties = properties.reduce((calc, property) => {
-      if (property._type === PropertyTypes.CORNER_RADIUS) calc[PropertyTypes.CORNER_RADIUS] = property;
+      if (
+        property._type === PropertyTypes.CORNER_RADIUS ||
+        property._type === PropertyTypes.STROKE_WIDTH_ALIGN
+      ) calc[property._type] = property;
+
       return calc;
     }, {});
 

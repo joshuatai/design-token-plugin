@@ -2,10 +2,12 @@ import preventEvent from 'utils/preventEvent';
 import BrowserEvents from 'enums/BrowserEvents';
 import PropertyTypes from 'enums/PropertyTypes';
 import { icon as CornerRadiusIcon } from './property-components/CornerRadius';
+import { icon as StrokeWidthIcon } from './property-components/StrokeWidthAlign';
 import { getToken, referByToken } from 'model/DataManager';
 
 const icons = {
-  [PropertyTypes.CORNER_RADIUS]: CornerRadiusIcon
+  [PropertyTypes.CORNER_RADIUS]: CornerRadiusIcon,
+  [PropertyTypes.STROKE_WIDTH_ALIGN]: StrokeWidthIcon
 }
 const removeIcon = '<svg class="svg" width="12" height="6" viewBox="0 0 12 6" xmlns="http://www.w3.org/2000/svg"><path d="M11.5 3.5H.5v-1h11v1z" fill-rule="nonzero" fill-opacity="1" fill="#000" stroke="none"></path></svg>';
 let $host;
@@ -42,11 +44,13 @@ export default function ($) {
                   value = property.radius;
                   title = `corner radius: ${property.radius}`;
                 }
-                if (property.useToken) {
-                  value = getToken(property.useToken).name;
-                }
               }
-              
+              if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
+                value = property.width;
+              }
+              if (property.useToken) {
+                value = getToken(property.useToken).name;
+              }
               return $(`
                 <li class="property-item">
                   <span class="sortable-handler"></span>

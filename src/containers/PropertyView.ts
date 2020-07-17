@@ -1,5 +1,4 @@
 import PropertyTypes from 'enums/PropertyTypes';
-import { Mixed } from 'symbols/index'
 
 const consolidateProperties = (properties) => (
   properties.reduce((calc, property) => {
@@ -9,7 +8,11 @@ const consolidateProperties = (properties) => (
       calc['border-bottom-right-radius'] = property.bottomRight;
       calc['border-bottom-left-radius'] = property.bottomLeft;
     }
-    
+    if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
+      calc['border-width'] = `${property.width}px`;
+      calc['border-style'] = 'solid';
+      calc['border-color'] = '#000000';
+    }
     return calc;
   }, {})
 );

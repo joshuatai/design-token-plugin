@@ -6,10 +6,10 @@ import { Mixed } from 'symbols/index';
 import { getToken, getPureToken } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
 let hostData;
+const NAME = 'radius';
 const separators = ['top-left', 'top-right', 'bottom-right', 'bottom-left'];
 export const icon = '<span class="corner-radius-icon"></span>';
 export default function ($) {
-    const NAME = 'radius';
     var Radius = function (element, options) {
         const tokensMap = getPureToken(PropertyTypes.CORNER_RADIUS);
         const tokenList = Object.keys(tokensMap).map(key => tokensMap[key]);
@@ -92,19 +92,19 @@ export default function ($) {
     function Plugin(option) {
         return this.each(function () {
             var $this = $(this);
-            var data = $this.data('radius');
+            var data = $this.data(NAME);
             var options = typeof option == 'object' && option;
             if (data)
                 data.destroy(), data = undefined;
             if (!data)
-                $this.data('radius', (data = new Radius(this, options)));
+                $this.data(NAME, (data = new Radius(this, options)));
         });
     }
-    var old = $.fn.radius;
-    $.fn.radius = Plugin;
-    $.fn.radius.Constructor = Radius;
-    $.fn.radius.noConflict = function () {
-        $.fn.radius = old;
+    var old = $.fn[NAME];
+    $.fn[NAME] = Plugin;
+    $.fn[NAME].Constructor = Radius;
+    $.fn[NAME].noConflict = function () {
+        $.fn[NAME] = old;
         return this;
     };
     $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] [contenteditable="true"]`, function () {
@@ -169,5 +169,6 @@ export default function ($) {
     $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .detach-token`, function (event) {
         hostData.detachToken($(this).data('token'));
     });
+    return NAME;
 }
 (jQuery);
