@@ -1,4 +1,5 @@
 import PropertyTypes from 'enums/PropertyTypes';
+import StrokeAligns from 'enums/StrokeAligns';
 
 const consolidateProperties = (properties) => (
   properties.reduce((calc, property) => {
@@ -12,6 +13,7 @@ const consolidateProperties = (properties) => (
       calc['border-width'] = `${property.width}px`;
       calc['border-style'] = 'solid';
       calc['border-color'] = '#000000';
+      if (property.align === StrokeAligns.OUTSIDE) calc['box-sizing'] = 'content-box';
     }
     return calc;
   }, {})

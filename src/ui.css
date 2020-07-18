@@ -227,13 +227,14 @@ body {
 }
 #property-view {
   margin-top: 8px;
-  padding: 20px;
+  padding: 0;
   height: 100px;
   background: #cccccc;
+  justify-content: center;
 }
 #property-view .preview-box {
-  width: 100%;
-  height: 100%;
+  width: 200px;
+  height: 60px;
 }
 #property-list {
   flex-wrap: wrap;
@@ -363,6 +364,7 @@ body {
 }
 #property-setting button {
   min-width: 0;
+  position: relative;
 }
 #property-setting-create {
   display: none;
@@ -381,6 +383,8 @@ body {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+}
+[property-component="radius"] .custom-val {
   flex-direction: row-reverse;
 }
 .token-val {
@@ -392,7 +396,7 @@ body {
   display: flex;
   align-items: center;
   flex: 1;
-  height: 30px;
+  height: 32px;
 }
 [aria-pressed="true"] + .val-container {
   pointer-events: none;
@@ -414,7 +418,7 @@ body {
 .corner-radius-icon {
   width: 16px;
   height: 16px;
-  margin: 6px 8px 6px 6px;
+  margin: 7px 8px 7px 6px;
   border-color: #B3B3B3;
   border-top-style: solid;
   border-top-width: 1px;
@@ -425,8 +429,8 @@ body {
 .detach-token,
 .use-token,
 .separator-icon {
-  width: 28px;
-  height: 28px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -453,9 +457,10 @@ body {
   background-clip: content-box;
   position: relative;
   transform: translateZ(0);
+  margin-left: 2px;
 }
 .separator-icon:hover {
-  box-shadow: inset 0 0 0 1px #e6e6e6;
+  border: 1px solid #e6e6e6;
 }
 .separator-icon.active {
   background-image: none;
@@ -463,15 +468,16 @@ body {
   outline: none;
 }
 .separator-icon.active:hover {
-  box-shadow: inset 0 0 0 1px #e6e6e6;
+  border: 1px solid #e6e6e6;
   border-radius: 3px;
 }
-
 .separator-icon.active::after {
   content: '';
   position: absolute;
-  width: 24px;
-  height: 24px;
+  top: 2px;
+  right: 2px;
+  width: 26px;
+  height: 26px;
   border-radius: 2px;
   background-color: #e6e6e6;
   z-index: -1;
@@ -535,6 +541,18 @@ span.stroke-width-icon:after {
   margin-top: 3px;
   width: 12px;
 }
+.stroke-align {
+  margin-left: 2px;
+}
+.stroke-align .dropdown-toggle,
+.stroke-align .dropdown-menu li a {
+  text-transform: lowercase;
+}
+.stroke-align .dropdown-toggle::first-letter,
+.stroke-align .dropdown-menu li a::first-letter {
+  text-transform: capitalize;
+}
+
 .corner-radius-val,
 .stroke-val {
   flex: 1;

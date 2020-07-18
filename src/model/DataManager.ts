@@ -57,7 +57,8 @@ const save = () => {
       tokens.forEach((token: Token, tokenIndex) => {
         setPureToken(token);
         if (token.propertyType === Mixed) token.propertyType = String(Mixed);
-        token.properties.forEach((property: any, propIndex) => {setProperty(data[groupIndex].tokens[tokenIndex].properties[propIndex]);
+        token.properties.forEach((property: any, propIndex) => {
+          setProperty(data[groupIndex].tokens[tokenIndex].properties[propIndex]);
           if (property.type === PropertyTypes.CORNER_RADIUS && property.radius === Mixed) {
             property.radius = String(Mixed);
           }

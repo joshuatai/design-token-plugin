@@ -140,9 +140,10 @@ export default function ($) {
         this.$propertySettingSections.hide().destroy();
         this.$propertyTypeDropdowns.children().show();
         this.token.properties.forEach(property => {
-            if (property.type === PropertyTypes.CORNER_RADIUS) {
+            if (property.type === PropertyTypes.CORNER_RADIUS)
                 this.$propertyOption_CORNER_RADIUS.hide();
-            }
+            if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN)
+                this.$propertyOption_STROKE_WIDTH_ALIGN.hide();
         });
         if (property) {
             this.choosePropertyType(property);

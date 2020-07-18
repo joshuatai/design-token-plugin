@@ -1,10 +1,10 @@
 import validator from 'validator';
 import StrokeWidthAlign from 'model/StrokeWidthAlign';
-import camelize from 'utils/camelize';
 import BrowserEvents from 'enums/BrowserEvents';
-import { Mixed } from 'symbols/index';
 import { getToken, getPureToken } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
+import StrokeAligns from 'enums/StrokeAligns';
+import camelize from 'utils/camelize';
 
 let hostData;
 const NAME = 'stroke';
@@ -22,6 +22,16 @@ export default function ($) {
     this.$valContainer = $('<div class="val-container"></div>');
     this.$StokeIcon = $(icon);
     this.$stokeValue = $('<span class="stroke-val"></span>').attr('contenteditable', !useToken);
+    this.$align = $('<div class="stroke-align btn-group" />');
+    this.$alignDropdownBtn = $(`
+      <button type="button" class="btn btn-border dropdown-toggle" data-toggle="dropdown">
+        <span class="tmicon tmicon-caret-down"></span>
+
+      </button>
+    `);
+    this.$alignDropdownBtnVal = $(`<span>${this.options.align}</span>`);
+    this.$alignDropdowns = $(`<ul class="dropdown-menu pull-right" />`);
+    this.$alignOptions = Object.keys(StrokeAligns).reduce((calc, key) => calc.add($(`<li><a href="#">${key}</a></li>`)), $());
     this.$detachToken = $(`
       <div class="detach-token">
         <svg class="svg" width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><path d="M4 0v3h1V0H4zm9.103.896c-1.162-1.161-3.045-1.161-4.207 0l-2.75 2.75.707.708 2.75-2.75c.771-.772 2.022-.772 2.793 0 .771.77.771 2.021 0 2.792l-2.75 2.75.707.708 2.75-2.75c1.162-1.162 1.162-3.046 0-4.208zM.896 13.103c-1.162-1.161-1.162-3.045 0-4.207l2.75-2.75.707.708-2.75 2.75c-.771.77-.771 2.021 0 2.792.771.772 2.022.772 2.793 0l2.75-2.75.707.707-2.75 2.75c-1.162 1.162-3.045 1.162-4.207 0zM14 10h-3V9h3v1zM10 11v3H9v-3h1zM3 4H0v1h3V4z" fill-rule="nonzero" fill-opacity=".9" fill="#000" stroke="none"></path></svg>
@@ -35,20 +45,13 @@ export default function ($) {
       </div>`
     );
 
-
     this.$tokenList = $('<ul class="dropdown-menu pull-right"></ul>');
-    // this.$separateToggle = $('<button id="separator-toggle" type="button" class="btn separator-icon" data-toggle="button" aria-pressed="false" autoComplete="off"><svg class="svg" width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h3v1H1v2H0V0zm7 0h3v3H9V1H7V0zM1 9V7H0v3h3V9H1zm9-2v3H7V9h2V7h1z" fill-rule="nonzero" fill-opacity="1" fill="#000" stroke="none"></path></svg></button>');
-    // this.$separateSetting =  $('<div class="separator-vals"></div>');
-    // this.$separateIcon = $('<i class="separator-mode-sign" separate-type="top-left"></i>');
-    // this.$separatorGroup = $('<div class="btn-group"></div>');
-    // this.$separateRadius;
     this.$propertyView = this.$element.data('propertyView');
     this.token = this.$element.data('token');
     
     this.$element
       .append(
         this.$customVal
-          // .append(this.$separateToggle[useToken ? 'hide' : 'show']())
           .append(
             this.$valContainer
               .append(this.$StokeIcon)
@@ -62,6 +65,11 @@ export default function ($) {
                 )) :
                 null
               )
+          )
+          .append(
+            this.$align
+              .append(this.$alignDropdownBtn.append(this.$alignDropdownBtnVal))
+              .append(this.$alignDropdowns.append(this.$alignOptions))
           )
           // .append(
           //   this.$separateSetting
@@ -88,18 +96,12 @@ export default function ($) {
     });
     this.$stokeValue.text(token.name).attr('contenteditable', false);
     this.$detachToken.data('token', token).show();
-    // this.$separateToggle.hide();
   }
   Stroke.prototype.detachToken = function (token) {
     const usedProperty = token.properties[0];
     this.options.useToken = '';
     this.$stokeValue.text(usedProperty.width).attr('contenteditable', true);
-    // separators.forEach(type => {
-    //   $(`[data-separate-type="${type}"]`).text(this.options[camelize(type)]);
-    // })
-
     this.$detachToken.removeData('token').hide();
-    // this.$separateToggle.show();
   }
   Stroke.prototype.destroy = function () {
     return this.$element.removeAttr('property-component').empty().removeData().hide();
@@ -128,63 +130,36 @@ export default function ($) {
   $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] [contenteditable="true"]`, function () {
     $(this).selectText();
   });
-  // $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] [data-separate-type]`, function () {
-  //   const separateBtn = $(this);
-  //   hostData.$separateIcon.attr('separate-type', separateBtn.data('separate-type'));
-  // });
   $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .stroke-val[contenteditable="true"]`, function (event) {
     if (event.type === BrowserEvents.KEY_UP && event.key !== 'Enter') {
       return;
     }
     const $this = $(this);
-    // const { separateType } = $this.data();
     const options = hostData.options;
     const value =  $this.text();
-    let oldVal;
-    // if (separateType) {
-    //   oldVal = options[camelize(separateType)];
-    //   if (validator.isInt(value)) {
-    //     options[camelize(separateType)] = Number(value);
-    //     const uniqueValues = [...new Set(
-    //         separators.map(type => options[camelize(type)])
-    //       )
-    //     ];
-    //     if (uniqueValues.length === 1) {
-    //       hostData.$radiusValue.text(value);
-    //       options.radius = Number(value);
-    //     } else {
-    //       hostData.$radiusValue.text('Mixed');
-    //       options.radius = Mixed;
-    //     }
-    //   } else {
-    //     $this.text(oldVal);
-    //   }
-    // } else {
-      oldVal = options.width;
-      if (validator.isInt(value)) {
-        options.width = Number(value);
-        // separators.forEach(type => {
-        //   options[camelize(type)] = Number(value);
-        // });
-        hostData.$stokeValue.text(value);
-      } 
-      // else {
-    //     if (typeof oldVal === 'symbol') {
-    //       $this.text('Mixed');
-    //     } else {
-    //       $this.text(oldVal);
-    //     }
-    //   }
-    // }
+    const oldVal = options.width;
+
+    if (validator.isInt(value)) {
+      options.width = Number(value);
+      hostData.$stokeValue.text(value);
+    } else {
+      $this.text(oldVal);
+    }
     $(document).trigger('property-preview', [options]);
   });
-  // $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .token-item`, function (event) {
-  //   hostData.useToken($(this).data('token'));
-  //   $(document).trigger('property-preview', [hostData.options]);
-  // });
-  // $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .detach-token`, function (event) {
-  //   hostData.detachToken($(this).data('token'));
-  // });
+  $(document).on(BrowserEvents.CLICK, '.stroke-align .dropdown-menu li a', function (event) {
+    hostData.options.align = this.textContent;
+    hostData.$alignDropdownBtnVal.text(this.textContent);
+    $(document).trigger('property-preview', [hostData.options]);
+  });
+  
+  $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .token-item`, function (event) {
+    hostData.useToken($(this).data('token'));
+    $(document).trigger('property-preview', [hostData.options]);
+  });
+  $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .detach-token`, function (event) {
+    hostData.detachToken($(this).data('token'));
+  });
   return NAME;
 }(jQuery);
 

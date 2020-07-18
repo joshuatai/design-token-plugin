@@ -82,9 +82,9 @@ function assignProperty(properties, node) {
     }
     if (strokeWidthAlign) {
         const { width, align } = strokeWidthAlign;
-        if (width && hasStrokeNode(node)) {
+        if (hasStrokeNode(node)) {
             node.strokeWeight = width;
-            console.log(node.strokes);
+            node.strokeAlign = align;
         }
     }
 }
