@@ -14,7 +14,7 @@ export const icon = '<span class="corner-radius-icon"></span>';
 export default function ($) {
   var Radius = function (element, options) {
     const tokensMap = getPureToken(PropertyTypes.CORNER_RADIUS);
-    const tokenList = Object.keys(tokensMap).map(key => tokensMap[key]);
+    let tokenList = Object.keys(tokensMap).map(key => tokensMap[key]);
     const useToken = getToken(options.useToken);
     hostData = this;
     this.options   = new CornerRadius(options);
@@ -44,6 +44,8 @@ export default function ($) {
     this.$propertyView = this.$element.data('propertyView');
     this.token = this.$element.data('token');
     
+    tokenList = tokenList.filter(token => token.id !== this.token.id);
+    
     this.$element
       .append(
         this.$customVal
@@ -64,7 +66,7 @@ export default function ($) {
                 tokenList.length ?
                 this.$detachToken.add(this.$useToken.append(
                   this.$tokenList.append(
-                    tokenList.filter(token => token.id !== this.token.id).map(token => $(`<li class="token-item"><a href="#">${token.name}</a></li>`).data('token', token))
+                    tokenList.map(token => $(`<li class="token-item"><a href="#">${token.name}</a></li>`).data('token', token))
                   )
                 )) :
                 null
@@ -138,7 +140,7 @@ export default function ($) {
     return this
   }
 
-  $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] [contenteditable="true"]`, function () {
+  $(document).on(BrowserEvents.FOCUS, `[property-component="${NAME}"] [contenteditable="true"]`, function () {
     $(this).selectText();
   });
   $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] [data-separate-type]`, function () {

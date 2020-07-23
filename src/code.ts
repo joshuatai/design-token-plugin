@@ -1,7 +1,8 @@
+import Color from 'color';
 import NodeTypes from 'enums/NodeTypes';
 import MessageTypes from 'enums/MessageTypes';
 import PropertyTypes from 'enums/PropertyTypes';
-import Token from 'model/Token';
+import FillTypes from 'enums/FillTypes';
 
 function clone(val) {
   const type = typeof val
@@ -28,17 +29,6 @@ function clone(val) {
 function postMessage (type: String, message: String | Object): void {
   figma.ui.postMessage({ type, message });
 }
-
-function supportsChildren(node: SceneNode):
-  node is FrameNode | ComponentNode | InstanceNode | BooleanOperationNode
-{
-  const { FRAME, GROUP, COMPONENT, INSTANCE, BOOLEAN_OPERATION } = NodeTypes;
-  return node.type === FRAME ||
-         node.type === GROUP ||
-         node.type === COMPONENT ||
-         node.type === INSTANCE ||
-         node.type === BOOLEAN_OPERATION
-}
 function hasMixedCornerNode (node):
   node is ComponentNode | RectangleNode {
     return node.type === NodeTypes.RECTANGLE ||
@@ -58,10 +48,17 @@ function hasStrokeNode (node):
   const { ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR } = NodeTypes;
   return [ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR].includes(node.type);
 }
+function hasFillsNode (node):
+  node is ComponentNode | EllipseNode | FrameNode | InstanceNode | LineNode | PolygonNode | RectangleNode | StarNode | TextNode | VectorNode
+{
+  const { COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR } = NodeTypes;
+  return [COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR].includes(node.type); 
+}
+
 function assignProperty (properties, node) {
   const cornerRadius = properties[PropertyTypes.CORNER_RADIUS];
   const strokeWidthAlign = properties[PropertyTypes.STROKE_WIDTH_ALIGN];
-
+  const fillColor = properties[PropertyTypes.FILL_COLOR];
   node.type === NodeTypes.GROUP && node.children.forEach(child => {
     assignProperty(properties, child);
   });
@@ -78,16 +75,28 @@ function assignProperty (properties, node) {
       node.bottomLeftRadius = bottomLeft;
     } 
   }
-  if (strokeWidthAlign) {
+  if (strokeWidthAlign && hasStrokeNode(node)) {
     const { width, align } = strokeWidthAlign;
-    if (hasStrokeNode(node)) {
-      node.strokeWeight = width;
-      node.strokeAlign = align;
-    }
+    node.strokeWeight = width;
+    node.strokeAlign = align;
   }
 
+  if (fillColor && hasFillsNode(node)) {
+    const { fillType, color, visible, opacity, blendMode } = fillColor;
+    const [r, g, b] = Color(`#${color}`).rgb().color;
+    if (fillType === FillTypes.SOLID) {
+      const solidPaint: SolidPaint = {
+        type: FillTypes.SOLID,
+        color: { r: r / 255, g: g / 255, b: b / 255 },
+        visible,
+        opacity,
+        blendMode
+      };
+      node.fills = [solidPaint];
+    }
+  }
 }
-figma.showUI(__html__, { visible: true, width: 240, height: 500 });
+figma.showUI(__html__, { visible: true, width: 267, height: 600 });
 
 figma.ui.onmessage = async (msg) => {
   const { type, message } = msg;
@@ -102,7 +111,8 @@ figma.ui.onmessage = async (msg) => {
     const _properties = properties.reduce((calc, property) => {
       if (
         property._type === PropertyTypes.CORNER_RADIUS ||
-        property._type === PropertyTypes.STROKE_WIDTH_ALIGN
+        property._type === PropertyTypes.STROKE_WIDTH_ALIGN ||
+        property._type === PropertyTypes.FILL_COLOR
       ) calc[property._type] = property;
 
       return calc;

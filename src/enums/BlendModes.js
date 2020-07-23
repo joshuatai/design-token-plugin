@@ -1,0 +1,20 @@
+var BlendModes;
+(function (BlendModes) {
+    BlendModes["NORMAL"] = "NORMAL";
+    BlendModes["DARKEN"] = "DARKEN";
+    BlendModes["MULTIPLY"] = "MULTIPLY";
+    BlendModes["COLOR_BURN"] = "COLOR_BURN";
+    BlendModes["LIGHT"] = "LIGHT";
+    BlendModes["SCREEN"] = "SCREEN";
+    BlendModes["COLOR_DODGE"] = "COLOR_DODGE";
+    BlendModes["OVERLAY"] = "OVERLAY";
+    BlendModes["SOFT_LIGHT"] = "SOFT_LIGHT";
+    BlendModes["HARD_LIGHT"] = "HARD_LIGHT";
+    BlendModes["DIFFERENCE"] = "DIFFERENCE";
+    BlendModes["EXCLUSION"] = "EXCLUSION";
+    BlendModes["HUE"] = "HUE";
+    BlendModes["SATURATION"] = "SATURATION";
+    BlendModes["COLOR"] = "COLOR";
+    BlendModes["LUMINOSITY"] = "LUMINOSITY";
+})(BlendModes || (BlendModes = {}));
+export default BlendModes;

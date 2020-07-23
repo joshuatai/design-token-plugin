@@ -12,7 +12,7 @@ import { Mixed } from 'symbols/index';
 
 let hostData;
 const backIcon = `
-  <div id="turn-back-btn">
+  <div id="turn-back-btn" class="turn-back-btn">
     <svg
       class="svg"
       width="8"
@@ -258,7 +258,7 @@ export default function ($) {
     }
   }
   // done
-  $(document).on(BrowserEvents.CLICK, '#turn-back-btn', $.debounce(260, function () {
+  $(document).on(BrowserEvents.CLICK, '#token-setting #turn-back-btn', $.debounce(260, function () {
     const { token } = hostData;
     hostData.$element.trigger('destroy:TokenSetting', [token]).destroy();
   }));

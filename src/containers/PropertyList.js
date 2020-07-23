@@ -3,10 +3,12 @@ import BrowserEvents from 'enums/BrowserEvents';
 import PropertyTypes from 'enums/PropertyTypes';
 import { icon as CornerRadiusIcon } from './property-components/CornerRadius';
 import { icon as StrokeWidthIcon } from './property-components/StrokeWidthAlign';
+import { icon as FillColorIcon } from './property-components/FillColor';
 import { getToken, referByToken } from 'model/DataManager';
 const icons = {
     [PropertyTypes.CORNER_RADIUS]: CornerRadiusIcon,
-    [PropertyTypes.STROKE_WIDTH_ALIGN]: StrokeWidthIcon
+    [PropertyTypes.STROKE_WIDTH_ALIGN]: StrokeWidthIcon,
+    [PropertyTypes.FILL_COLOR]: FillColorIcon
 };
 const removeIcon = '<svg class="svg" width="12" height="6" viewBox="0 0 12 6" xmlns="http://www.w3.org/2000/svg"><path d="M11.5 3.5H.5v-1h11v1z" fill-rule="nonzero" fill-opacity="1" fill="#000" stroke="none"></path></svg>';
 let $host;
@@ -23,7 +25,7 @@ export default function ($) {
                 .append(this.$propertyContainer
                 .append(options.map((property, index) => {
                 const token = getToken(property.parent);
-                const icon = icons[property.type];
+                const $icon = $(icons[property.type]);
                 const referTokens = referByToken(token);
                 const $remove = $(`<span class="remove-property">${removeIcon}</span>`);
                 referTokens.length > 0 && $remove.attr({
@@ -32,6 +34,7 @@ export default function ($) {
                 });
                 let value;
                 let title;
+                let secondValue;
                 if (property.type === PropertyTypes.CORNER_RADIUS) {
                     if (typeof property.radius === 'symbol') {
                         value = 'Mixed';
@@ -39,25 +42,35 @@ export default function ($) {
                     }
                     else {
                         value = property.radius;
-                        title = `corner radius: ${property.radius}`;
+                        title = `Corner radius: ${property.radius}`;
                     }
                 }
                 if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
                     value = property.width;
+                    secondValue = property.align;
+                }
+                if (property.type === PropertyTypes.FILL_COLOR) {
+                    value = property.color;
+                    title = `Color: ${property.color}`;
+                    $icon
+                        .css('background', `#${property.color}`)
+                        .children()
+                        .css('opacity', (100 - (property.opacity * 100)) / 100);
                 }
                 if (property.useToken) {
-                    value = getToken(property.useToken).name;
+                    let tokenName = getToken(property.useToken).name;
+                    value = tokenName;
+                    title = `Token: ${tokenName}`;
                 }
-                return $(`
-                <li class="property-item">
-                  <span class="sortable-handler"></span>
-                  <span class="property-name">${property.type}</span>
-                  ${icon}
-                  <span class="property-value" ${title ? 'title="' + title + '"' : ''}>${value}</span>
-                </li>
-              `)
+                const propertyItem = $(`<li class="property-item"></li>`)
+                    .append(`<span class="sortable-handler"></span>`)
+                    .append(`<span class="property-name">${property.type}</span>`)
+                    .append($icon)
+                    .append(`<span class="property-value" ${title ? 'title="' + title + '"' : ''}>${value}</span>`)
+                    .append(secondValue ? $(`<span class="property-second-value">${secondValue}</span>`) : null)
                     .append($remove)
                     .data('property', property);
+                return propertyItem;
             })));
         }
         if (options.length > 1) {

@@ -2,8 +2,11 @@ var BrowserEvents;
 (function (BrowserEvents) {
     BrowserEvents["CLICK"] = "click";
     BrowserEvents["DBCLICK"] = "dblclick";
+    BrowserEvents["DRAG"] = "drag";
+    BrowserEvents["MOUSE_DOWN"] = "mousedown";
     BrowserEvents["MOUSE_OVER"] = "mouseover";
     BrowserEvents["MOUSE_OUT"] = "mouseout";
+    BrowserEvents["FOCUS"] = "focus";
     BrowserEvents["BLUR"] = "focusout";
     BrowserEvents["CHANG"] = "change";
     BrowserEvents["KEY_PRESS"] = "keypress";

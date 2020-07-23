@@ -1,0 +1,21 @@
+enum BlendModes {
+    NORMAL = 'NORMAL',
+    DARKEN = 'DARKEN',
+    MULTIPLY = 'MULTIPLY',
+    COLOR_BURN = 'COLOR_BURN',
+    LIGHT = 'LIGHT',
+    SCREEN = 'SCREEN',
+    COLOR_DODGE = 'COLOR_DODGE',
+    OVERLAY = 'OVERLAY',
+    SOFT_LIGHT = 'SOFT_LIGHT',
+    HARD_LIGHT = 'HARD_LIGHT',
+    DIFFERENCE = 'DIFFERENCE',
+    EXCLUSION = 'EXCLUSION',
+    HUE = 'HUE',
+    SATURATION = 'SATURATION',
+    COLOR = 'COLOR',
+    LUMINOSITY = 'LUMINOSITY'
+
+}
+
+export default BlendModes;

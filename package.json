@@ -28,6 +28,7 @@
     "typescript": "^3.5.3",
     "url-loader": "^2.1.0",
     "uuid": "^8.1.0",
+    "validate-color": "^2.1.0",
     "validator": "^13.0.0",
     "webpack": "^4.38.0",
     "webpack-cli": "^3.3.6"

@@ -12,7 +12,7 @@ export const icon = '<span class="corner-radius-icon"></span>';
 export default function ($) {
     var Radius = function (element, options) {
         const tokensMap = getPureToken(PropertyTypes.CORNER_RADIUS);
-        const tokenList = Object.keys(tokensMap).map(key => tokensMap[key]);
+        let tokenList = Object.keys(tokensMap).map(key => tokensMap[key]);
         const useToken = getToken(options.useToken);
         hostData = this;
         this.options = new CornerRadius(options);
@@ -39,6 +39,7 @@ export default function ($) {
         this.$separateRadius;
         this.$propertyView = this.$element.data('propertyView');
         this.token = this.$element.data('token');
+        tokenList = tokenList.filter(token => token.id !== this.token.id);
         this.$element
             .append(this.$customVal
             .append(this.$separateToggle[useToken ? 'hide' : 'show']())
@@ -50,7 +51,7 @@ export default function ($) {
                 this.options.radius :
                 'Mixed'))
             .append(tokenList.length ?
-            this.$detachToken.add(this.$useToken.append(this.$tokenList.append(tokenList.filter(token => token.id !== this.token.id).map(token => $(`<li class="token-item"><a href="#">${token.name}</a></li>`).data('token', token))))) :
+            this.$detachToken.add(this.$useToken.append(this.$tokenList.append(tokenList.map(token => $(`<li class="token-item"><a href="#">${token.name}</a></li>`).data('token', token))))) :
             null))
             .append(this.$separateSetting
             .append(this.$separateIcon)
@@ -107,7 +108,7 @@ export default function ($) {
         $.fn[NAME] = old;
         return this;
     };
-    $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] [contenteditable="true"]`, function () {
+    $(document).on(BrowserEvents.FOCUS, `[property-component="${NAME}"] [contenteditable="true"]`, function () {
         $(this).selectText();
     });
     $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] [data-separate-type]`, function () {

@@ -4,8 +4,8 @@ import { fetch, getAllGroup, getGroup, setGroup, getToken, setToken, removeToken
 import TokenSetting from './containers/TokenSetting';
 import PropertyTypes from 'enums/PropertyTypes';
 import BrowserEvents from 'enums/BrowserEvents';
-import FillType from 'enums/FillType';
-import ColorMode from 'enums/ColorMode';
+import FillTypes from 'enums/FillTypes';
+import ColorModes from 'enums/ColorModes';
 import percentToHex from 'utils/percentToHex';
 import preventEvent from  'utils/preventEvent';
 import Group from 'model/Group';
@@ -167,8 +167,8 @@ function thumbnailsBuilder (properties) {
   properties.forEach(property => {
     const { colorMode, colorCode, opacity } = property.value;
     if (property.propType === PropertyTypes.FILL_COLOR) {
-      if (property.type === FillType.SOLID) {
-        if (colorMode === ColorMode.HEX) {
+      if (property.type === FillTypes.SOLID) {
+        if (colorMode === ColorModes.HEX) {
           backgrounds.push(`${colorCode}${percentToHex(opacity * 100)}`);
         }
       }
