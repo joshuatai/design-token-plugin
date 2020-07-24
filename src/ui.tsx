@@ -5,7 +5,7 @@ import TokenSetting from './containers/TokenSetting';
 import PropertyTypes from 'enums/PropertyTypes';
 import BrowserEvents from 'enums/BrowserEvents';
 import FillTypes from 'enums/FillTypes';
-import ColorModes from 'enums/ColorModes';
+import ColorFormat from 'enums/ColorFormat';
 import percentToHex from 'utils/percentToHex';
 import preventEvent from  'utils/preventEvent';
 import Group from 'model/Group';
@@ -162,21 +162,21 @@ function createGroup () {
   save();
 }
 
-function thumbnailsBuilder (properties) {
-  const backgrounds = [];
-  properties.forEach(property => {
-    const { colorMode, colorCode, opacity } = property.value;
-    if (property.propType === PropertyTypes.FILL_COLOR) {
-      if (property.type === FillTypes.SOLID) {
-        if (colorMode === ColorModes.HEX) {
-          backgrounds.push(`${colorCode}${percentToHex(opacity * 100)}`);
-        }
-      }
-    }
-  });
+// function thumbnailsBuilder (properties) {
+//   const backgrounds = [];
+//   properties.forEach(property => {
+//     const { colorMode, colorCode, opacity } = property.value;
+//     if (property.propType === PropertyTypes.FILL_COLOR) {
+//       if (property.type === FillTypes.SOLID) {
+//         if (colorMode === ColorFormat.HEX) {
+//           backgrounds.push(`${colorCode}${percentToHex(opacity * 100)}`);
+//         }
+//       }
+//     }
+//   });
 
-  return `background-color: ${backgrounds.join(',')}`;
-}
+//   return `background-color: ${backgrounds.join(',')}`;
+// }
 
 const Root = () => {
   useEffect(function () {
