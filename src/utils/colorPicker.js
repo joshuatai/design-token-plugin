@@ -1,4 +1,5 @@
 import Color from 'color';
+import { validateHTMLColorHex } from "validate-color";
 import BrowserEvents from 'enums/BrowserEvents';
 import ColorFormat from 'enums/ColorFormat';
 let hostData;
@@ -80,18 +81,18 @@ export default function ($) {
         this.$hexInputs = $('<div class="hex-input-container input-container btn-group"></div>');
         this.$hex = $('<div class="btn" contenteditable="true"></div>');
         this.$rgbInputs = $('<div class="rgb-input-container input-container btn-group"></div>');
-        this.$r = $('<div class="btn" contenteditable="true"></div>');
-        this.$g = $('<div class="btn" contenteditable="true"></div>');
-        this.$b = $('<div class="btn" contenteditable="true"></div>');
+        this.$r = $('<div class="btn" color="r" contenteditable="true"></div>');
+        this.$g = $('<div class="btn" color="g" contenteditable="true"></div>');
+        this.$b = $('<div class="btn" color="b" contenteditable="true"></div>');
         this.$hslInputs = $('<div class="hsl-input-container input-container btn-group"></div>');
-        this.$hsl_hue = $('<div class="btn" contenteditable="true"></div>');
-        this.$hsl_saturation = $('<div class="btn" contenteditable="true"></div>');
-        this.$hsl_lightness = $('<div class="btn" contenteditable="true"></div>');
+        this.$hsl_hue = $('<div class="btn" color="h" contenteditable="true"></div>');
+        this.$hsl_saturation = $('<div class="btn" color="s" contenteditable="true"></div>');
+        this.$hsl_lightness = $('<div class="btn" color="l" contenteditable="true"></div>');
         this.$hsvInputs = $('<div class="hsv-input-container input-container btn-group"></div>');
         this.$hsv_hue = $('<div class="btn" contenteditable="true"></div>');
         this.$hsv_saturation = $('<div class="btn" contenteditable="true"></div>');
         this.$hsv_brightness = $('<div class="btn" contenteditable="true"></div>');
-        this.$opacity = $('<div class="btn" contenteditable="true"></div>');
+        this.$opacity = $('<div class="btn" color="o" contenteditable="true"></div>');
         this.$colorPickerContainer
             .append(this.$colorPickerHeader
             .append(this.$turnBackBtn)
@@ -148,10 +149,13 @@ export default function ($) {
         this.setVal();
         this.setHandler();
     };
-    ColorPicker.prototype.setColor = function (color) {
+    ColorPicker.prototype.setColor = function (color, customHue) {
         const { color: [r, g, b] } = color.rgb();
-        const { color: [hue, hsvSaturation, brightness] } = color.hsv();
         const { color: [hslHsu, hslSaturation, lightness] } = color.hsl();
+        let { color: [hue, hsvSaturation, brightness] } = color.hsv();
+        if (customHue) {
+            hue = customHue;
+        }
         this.hex = color.hex();
         this.r = r;
         this.g = g;
@@ -162,9 +166,9 @@ export default function ($) {
         this.brightness = brightness;
         this.hslSaturation = hslSaturation;
         this.lightness = lightness;
+        this.options.color = this.hex;
     };
     ColorPicker.prototype.setHandler = function () {
-        console.log(this.brightness);
         this.$hsvHandler.css({
             position: 'absolute',
             top: `${(100 - this.brightness) * (255 / 100)}px`,
@@ -193,7 +197,7 @@ export default function ($) {
         this.$hsv_brightness.text(Math.round(this.brightness));
         this.$opacity.text(`${this.opacity}%`);
         this.$hueSlider.slider("option", "value", this.hue);
-        this.$opacitySlider.slider("option", "value", this.opacity * 100);
+        this.$opacitySlider.slider("option", "value", this.opacity);
     };
     ColorPicker.prototype.setFormat = function (format) {
         this.options.format = format;
@@ -242,6 +246,70 @@ export default function ($) {
     });
     $(document).on(BrowserEvents.CLICK, '.color-mode .dropdown-menu li a', function (event) {
         hostData.setFormat(this.innerText);
+    });
+    $(document).on(BrowserEvents.FOCUS, `#color-picker-container [contenteditable="true"]`, function () {
+        $(this).selectText();
+    });
+    $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `#color-picker-container [contenteditable="true"]`, function (event) {
+        if (event.type === BrowserEvents.KEY_UP) {
+            if (event.key === 'Enter') {
+                this.blur();
+            }
+            return;
+        }
+        const color = $(this).attr('color');
+        let value = this.innerText;
+        if (color === 'o') {
+            value = value.replace('%', '');
+            if (!isNaN(value)) {
+                value = Math.min(100, Math.max(0, Number(value)));
+                hostData.setOpacity(Number(value));
+                hostData.setHandler();
+            }
+            this.innerText = `${hostData.opacity}%`;
+            return;
+        }
+        if (hostData.format === ColorFormat.HEX) {
+            if (validateHTMLColorHex(`#${value}`)) {
+                hostData.setColor(Color().hex(`#${value}`));
+                hostData.setVal();
+                hostData.setHandler();
+            }
+            this.innerText = hostData.hex.replace('#', '');
+        }
+        if (hostData.format === ColorFormat.RGB) {
+            const color = $(this).attr('color');
+            const colorIndex = { r: 0, g: 1, b: 2 };
+            const val = [hostData.r, hostData.g, hostData.b];
+            if (!isNaN(value)) {
+                value = Math.min(255, Math.max(0, Number(value)));
+                val.splice(colorIndex[color], 1, Math.round(Number(value)));
+                hostData.setColor(Color(val));
+                hostData.setVal();
+                hostData.setHandler();
+            }
+            this.innerText = hostData[color];
+        }
+        if (hostData.format === ColorFormat.HSL) {
+            const color = $(this).attr('color');
+            const colorIndex = { h: 0, s: 1, l: 2 };
+            const val = [hostData.hue, hostData.hslSaturation, hostData.lightness];
+            if (!isNaN(value)) {
+                if (color === 'h')
+                    value = Math.min(360, Math.max(0, Number(value)));
+                if (color === 's')
+                    value = Math.min(100, Math.max(0, Number(value)));
+                if (color === 'l')
+                    value = Math.min(100, Math.max(0, Number(value)));
+                val.splice(colorIndex[color], 1, Number(value));
+                hostData.setColor(Color().hsl(...val), val[0]);
+                hostData.setVal();
+                hostData.setHandler();
+            }
+            else {
+                this.innerText = Math.round(val[colorIndex[color]]);
+            }
+        }
     });
     return NAME;
 }
