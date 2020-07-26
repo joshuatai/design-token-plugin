@@ -98,9 +98,9 @@ export default function ($) {
     this.$hsl_saturation = $('<div class="btn" color="s" contenteditable="true"></div>');
     this.$hsl_lightness = $('<div class="btn" color="l" contenteditable="true"></div>');
     this.$hsvInputs = $('<div class="hsv-input-container input-container btn-group"></div>');
-    this.$hsv_hue = $('<div class="btn" contenteditable="true"></div>');
-    this.$hsv_saturation = $('<div class="btn" contenteditable="true"></div>');
-    this.$hsv_brightness = $('<div class="btn" contenteditable="true"></div>');
+    this.$hsv_hue = $('<div class="btn" color="h" contenteditable="true"></div>');
+    this.$hsv_saturation = $('<div class="btn" color="s" contenteditable="true"></div>');
+    this.$hsv_brightness = $('<div class="btn" color="v" contenteditable="true"></div>');
     
     this.$opacity = $('<div class="btn" color="o" contenteditable="true"></div>');
     this.$colorPickerContainer
@@ -188,7 +188,7 @@ export default function ($) {
     const { color: [r, g, b] } = color.rgb();
     const { color: [hslHsu, hslSaturation, lightness] } = color.hsl();
     let { color: [hue, hsvSaturation, brightness] } = color.hsv();
-  
+    // console.log(hue, customHue);
     if (customHue) {
       hue = customHue;
     }
@@ -329,20 +329,19 @@ export default function ($) {
       this.innerText = hostData.hex.replace('#', '');
     }
     if (hostData.format === ColorFormat.RGB) {
-      const color = $(this).attr('color');
       const colorIndex = { r: 0, g: 1, b: 2 };
       const val= [hostData.r, hostData.g, hostData.b];
       if (!isNaN(value)) {
         value = Math.min(255, Math.max(0, Number(value)));
         val.splice(colorIndex[color], 1, Math.round(Number(value)));
-        hostData.setColor(Color(val));
+
+        hostData.setColor(Color(val), val.filter(item => item !== 255).length === 0 ? hostData.hue : null);
         hostData.setVal();
         hostData.setHandler();
       }
       this.innerText = hostData[color];
     } 
     if (hostData.format === ColorFormat.HSL) {
-      const color = $(this).attr('color');
       const colorIndex = { h: 0, s: 1, l: 2 };
       const val= [hostData.hue, hostData.hslSaturation, hostData.lightness];
       if (!isNaN(value)) {
@@ -353,6 +352,23 @@ export default function ($) {
         val.splice(colorIndex[color], 1, Number(value));
 
         hostData.setColor(Color().hsl(...val), val[0]);
+        hostData.setVal();
+        hostData.setHandler();
+      } else {
+        this.innerText = Math.round(val[colorIndex[color]]);
+      }
+    }
+    if (hostData.format === ColorFormat.HSV) {
+      const colorIndex = { h: 0, s: 1, v: 2 };
+      const val= [hostData.hue, hostData.hsvSaturation, hostData.brightness];
+      if (!isNaN(value)) {
+        if (color === 'h') value = Math.min(360, Math.max(0, Number(value)));
+        if (color === 's') value = Math.min(100, Math.max(0, Number(value)));
+        if (color === 'v') value = Math.min(100, Math.max(0, Number(value)));
+        
+        val.splice(colorIndex[color], 1, Number(value));
+
+        hostData.setColor(Color().hsv(...val), val[0]);
         hostData.setVal();
         hostData.setHandler();
       } else {
