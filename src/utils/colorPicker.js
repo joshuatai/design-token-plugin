@@ -16,9 +16,15 @@ var PickerMode;
 class Picker {
     constructor(options) {
         this.mode = PickerMode.SOLID;
+        this.color = 0xC4C4C4;
         this.opacity = 1;
-        this.color = 0x12C46F;
         this.format = ColorFormat.HEX;
+        if (options.mode)
+            this.mode = options.mode;
+        if (options.color != null)
+            this.color = options.color;
+        if (options.opacity != null)
+            this.opacity = options.opacity;
     }
 }
 export default function ($) {
@@ -153,7 +159,6 @@ export default function ($) {
         const { color: [r, g, b] } = color.rgb();
         const { color: [hslHsu, hslSaturation, lightness] } = color.hsl();
         let { color: [hue, hsvSaturation, brightness] } = color.hsv();
-        // console.log(hue, customHue);
         if (customHue) {
             hue = customHue;
         }
@@ -230,6 +235,7 @@ export default function ($) {
         return this;
     };
     $(document).on(BrowserEvents.CLICK, `#color-picker-container .turn-back-btn`, function (event) {
+        hostData.$element.trigger('color-picker-change', [hostData.options]);
         hostData.destroy();
     });
     $(document).on("slide", '.hue-slider, .opacity-slider', function (event, ui) {

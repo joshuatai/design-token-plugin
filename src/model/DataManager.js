@@ -73,6 +73,17 @@ const syncToken = (token) => {
                 property.bottomLeft = refer.bottomLeft;
                 property.radius = refer.radius;
             }
+            if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
+                property.align = refer.align;
+                property.width = refer.width;
+            }
+            if (property.type === PropertyTypes.FILL_COLOR) {
+                property.blendMode = refer.blendMode;
+                property.color = refer.color;
+                property.fillType = refer.fillType;
+                property.opacity = refer.opacity;
+                property.visible = refer.visible;
+            }
             if (hostToken.properties.length === 1)
                 syncToken(hostToken);
         }
@@ -81,10 +92,13 @@ const syncToken = (token) => {
 const referByToken = (token) => getAllProperty()
     .filter((property) => property.useToken === token.id)
     .map((property) => getToken(property.parent));
+const syncNode = (token) => {
+    sendMessage(MessageTypes.SYNC_NODES, token);
+};
 const sendMessage = (type, message = "") => parent.postMessage({
     pluginMessage: {
         type,
         message: JSON.stringify(message),
     },
 }, "*");
-export { fetch, getAllGroup, getGroup, getAllToken, getToken, getProperty, getPureToken, setGroup, setToken, setProperty, setPureToken, removeToken, save, syncToken, referByToken, sendMessage };
+export { fetch, getAllGroup, getGroup, getAllToken, getToken, getProperty, getPureToken, setGroup, setToken, setProperty, setPureToken, removeToken, save, syncToken, syncNode, referByToken, sendMessage };

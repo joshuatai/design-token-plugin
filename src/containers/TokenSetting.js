@@ -1,7 +1,7 @@
 import _cloneDeep from 'lodash/cloneDeep';
 import _findIndex from 'lodash/findIndex';
 import BrowserEvents from '../enums/BrowserEvents';
-import { getGroup, getToken, setToken, syncToken, save } from '../model/DataManager';
+import { getGroup, getToken, setToken, syncToken, save, syncNode } from '../model/DataManager';
 import Token from '../model/Token';
 import { inputCheck, valChange } from '../utils/inputValidator';
 import propertyConponents from './property-components';
@@ -199,6 +199,7 @@ export default function ($) {
         this.$propertyView.propertyView(this.token.properties);
         syncToken(this.token);
         save();
+        syncNode(this.token);
     };
     TokenSetting.prototype.propertyView = function (property) {
         const tmpProperties = _cloneDeep(this.token.properties);

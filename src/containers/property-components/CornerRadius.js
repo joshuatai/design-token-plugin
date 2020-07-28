@@ -5,10 +5,10 @@ import BrowserEvents from 'enums/BrowserEvents';
 import { Mixed } from 'symbols/index';
 import { getToken, getPureToken } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
+import PropertyIcon from './PropertyIcon';
 let hostData;
 const NAME = 'radius';
 const separators = ['top-left', 'top-right', 'bottom-right', 'bottom-left'];
-export const icon = '<span class="corner-radius-icon"></span>';
 export default function ($) {
     var Radius = function (element, options) {
         const tokensMap = getPureToken(PropertyTypes.CORNER_RADIUS);
@@ -19,7 +19,7 @@ export default function ($) {
         this.$element = $(element).attr('property-component', NAME).addClass('show');
         this.$customVal = $('<div class="custom-val"></div>');
         this.$valContainer = $('<div class="val-container"></div>');
-        this.$radiusIcon = $(icon);
+        this.$radiusIcon = PropertyIcon(this.options);
         this.$radiusValue = $('<span class="corner-radius-val"></span>').attr('contenteditable', !useToken);
         this.$detachToken = $(`
       <div class="detach-token">

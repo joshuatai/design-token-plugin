@@ -1,4 +1,4 @@
-import _cloneDeep from 'lodash/cloneDeep'
+import _cloneDeep from 'lodash/cloneDeep';
 import MessageTypes from 'enums/MessageTypes';
 import PropertyTypes from 'enums/PropertyTypes';
 import { Mixed } from 'symbols/index';
@@ -79,6 +79,17 @@ const syncToken = (token: Token) => {
         property.bottomRight = refer.bottomRight;
         property.bottomLeft = refer.bottomLeft;
         property.radius = refer.radius;
+      }
+      if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
+        property.align = refer.align;
+        property.width = refer.width;
+      }
+      if (property.type === PropertyTypes.FILL_COLOR) {
+        property.blendMode = refer.blendMode;
+        property.color = refer.color;
+        property.fillType = refer.fillType;
+        property.opacity = refer.opacity;
+        property.visible = refer.visible;
       } 
       if (hostToken.properties.length === 1) syncToken(hostToken);
     }
@@ -88,6 +99,12 @@ const referByToken = (token: Token): Array<Token> =>
   getAllProperty()
     .filter((property: any) => property.useToken === token.id)
     .map((property: any) => getToken(property.parent));
+const syncNode = (token: Token) => {
+  sendMessage(
+    MessageTypes.SYNC_NODES,
+    token
+  );
+};
 const sendMessage = (type: MessageTypes | String, message: String | object = "") => parent.postMessage(
   {
     pluginMessage: {
@@ -114,6 +131,7 @@ export {
   removeToken,
   save,
   syncToken,
+  syncNode,
   referByToken,
   sendMessage
 };

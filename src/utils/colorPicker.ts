@@ -16,10 +16,13 @@ enum PickerMode {
 
 class Picker {
   mode: PickerMode = PickerMode.SOLID;
+  color: number = 0xC4C4C4;
   opacity: number = 1;
-  color: number = 0x12C46F;
   format: String = ColorFormat.HEX;
   constructor(options?: any) {
+    if (options.mode) this.mode = options.mode;
+    if (options.color != null) this.color = options.color;
+    if (options.opacity != null) this.opacity = options.opacity;
   }
 }
 
@@ -188,7 +191,7 @@ export default function ($) {
     const { color: [r, g, b] } = color.rgb();
     const { color: [hslHsu, hslSaturation, lightness] } = color.hsl();
     let { color: [hue, hsvSaturation, brightness] } = color.hsv();
-    // console.log(hue, customHue);
+  
     if (customHue) {
       hue = customHue;
     }
@@ -270,6 +273,7 @@ export default function ($) {
   }
 
   $(document).on(BrowserEvents.CLICK, `#color-picker-container .turn-back-btn`, function (event) {
+    hostData.$element.trigger('color-picker-change', [hostData.options]);
     hostData.destroy();
   });
 

@@ -1,15 +1,8 @@
 import preventEvent from 'utils/preventEvent';
 import BrowserEvents from 'enums/BrowserEvents';
 import PropertyTypes from 'enums/PropertyTypes';
-import { icon as CornerRadiusIcon } from './property-components/CornerRadius';
-import { icon as StrokeWidthIcon } from './property-components/StrokeWidthAlign';
-import { icon as FillColorIcon } from './property-components/FillColor';
 import { getToken, referByToken } from 'model/DataManager';
-const icons = {
-    [PropertyTypes.CORNER_RADIUS]: CornerRadiusIcon,
-    [PropertyTypes.STROKE_WIDTH_ALIGN]: StrokeWidthIcon,
-    [PropertyTypes.FILL_COLOR]: FillColorIcon
-};
+import PropertyIcon from './property-components/PropertyIcon';
 const removeIcon = '<svg class="svg" width="12" height="6" viewBox="0 0 12 6" xmlns="http://www.w3.org/2000/svg"><path d="M11.5 3.5H.5v-1h11v1z" fill-rule="nonzero" fill-opacity="1" fill="#000" stroke="none"></path></svg>';
 let $host;
 export default function ($) {
@@ -25,7 +18,7 @@ export default function ($) {
                 .append(this.$propertyContainer
                 .append(options.map((property, index) => {
                 const token = getToken(property.parent);
-                const $icon = $(icons[property.type]);
+                const $icon = PropertyIcon(property);
                 const referTokens = referByToken(token);
                 const $remove = $(`<span class="remove-property">${removeIcon}</span>`);
                 referTokens.length > 0 && $remove.attr({
@@ -42,7 +35,7 @@ export default function ($) {
                     }
                     else {
                         value = property.radius;
-                        title = `Corner radius: ${property.radius}`;
+                        title = `Corner Radius: ${property.radius}`;
                     }
                 }
                 if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
@@ -51,11 +44,11 @@ export default function ($) {
                 }
                 if (property.type === PropertyTypes.FILL_COLOR) {
                     value = property.color;
-                    title = `Color: ${property.color}`;
-                    $icon
-                        .css('background', `#${property.color}`)
-                        .children()
-                        .css('opacity', (100 - (property.opacity * 100)) / 100);
+                    title = `Fill Color: ${property.color}`;
+                }
+                if (property.type === PropertyTypes.STROKE_FILL) {
+                    value = property.color;
+                    title = `Stroke Color: ${property.color}`;
                 }
                 if (property.useToken) {
                     let tokenName = getToken(property.useToken).name;

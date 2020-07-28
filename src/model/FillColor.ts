@@ -4,7 +4,7 @@ import FillTypes from 'enums/FillTypes';
 import BlendModes from 'enums/BlendModes';
 
 class FillColor {
-  private _type: string = PropertyType.FILL_COLOR;
+  protected _type: string = PropertyType.FILL_COLOR;
   id: String = v4();
   parent: String = '';
   fillType: String = FillTypes.SOLID;

@@ -4,10 +4,9 @@ import BrowserEvents from 'enums/BrowserEvents';
 import { getToken, getPureToken } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
 import StrokeAligns from 'enums/StrokeAligns';
-
+import PropertyIcon from './PropertyIcon';
 let hostData;
 const NAME = 'stroke';
-export const icon = '<span class="stroke-width-icon"></span>';
 export default function ($) {
   var Stroke = function (element, options) {
     const tokensMap = getPureToken(PropertyTypes.STROKE_WIDTH_ALIGN);
@@ -19,7 +18,7 @@ export default function ($) {
     this.$element  = $(element).attr('property-component', NAME).addClass('show');
     this.$customVal = $('<div class="custom-val"></div>');
     this.$valContainer = $('<div class="val-container"></div>');
-    this.$StokeIcon = $(icon);
+    this.$StokeIcon = PropertyIcon(this.options);
     this.$stokeValue = $('<span class="stroke-val"></span>').attr('contenteditable', !useToken);
     this.$align = $('<div class="stroke-align btn-group" />');
     this.$alignDropdownBtn = $(`
@@ -82,6 +81,7 @@ export default function ($) {
     
     this.options.parent = this.token.id;
     useToken ? this.$detachToken.data('token', useToken).show() : this.$detachToken.hide();
+
     this.$element.data('value', this.options);
     $(document).trigger('property-preview', [this.options]);
   }

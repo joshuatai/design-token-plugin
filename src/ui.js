@@ -11,8 +11,10 @@ import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { fetch, getAllGroup, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage } from './model/DataManager';
 import TokenSetting from './containers/TokenSetting';
+import PropertyIcon from './containers/property-components/PropertyIcon';
 import BrowserEvents from 'enums/BrowserEvents';
 import preventEvent from 'utils/preventEvent';
+// import properties2css from 'utils/properties2css';
 import Group from 'model/Group';
 import Token from 'model/Token';
 import Properties from 'model/Properties';
@@ -25,10 +27,8 @@ import { Mixed } from './symbols';
 TokenSetting(jQuery);
 SelectText(jQuery);
 PluginDestroy(jQuery);
-var Color = require('color');
 const { useEffect } = React;
 let $tokenContainer, $tokenSetting, $groupCreator;
-const thumbnailsColor = '<span class="token-icon color-token-icon"></span>';
 const $tokenEditBtn = $('<button type="button" class="token-edit-btn"><svg class="svg" width="12" height="14" viewBox="0 0 12 14" xmlns="http://www.w3.org/2000/svg"><path d="M2 7.05V0h1v7.05c1.141.232 2 1.24 2 2.45 0 1.21-.859 2.218-2 2.45V14H2v-2.05c-1.141-.232-2-1.24-2-2.45 0-1.21.859-2.218 2-2.45zM4 9.5c0 .828-.672 1.5-1.5 1.5-.828 0-1.5-.672-1.5-1.5C1 8.672 1.672 8 2.5 8 3.328 8 4 8.672 4 9.5zM9 14h1V6.95c1.141-.232 2-1.24 2-2.45 0-1.21-.859-2.218-2-2.45V0H9v2.05c-1.141.232-2 1.24-2 2.45 0 1.21.859 2.218 2 2.45V14zm2-9.5c0-.828-.672-1.5-1.5-1.5C8.672 3 8 3.672 8 4.5 8 5.328 8.672 6 9.5 6c.828 0 1.5-.672 1.5-1.5z" fill-rule="evenodd" fill-opacity="1" fill="#000" stroke="none"></path></svg></button>');
 const Utils = {
     newGroupName: () => {
@@ -75,18 +75,15 @@ const Renderer = {
             'token': token.id
         });
         const $tokenName = $('<span class="token-key"></span>').text(token.name);
-        let $tokenThumbnails;
-        // const thumbnailsCSS = thumbnailsBuilder(token.properties);
-        // if (token.type === PropertyTypes.FILLS) {
-        //   $tokenThumbnails = $(thumbnailsColor).attr('style', thumbnailsCSS);
-        // }
-        // if (token.type === PropertyTypes.STROKE) {
-        // }
+        let $icon;
+        if (token.propertyType !== Mixed) {
+            $icon = PropertyIcon(token.properties[0]);
+        }
         $token.data = token;
         $tokenList.append($token);
         $expend.show();
         return $token
-            .append($tokenThumbnails)
+            .append($icon)
             .append($tokenName);
     },
     updateToken: function (token) {
@@ -148,17 +145,17 @@ function createGroup() {
 }
 // function thumbnailsBuilder (properties) {
 //   const backgrounds = [];
-//   properties.forEach(property => {
-//     const { colorMode, colorCode, opacity } = property.value;
-//     if (property.propType === PropertyTypes.FILL_COLOR) {
-//       if (property.type === FillTypes.SOLID) {
-//         if (colorMode === ColorFormat.HEX) {
-//           backgrounds.push(`${colorCode}${percentToHex(opacity * 100)}`);
-//         }
-//       }
-//     }
-//   });
-//   return `background-color: ${backgrounds.join(',')}`;
+//   // properties.forEach(property => {
+//   //   const { colorMode, colorCode, opacity } = property.value;
+//   //   // if (property.propType === PropertyTypes.FILL_COLOR) {
+//   //   //   if (property.type === FillTypes.SOLID) {
+//   //   //     if (colorMode === ColorFormat.HEX) {
+//   //   //       backgrounds.push(`${colorCode}${percentToHex(opacity * 100)}`);
+//   //   //     }
+//   //   //   }
+//   //   // }
+//   // });
+// //   return `background-color: ${backgrounds.join(',')}`;
 // }
 const Root = () => {
     useEffect(function () {

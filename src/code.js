@@ -12,6 +12,7 @@ import NodeTypes from 'enums/NodeTypes';
 import MessageTypes from 'enums/MessageTypes';
 import PropertyTypes from 'enums/PropertyTypes';
 import FillTypes from 'enums/FillTypes';
+import { hasCornerNode, hasMixedCornerNode, hasStrokeNode, hasFillsNode } from 'utils/hasNodeType';
 function clone(val) {
     const type = typeof val;
     if (val === null) {
@@ -41,28 +42,20 @@ function clone(val) {
 function postMessage(type, message) {
     figma.ui.postMessage({ type, message });
 }
-function hasMixedCornerNode(node) {
-    return node.type === NodeTypes.RECTANGLE ||
-        node.type === NodeTypes.COMPONENT;
-}
-function hasCornerNode(node) {
-    const { RECTANGLE, POLYGON, STAR, VECTOR } = NodeTypes;
-    return node.type === RECTANGLE ||
-        node.type === POLYGON ||
-        node.type === STAR ||
-        node.type === VECTOR;
-}
-function hasStrokeNode(node) {
-    const { ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR } = NodeTypes;
-    return [ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR].includes(node.type);
-}
-function hasFillsNode(node) {
-    const { COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR } = NodeTypes;
-    return [COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR].includes(node.type);
+function propertyMaps(properties) {
+    return properties.reduce((calc, property) => {
+        if (property._type === PropertyTypes.CORNER_RADIUS ||
+            property._type === PropertyTypes.STROKE_WIDTH_ALIGN ||
+            property._type === PropertyTypes.FILL_COLOR ||
+            property._type === PropertyTypes.STROKE_FILL)
+            calc[property._type] = property;
+        return calc;
+    }, {});
 }
 function assignProperty(properties, node) {
     const cornerRadius = properties[PropertyTypes.CORNER_RADIUS];
     const strokeWidthAlign = properties[PropertyTypes.STROKE_WIDTH_ALIGN];
+    const strokeFill = properties[PropertyTypes.STROKE_FILL];
     const fillColor = properties[PropertyTypes.FILL_COLOR];
     node.type === NodeTypes.GROUP && node.children.forEach(child => {
         assignProperty(properties, child);
@@ -84,6 +77,20 @@ function assignProperty(properties, node) {
         node.strokeWeight = width;
         node.strokeAlign = align;
     }
+    if (strokeFill && hasStrokeNode(node)) {
+        const { fillType, color, opacity, visible, blendMode } = strokeFill;
+        const [r, g, b] = Color(`#${color}`).rgb().color;
+        if (fillType === FillTypes.SOLID) {
+            const solidPaint = {
+                type: FillTypes.SOLID,
+                color: { r: r / 255, g: g / 255, b: b / 255 },
+                visible,
+                opacity,
+                blendMode
+            };
+            node.strokes = [solidPaint];
+        }
+    }
     if (fillColor && hasFillsNode(node)) {
         const { fillType, color, visible, opacity, blendMode } = fillColor;
         const [r, g, b] = Color(`#${color}`).rgb().color;
@@ -99,6 +106,12 @@ function assignProperty(properties, node) {
         }
     }
 }
+function getUsedTokens(properties, token) {
+    const usedTokens = properties
+        .filter(prop => prop.useToken && prop.useToken === token)
+        .map(prop => prop.parent);
+    return usedTokens.concat(...usedTokens.map(token => getUsedTokens(properties, token)));
+}
 figma.showUI(__html__, { visible: true, width: 267, height: 600 });
 figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
     const { type, message } = msg;
@@ -110,17 +123,47 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
     }
     if (type === MessageTypes.ASSIGN_TOKEN) {
         const { id, properties } = JSON.parse(message);
-        const _properties = properties.reduce((calc, property) => {
-            if (property._type === PropertyTypes.CORNER_RADIUS ||
-                property._type === PropertyTypes.STROKE_WIDTH_ALIGN ||
-                property._type === PropertyTypes.FILL_COLOR)
-                calc[property._type] = property;
-            return calc;
-        }, {});
         const selection = figma.currentPage.selection.slice();
         selection.forEach((node) => {
-            assignProperty(_properties, node);
+            const data = node.getPluginData('useTokens');
+            const usedTokens = data ? JSON.parse(data) : [];
+            const existIndex = usedTokens.findIndex(tokenId => tokenId === id);
+            if (existIndex > -1)
+                usedTokens.splice(existIndex, 1);
+            usedTokens.push(id);
+            node.setPluginData('useTokens', JSON.stringify(usedTokens));
+            assignProperty(propertyMaps(properties), node);
         });
+    }
+    if (type === MessageTypes.SYNC_NODES) {
+        const token = JSON.parse(message);
+        const data = JSON.parse(figma.root.getPluginData('Tokens'));
+        const allProperties = [];
+        const tokensMap = data.reduce((calc, group) => {
+            group.tokens.forEach(token => {
+                allProperties.push(...token.properties);
+                calc[token.id] = token;
+            });
+            return calc;
+        }, {});
+        const usedTokens = getUsedTokens(allProperties, token.id);
+        usedTokens.push(token.id);
+        function traverse(node) {
+            if ("children" in node) {
+                for (const child of node.children) {
+                    traverse(child);
+                }
+            }
+            const data = node.getPluginData('useTokens');
+            const tokens = data ? JSON.parse(data) : [];
+            const usedToken = usedTokens.filter(token => tokens.includes(token));
+            if (usedToken.length > 0) {
+                tokens.forEach(token => {
+                    assignProperty(propertyMaps(tokensMap[token].properties), node);
+                });
+            }
+        }
+        traverse(figma.root);
     }
 });
 figma.on("selectionchange", () => {
