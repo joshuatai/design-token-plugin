@@ -1,7 +1,5 @@
-import Color from 'color';
 import preventEvent from 'utils/preventEvent';
 import BrowserEvents from 'enums/BrowserEvents';
-import PropertyTypes from 'enums/PropertyTypes';
 import { getToken, referByToken } from 'model/DataManager';
 import PropertyIcon from './property-components/PropertyIcon';
 
@@ -21,45 +19,14 @@ export default function ($) {
         .append(
           this.$propertyContainer
             .append(options.map((property, index) => {
+              let { $icon, value, title, secondValue } = PropertyIcon(property);
               const token = getToken(property.parent);
-              const $icon = PropertyIcon(property);
               const referTokens = referByToken(token);
               const $remove = $(`<span class="remove-property">${removeIcon}</span>`);
               referTokens.length > 0 && $remove.attr({
                 'disabled': true,
                 'title': `This token has been linked by token: ${referTokens.map(token => token.name)}`
               });
-
-              let value;
-              let title;
-              let secondValue;
-
-              if (property.type === PropertyTypes.CORNER_RADIUS) {
-                if (typeof property.radius === 'symbol') {
-                  value = 'Mixed';
-                  title = `top-left: ${property.topLeft}; top-right: ${property.topRight}; bottom-right: ${property.bottomRight}; bottom-left: ${property.bottomLeft};`;
-                } else {
-                  value = property.radius;
-                  title = `Corner Radius: ${property.radius}`;
-                }
-              }
-              if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
-                value = property.width;
-                secondValue = property.align;
-              }
-              if (property.type === PropertyTypes.FILL_COLOR) {
-                value = property.color;
-                title = `Fill Color: ${property.color}`;
-              }
-              if (property.type === PropertyTypes.STROKE_FILL) {
-                value = property.color;
-                title = `Stroke Color: ${property.color}`; 
-              }
-              if (property.useToken) {
-                let tokenName = getToken(property.useToken).name;
-                value = tokenName;
-                title = `Token: ${tokenName}`;
-              }
 
               const propertyItem = $(`<li class="property-item"></li>`)
                 .append(`<span class="sortable-handler"></span>`)

@@ -5,5 +5,6 @@ var MessageTypes;
     MessageTypes["ASSIGN_TOKEN"] = "Assign Token";
     MessageTypes["SYNC_NODES"] = "Sync Nodes";
     MessageTypes["SELECTION_CHANGE"] = "Selection Change";
+    MessageTypes["FONT_LIST"] = "Font List";
 })(MessageTypes || (MessageTypes = {}));
 export default MessageTypes;

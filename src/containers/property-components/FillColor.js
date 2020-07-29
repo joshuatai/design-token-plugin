@@ -22,7 +22,7 @@ export default function ($) {
         this.$element = $(element).attr('property-component', NAME).addClass('show');
         this.$customVal = $('<div class="custom-val"></div>');
         this.$valContainer = $('<div class="val-container"></div>');
-        this.$ColorIcon = PropertyIcon(this.options);
+        this.$ColorIcon = PropertyIcon(this.options).$icon;
         this.$colorValue = $('<span class="color-val"></span>').attr('contenteditable', !useToken);
         this.$colorOpacity = $('<span class="opacity-val"></span>').attr('contenteditable', !useToken);
         this.$detachToken = $(`
@@ -57,7 +57,7 @@ export default function ($) {
         $(document).trigger('property-preview', [this.options]);
     };
     Fill.prototype.setIcon = function () {
-        const newIcon = PropertyIcon(this.options);
+        const newIcon = PropertyIcon(this.options).$icon;
         hostData.$ColorIcon.replaceWith(newIcon);
         hostData.$ColorIcon = newIcon;
         if (this.options.useToken) {
@@ -69,7 +69,6 @@ export default function ($) {
         }
     };
     Fill.prototype.useToken = function (token) {
-        console.log('useToken', token);
         const { color, blendMode, fillType, opacity, visible } = token.properties[0];
         Object.assign(this.options, {
             useToken: token.id, color, blendMode, fillType, opacity, visible
@@ -79,7 +78,6 @@ export default function ($) {
         this.$detachToken.data('token', token).show();
     };
     Fill.prototype.detachToken = function (token) {
-        console.log(token);
         const usedProperty = token.properties[0];
         this.options.useToken = '';
         this.$colorValue.text(usedProperty.color).attr('contenteditable', true);

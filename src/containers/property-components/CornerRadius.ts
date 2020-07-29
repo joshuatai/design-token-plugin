@@ -21,7 +21,7 @@ export default function ($) {
     this.$element  = $(element).attr('property-component', NAME).addClass('show');
     this.$customVal = $('<div class="custom-val"></div>');
     this.$valContainer = $('<div class="val-container"></div>');
-    this.$radiusIcon = PropertyIcon(this.options);
+    this.$radiusIcon = PropertyIcon(this.options).$icon;
     this.$radiusValue = $('<span class="corner-radius-val"></span>').attr('contenteditable', !useToken);
     this.$detachToken = $(`
       <div class="detach-token">

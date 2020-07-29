@@ -7,6 +7,7 @@ var PropertyTypes;
     PropertyTypes["STROKE_FILL"] = "Stroke Fill";
     PropertyTypes["STROKE_DASH"] = "Stroke Dash Pattern";
     PropertyTypes["STROKE_WIDTH_ALIGN"] = "Stroke Width/Align";
+    PropertyTypes["TEXT"] = "Text";
     PropertyTypes["SPACE"] = "Space";
     PropertyTypes["MIXED"] = "Mixed";
 })(PropertyTypes || (PropertyTypes = {}));

@@ -8,6 +8,7 @@ import Token from './Token';
 const data: Array<Group> = [];
 const groupMap = {};
 const tokenMap = {};
+let fonts = {};
 let propertiesMap = {};
 
 const pureToken = Object.keys(PropertyTypes).reduce((calc, type) => (calc[PropertyTypes[type]] = {}, calc), {});
@@ -15,6 +16,9 @@ const clearPureToken = () => {
   Object.keys(pureToken).forEach(key => {
     pureToken[key] = {};
   });
+};
+const getFonts = () => {
+  return _cloneDeep(fonts);
 };
 const fetch = () => sendMessage(MessageTypes.GET_TOKENS);
 const getAllGroup = (): Array<Group> => data;
@@ -25,6 +29,9 @@ const getProperty = id => propertiesMap[id];
 const getAllProperty = () => Object.values(propertiesMap);
 const getPureToken = (type): Object => pureToken[type];
 
+const setFonts = _fonts => {
+  fonts = _fonts;
+};
 const setGroup = (group: Group): Group => {
   data.push(group);
   groupMap[group.id] = group;
@@ -117,6 +124,7 @@ const sendMessage = (type: MessageTypes | String, message: String | object = "")
 
 export {
   fetch,
+  getFonts,
   getAllGroup,
   getGroup,
   getAllToken,
@@ -124,6 +132,7 @@ export {
   getProperty,
   getPureToken,
 
+  setFonts,
   setGroup,
   setToken,
   setProperty,

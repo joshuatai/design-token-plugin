@@ -5,12 +5,16 @@ import { Mixed } from 'symbols/index';
 const data = [];
 const groupMap = {};
 const tokenMap = {};
+let fonts = {};
 let propertiesMap = {};
 const pureToken = Object.keys(PropertyTypes).reduce((calc, type) => (calc[PropertyTypes[type]] = {}, calc), {});
 const clearPureToken = () => {
     Object.keys(pureToken).forEach(key => {
         pureToken[key] = {};
     });
+};
+const getFonts = () => {
+    return _cloneDeep(fonts);
 };
 const fetch = () => sendMessage(MessageTypes.GET_TOKENS);
 const getAllGroup = () => data;
@@ -20,6 +24,9 @@ const getAllToken = () => Object.values(tokenMap);
 const getProperty = id => propertiesMap[id];
 const getAllProperty = () => Object.values(propertiesMap);
 const getPureToken = (type) => pureToken[type];
+const setFonts = _fonts => {
+    fonts = _fonts;
+};
 const setGroup = (group) => {
     data.push(group);
     groupMap[group.id] = group;
@@ -101,4 +108,4 @@ const sendMessage = (type, message = "") => parent.postMessage({
         message: JSON.stringify(message),
     },
 }, "*");
-export { fetch, getAllGroup, getGroup, getAllToken, getToken, getProperty, getPureToken, setGroup, setToken, setProperty, setPureToken, removeToken, save, syncToken, syncNode, referByToken, sendMessage };
+export { fetch, getFonts, getAllGroup, getGroup, getAllToken, getToken, getProperty, getPureToken, setFonts, setGroup, setToken, setProperty, setPureToken, removeToken, save, syncToken, syncNode, referByToken, sendMessage };

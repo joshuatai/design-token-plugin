@@ -12,7 +12,7 @@ import NodeTypes from 'enums/NodeTypes';
 import MessageTypes from 'enums/MessageTypes';
 import PropertyTypes from 'enums/PropertyTypes';
 import FillTypes from 'enums/FillTypes';
-import { hasCornerNode, hasMixedCornerNode, hasStrokeNode, hasFillsNode } from 'utils/hasNodeType';
+import { hasCornerNode, hasMixedCornerNode, hasStrokeNode, hasFillsNode, hasFontNode } from 'utils/hasNodeType';
 function clone(val) {
     const type = typeof val;
     if (val === null) {
@@ -47,64 +47,74 @@ function propertyMaps(properties) {
         if (property._type === PropertyTypes.CORNER_RADIUS ||
             property._type === PropertyTypes.STROKE_WIDTH_ALIGN ||
             property._type === PropertyTypes.FILL_COLOR ||
-            property._type === PropertyTypes.STROKE_FILL)
+            property._type === PropertyTypes.STROKE_FILL ||
+            property._type === PropertyTypes.TEXT)
             calc[property._type] = property;
         return calc;
     }, {});
 }
 function assignProperty(properties, node) {
-    const cornerRadius = properties[PropertyTypes.CORNER_RADIUS];
-    const strokeWidthAlign = properties[PropertyTypes.STROKE_WIDTH_ALIGN];
-    const strokeFill = properties[PropertyTypes.STROKE_FILL];
-    const fillColor = properties[PropertyTypes.FILL_COLOR];
-    node.type === NodeTypes.GROUP && node.children.forEach(child => {
-        assignProperty(properties, child);
+    return __awaiter(this, void 0, void 0, function* () {
+        const cornerRadius = properties[PropertyTypes.CORNER_RADIUS];
+        const strokeWidthAlign = properties[PropertyTypes.STROKE_WIDTH_ALIGN];
+        const strokeFill = properties[PropertyTypes.STROKE_FILL];
+        const fillColor = properties[PropertyTypes.FILL_COLOR];
+        const fontSize = properties[PropertyTypes.TEXT];
+        node.type === NodeTypes.GROUP && node.children.forEach(child => {
+            assignProperty(properties, child);
+        });
+        if (cornerRadius) {
+            const { radius, topLeft, topRight, bottomRight, bottomLeft } = cornerRadius;
+            if (radius !== undefined && hasCornerNode(node)) {
+                node.cornerRadius = radius;
+            }
+            else if (hasMixedCornerNode(node)) {
+                node.topLeftRadius = topLeft;
+                node.topRightRadius = topRight;
+                node.bottomRightRadius = bottomRight;
+                node.bottomLeftRadius = bottomLeft;
+            }
+        }
+        if (strokeWidthAlign && hasStrokeNode(node)) {
+            const { width, align } = strokeWidthAlign;
+            node.strokeWeight = width;
+            node.strokeAlign = align;
+        }
+        if (strokeFill && hasStrokeNode(node)) {
+            const { fillType, color, opacity, visible, blendMode } = strokeFill;
+            const [r, g, b] = Color(`#${color}`).rgb().color;
+            if (fillType === FillTypes.SOLID) {
+                const solidPaint = {
+                    type: FillTypes.SOLID,
+                    color: { r: r / 255, g: g / 255, b: b / 255 },
+                    visible,
+                    opacity,
+                    blendMode
+                };
+                node.strokes = [solidPaint];
+            }
+        }
+        if (fillColor && hasFillsNode(node)) {
+            const { fillType, color, visible, opacity, blendMode } = fillColor;
+            const [r, g, b] = Color(`#${color}`).rgb().color;
+            if (fillType === FillTypes.SOLID) {
+                const solidPaint = {
+                    type: FillTypes.SOLID,
+                    color: { r: r / 255, g: g / 255, b: b / 255 },
+                    visible,
+                    opacity,
+                    blendMode
+                };
+                node.fills = [solidPaint];
+            }
+        }
+        if (fontSize && hasFontNode(node)) {
+            const { fontSize: size } = fontSize;
+            let len = node.characters.length;
+            yield figma.loadFontAsync(node.fontName);
+            node.fontSize = size;
+        }
     });
-    if (cornerRadius) {
-        const { radius, topLeft, topRight, bottomRight, bottomLeft } = cornerRadius;
-        if (radius !== undefined && hasCornerNode(node)) {
-            node.cornerRadius = radius;
-        }
-        else if (hasMixedCornerNode(node)) {
-            node.topLeftRadius = topLeft;
-            node.topRightRadius = topRight;
-            node.bottomRightRadius = bottomRight;
-            node.bottomLeftRadius = bottomLeft;
-        }
-    }
-    if (strokeWidthAlign && hasStrokeNode(node)) {
-        const { width, align } = strokeWidthAlign;
-        node.strokeWeight = width;
-        node.strokeAlign = align;
-    }
-    if (strokeFill && hasStrokeNode(node)) {
-        const { fillType, color, opacity, visible, blendMode } = strokeFill;
-        const [r, g, b] = Color(`#${color}`).rgb().color;
-        if (fillType === FillTypes.SOLID) {
-            const solidPaint = {
-                type: FillTypes.SOLID,
-                color: { r: r / 255, g: g / 255, b: b / 255 },
-                visible,
-                opacity,
-                blendMode
-            };
-            node.strokes = [solidPaint];
-        }
-    }
-    if (fillColor && hasFillsNode(node)) {
-        const { fillType, color, visible, opacity, blendMode } = fillColor;
-        const [r, g, b] = Color(`#${color}`).rgb().color;
-        if (fillType === FillTypes.SOLID) {
-            const solidPaint = {
-                type: FillTypes.SOLID,
-                color: { r: r / 255, g: g / 255, b: b / 255 },
-                visible,
-                opacity,
-                blendMode
-            };
-            node.fills = [solidPaint];
-        }
-    }
 }
 function getUsedTokens(properties, token) {
     const usedTokens = properties
@@ -170,3 +180,18 @@ figma.on("selectionchange", () => {
     console.log(figma.currentPage.selection);
     postMessage(MessageTypes.SELECTION_CHANGE, figma.currentPage.selection);
 });
+function getFonts() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const list = yield figma.listAvailableFontsAsync();
+        const fonts = list.reduce((calc, font) => {
+            if (!font.fontName.family.match(/^\./gi)) {
+                if (!calc[font.fontName.family])
+                    calc[font.fontName.family] = [];
+                calc[font.fontName.family].push(font.fontName);
+            }
+            return calc;
+        }, {});
+        postMessage(MessageTypes.FONT_LIST, fonts);
+    });
+}
+getFonts();

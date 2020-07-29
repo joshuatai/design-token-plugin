@@ -1,7 +1,7 @@
 import _cloneDeep from 'lodash/cloneDeep';
 import _findIndex from 'lodash/findIndex';
 import BrowserEvents from '../enums/BrowserEvents';
-import { getGroup, getToken, setToken, syncToken, save, syncNode } from '../model/DataManager';
+import { getGroup, getToken, getFonts, setToken, syncToken, save, syncNode } from '../model/DataManager';
 import Token from '../model/Token';
 import { inputCheck, valChange } from '../utils/inputValidator';
 import propertyConponents from './property-components';
@@ -35,6 +35,7 @@ PropertyList(jQuery);
 export default function ($) {
     const NAME = 'TokenSetting';
     var TokenSetting = function (element, { group, token }) {
+        console.log(getFonts());
         hostData = this;
         this.group = getGroup(group);
         this.token = getToken(token) || setToken(new Token({ parent: group }));

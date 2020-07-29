@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { fetch, getAllGroup, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage } from './model/DataManager';
+import { fetch, getAllGroup, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage, setFonts } from './model/DataManager';
 import TokenSetting from './containers/TokenSetting';
 import PropertyIcon from './containers/property-components/PropertyIcon';
 import BrowserEvents from 'enums/BrowserEvents';
@@ -84,7 +84,7 @@ const Renderer = {
     const $tokenName = $('<span class="token-key"></span>').text(token.name);
     let $icon;
     if (token.propertyType !== Mixed) {
-      $icon = PropertyIcon(token.properties[0]);
+      $icon = PropertyIcon(token.properties[0]).$icon;
     }
     $token.data = token;
     $tokenList.append($token);
@@ -265,7 +265,11 @@ ReactDOM.render(<App />, document.getElementById('react-page'));
 
 window.onmessage = async (event) => {
   const msg = event.data.pluginMessage;
+  if (msg.type === MessageTypes.FONT_LIST) {
+    setFonts(msg.message);
+  }
   if (msg.type === MessageTypes.GET_TOKENS) {
+    // console.log(JSON.stringify(msg.message));
     init(msg.message);
   }
   if (msg.type === MessageTypes.SELECTION_CHANGE) {

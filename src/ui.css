@@ -121,14 +121,16 @@ body {
   display: flex;
   -webkit-filter: none;
   filter: none;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 100%;
   border: 1px solid #ffffff;
   justify-content: center;
   align-items: center;
   box-sizing: border-box;
-  margin-right: 8px;
+  margin: 8px;
+  overflow: hidden;
+  cursor: default;
 }
 .token-key {
   flex: 1;
@@ -237,10 +239,17 @@ body {
   margin-top: 8px;
   padding: 0;
   height: 100px;
-  background: #DDDDDD;
+  background: #FFFFFF;
   border-top: 1px solid #dddddd;
   border-bottom: 1px solid #dddddd;
   justify-content: center;
+}
+#property-view.hasProperty::before {
+  content: '';
+  width: 220px;
+  height: 60px;
+  position: absolute;
+  background: url('data:image/svg+xml;utf8,%3Csvg%20width%3D%226%22%20height%3D%226%22%20viewBox%3D%220%200%206%206%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M0%200H3V3H0V0Z%22%20fill%3D%22%23E1E1E1%22/%3E%3Cpath%20d%3D%22M3%200H6V3H3V0Z%22%20fill%3D%22white%22/%3E%3Cpath%20d%3D%22M3%203H6V6H3V3Z%22%20fill%3D%22%23E1E1E1%22/%3E%3Cpath%20d%3D%22M0%203H3V6H0V3Z%22%20fill%3D%22white%22/%3E%3C/svg%3E%0A');
 }
 #property-view.hasLight {
   background: #666666;
@@ -248,6 +257,11 @@ body {
 #property-view .preview-box {
   width: 220px;
   height: 60px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: rgb(0,0,0,.4);
+  font-size: 18px;
   position: relative;
 }
 #property-list {
@@ -431,7 +445,7 @@ body {
 .corner-radius-icon {
   width: 16px;
   height: 16px;
-  margin: 7px 8px 7px 6px;
+  margin: 8px;
   border-color: #B3B3B3;
   border-top-style: solid;
   border-top-width: 1px;
@@ -545,7 +559,7 @@ body {
   height: 12px;
   border-top: 1px solid #b3b3b3;
   border-bottom: 3px solid #b3b3b3;
-  margin: 8px 10px 8px 8px;
+  margin: 10px;
 }
 span.stroke-width-icon:after {
   border-top: 2px solid #b3b3b3;
@@ -608,7 +622,8 @@ span.stroke-width-icon:after {
 .corner-radius-val,
 .stroke-val,
 .color-val,
-.opacity-val {
+.opacity-val,
+.font-size-val {
   line-height: 30px;
   flex: 1;
   padding: 0;
@@ -619,9 +634,9 @@ span.stroke-width-icon:after {
   width: 10px;
   text-overflow: ellipsis;
 }
-.opacity-val[contenteditable="true"] {
-  padding-left: 8px;
-  border-left: 1px solid #dddddd;
+.stroke-val[contenteditable="true"],
+.color-val[contenteditable="true"] {
+  border-right: 1px solid #dddddd;
 }
 
 #color-picker-container {
@@ -752,4 +767,27 @@ span.stroke-width-icon:after {
 }
 .custom-color-setting .input-container .btn:active {
   box-shadow: none;
+}
+.opacity-icon {
+  opacity: 1;
+  width: 16px;
+  margin: 7px 8px 7px 6px;
+}
+.font-size-icon {
+  width: 16px;
+  height: 16px;
+  text-align: right;
+  font-size: 14px;
+  margin: 8px;
+  color: #BBB;
+  cursor: default;
+  position: relative;
+}
+.font-size-icon::before {
+  content: 'A';
+  font-size: 8px;
+  color: #000;
+  top: 2px;
+  left: 3px;
+  position: absolute;
 }

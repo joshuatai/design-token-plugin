@@ -3,7 +3,7 @@ import NodeTypes from 'enums/NodeTypes';
 import MessageTypes from 'enums/MessageTypes';
 import PropertyTypes from 'enums/PropertyTypes';
 import FillTypes from 'enums/FillTypes';
-import { hasCornerNode, hasMixedCornerNode, hasStrokeNode, hasFillsNode } from 'utils/hasNodeType';
+import { hasCornerNode, hasMixedCornerNode, hasStrokeNode, hasFillsNode, hasFontNode } from 'utils/hasNodeType';
 
 function clone(val) {
   const type = typeof val
@@ -36,16 +36,18 @@ function propertyMaps (properties) {
       property._type === PropertyTypes.CORNER_RADIUS ||
       property._type === PropertyTypes.STROKE_WIDTH_ALIGN ||
       property._type === PropertyTypes.FILL_COLOR ||
-      property._type === PropertyTypes.STROKE_FILL
+      property._type === PropertyTypes.STROKE_FILL ||
+      property._type === PropertyTypes.TEXT
     ) calc[property._type] = property;
     return calc;
   }, {});
 }
-function assignProperty (properties, node) {
+async function assignProperty (properties, node) {
   const cornerRadius = properties[PropertyTypes.CORNER_RADIUS];
   const strokeWidthAlign = properties[PropertyTypes.STROKE_WIDTH_ALIGN];
   const strokeFill = properties[PropertyTypes.STROKE_FILL];
   const fillColor = properties[PropertyTypes.FILL_COLOR];
+  const fontSize = properties[PropertyTypes.TEXT];
   node.type === NodeTypes.GROUP && node.children.forEach(child => {
     assignProperty(properties, child);
   });
@@ -96,6 +98,12 @@ function assignProperty (properties, node) {
       };
       node.fills = [solidPaint];
     }
+  }
+  if (fontSize && hasFontNode(node)) {
+    const { fontSize: size } = fontSize;
+    let len = node.characters.length;
+    await figma.loadFontAsync(node.fontName as any)
+    node.fontSize = size;
   }
 }
 function getUsedTokens (properties, token: string) {
@@ -165,3 +173,18 @@ figma.on("selectionchange", () => {
   console.log(figma.currentPage.selection);
   postMessage(MessageTypes.SELECTION_CHANGE, figma.currentPage.selection);
 });
+
+
+async function getFonts () {
+  const list = await figma.listAvailableFontsAsync();
+  const fonts = list.reduce((calc, font) => {
+    if (!font.fontName.family.match(/^\./gi)) {
+      if (!calc[font.fontName.family]) calc[font.fontName.family] = [];
+      calc[font.fontName.family].push(font.fontName);
+    }
+    return calc;
+  }, {});
+  postMessage(MessageTypes.FONT_LIST, fonts);
+}
+
+getFonts();
