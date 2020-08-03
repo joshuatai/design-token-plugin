@@ -184,11 +184,9 @@ function getFonts() {
     return __awaiter(this, void 0, void 0, function* () {
         const list = yield figma.listAvailableFontsAsync();
         const fonts = list.reduce((calc, font) => {
-            if (!font.fontName.family.match(/^\./gi)) {
-                if (!calc[font.fontName.family])
-                    calc[font.fontName.family] = [];
-                calc[font.fontName.family].push(font.fontName);
-            }
+            if (!calc[font.fontName.family])
+                calc[font.fontName.family] = [];
+            calc[font.fontName.family].push(font.fontName);
             return calc;
         }, {});
         postMessage(MessageTypes.FONT_LIST, fonts);

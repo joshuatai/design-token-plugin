@@ -55,8 +55,8 @@ export default (options) => {
         title = `Stroke Color: #${value.toUpperCase()}`;
     }
     if (options.type === PropertyTypes.OPACITY) {
-        value = options.opacity;
-        title = `Opacity: ${value}%`;
+        value = `${options.opacity}%`;
+        title = `Opacity: ${value}`;
     }
     if (options.type === PropertyTypes.TEXT) {
         value = options.fontSize;

@@ -17,7 +17,6 @@ import MessageTypes from 'enums/MessageTypes';
 import { Mixed } from './symbols';
 
 declare var $: any;
-declare function require(path: string): any
 
 TokenSetting(jQuery);
 SelectText(jQuery);
@@ -141,6 +140,7 @@ function init (groups: Array<Object>) {
       }
     }
   });
+  console.log(groups);
 }
 
 function createGroup () {

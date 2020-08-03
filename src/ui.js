@@ -133,6 +133,7 @@ function init(groups) {
             }
         }
     });
+    console.log(groups);
 }
 function createGroup() {
     const $group = Renderer.group(new Group({

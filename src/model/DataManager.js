@@ -23,7 +23,16 @@ const getToken = (id) => tokenMap[id];
 const getAllToken = () => Object.values(tokenMap);
 const getProperty = id => propertiesMap[id];
 const getAllProperty = () => Object.values(propertiesMap);
-const getPureToken = (type) => pureToken[type];
+const getPureToken = (type) => {
+    if (typeof type === 'string') {
+        return pureToken[type];
+    }
+    else {
+        return type.reduce((calc, item) => {
+            return Object.assign(calc, pureToken[item]);
+        }, {});
+    }
+};
 const setFonts = _fonts => {
     fonts = _fonts;
 };

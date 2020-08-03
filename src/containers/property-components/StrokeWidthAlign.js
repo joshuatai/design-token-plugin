@@ -5,12 +5,11 @@ import { getToken, getPureToken } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
 import StrokeAligns from 'enums/StrokeAligns';
 import PropertyIcon from './PropertyIcon';
+import Token from './Token';
 let hostData;
 const NAME = 'stroke';
 export default function ($) {
     var Stroke = function (element, options) {
-        const tokensMap = getPureToken(PropertyTypes.STROKE_WIDTH_ALIGN);
-        let tokenList = Object.keys(tokensMap).map(key => tokensMap[key]);
         const useToken = getToken(options.useToken);
         let strokeValue;
         hostData = this;
@@ -28,61 +27,59 @@ export default function ($) {
       </button>
     `);
         this.$alignDropdownBtnVal = $(`<span>${this.options.align}</span>`);
-        this.$alignDropdowns = $(`<ul class="dropdown-menu pull-right" />`);
+        this.$alignDropdowns = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right" />`);
         this.$alignOptions = Object.keys(StrokeAligns).reduce((calc, key) => calc.add($(`<li><a href="#">${key}</a></li>`)), $());
-        this.$detachToken = $(`
-      <div class="detach-token">
-        <svg class="svg" width="14" height="14" viewBox="0 0 14 14" xmlns="http://www.w3.org/2000/svg"><path d="M4 0v3h1V0H4zm9.103.896c-1.162-1.161-3.045-1.161-4.207 0l-2.75 2.75.707.708 2.75-2.75c.771-.772 2.022-.772 2.793 0 .771.77.771 2.021 0 2.792l-2.75 2.75.707.708 2.75-2.75c1.162-1.162 1.162-3.046 0-4.208zM.896 13.103c-1.162-1.161-1.162-3.045 0-4.207l2.75-2.75.707.708-2.75 2.75c-.771.77-.771 2.021 0 2.792.771.772 2.022.772 2.793 0l2.75-2.75.707.707-2.75 2.75c-1.162 1.162-3.045 1.162-4.207 0zM14 10h-3V9h3v1zM10 11v3H9v-3h1zM3 4H0v1h3V4z" fill-rule="nonzero" fill-opacity=".9" fill="#000" stroke="none"></path></svg>
-      </div>`);
-        this.$useToken = $(`
-      <div class="dropdown">
-        <div class="use-token" data-toggle="dropdown">
-          <svg className="svg" width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M.5 2c0 .828.672 1.5 1.5 1.5.828 0 1.5-.672 1.5-1.5C3.5 1.172 2.828.5 2 .5 1.172.5.5 1.172.5 2zm6 0c0 .828.672 1.5 1.5 1.5.828 0 1.5-.672 1.5-1.5C9.5 1.172 8.828.5 8 .5c-.828 0-1.5.672-1.5 1.5zM8 9.5c-.828 0-1.5-.672-1.5-1.5 0-.828.672-1.5 1.5-1.5.828 0 1.5.672 1.5 1.5 0 .828-.672 1.5-1.5 1.5zM.5 8c0 .828.672 1.5 1.5 1.5.828 0 1.5-.672 1.5-1.5 0-.828-.672-1.5-1.5-1.5C1.172 6.5.5 7.172.5 8z" fill-rule="nonzero" fill-opacity="1" fill="#000" stroke="none"></path></svg>
-        </div>
-      </div>`);
-        this.$tokenList = $('<ul class="dropdown-menu pull-right"></ul>');
         this.$propertyView = this.$element.data('propertyView');
-        this.token = this.$element.data('token');
-        tokenList = tokenList.filter(token => token.id !== this.token.id);
-        if (useToken) {
-            strokeValue = useToken.name;
-            this.$align.hide();
-        }
-        else {
-            strokeValue = this.options.width;
-        }
+        this.tokensMap = getPureToken(PropertyTypes.STROKE_WIDTH_ALIGN);
+        this.$token = Token(this);
+        useToken ? strokeValue = useToken.name : strokeValue = this.options.width;
         this.$element
             .append(this.$customVal
             .append(this.$valContainer
             .append(this.$StokeIcon)
-            .append(this.$stokeValue.text(strokeValue).attr('title', strokeValue))
-            .append(tokenList.length ?
-            this.$detachToken.add(this.$useToken.append(this.$tokenList.append(tokenList.map(token => $(`<li class="token-item"><a href="#">${token.name}</a></li>`).data('token', token))))) :
-            null))
-            .append(this.$align
+            .append(this.$stokeValue.text(strokeValue).attr('title', strokeValue).addClass(this.tokenList.length ? 'hasReferenceToken' : ''))
+            .append(this.$token))
+            .append(this.$align[useToken ? 'hide' : 'show']()
             .append(this.$alignDropdownBtn.append(this.$alignDropdownBtnVal))
             .append(this.$alignDropdowns.append(this.$alignOptions))));
-        this.options.parent = this.token.id;
         useToken ? this.$detachToken.data('token', useToken).show() : this.$detachToken.hide();
-        this.$element.data('value', this.options);
+        this.setAlign(this.options.align);
         $(document).trigger('property-preview', [this.options]);
     };
     Stroke.prototype.useToken = function (token) {
         const { width, align } = token.properties[0];
-        Object.assign(this.options, {
-            useToken: token.id, width, align
-        });
-        this.$stokeValue.text(token.name).attr('contenteditable', false);
+        Object.assign(this.options, { width, align });
+        this.$stokeValue.text(token.name)
+            .attr('contenteditable', false)
+            .attr('title', token.name)
+            .removeAttr('title');
         this.$alignDropdownBtnVal.text(align);
         this.$align.hide();
-        this.$detachToken.data('token', token).show();
     };
     Stroke.prototype.detachToken = function (token) {
         const usedProperty = token.properties[0];
-        this.options.useToken = '';
         this.$stokeValue.text(usedProperty.width).attr('contenteditable', true);
         this.$align.show();
-        this.$detachToken.removeData('token').hide();
+        this.$alignDropdowns
+            .children()
+            .removeClass('selected')
+            .children()
+            .filter((index, item) => item.textContent === usedProperty.align)
+            .parent()
+            .addClass('selected');
+    };
+    Stroke.prototype.setAlign = function (align, isPreview = false) {
+        this.options.align = align;
+        this.$alignDropdownBtnVal.text(align);
+        this.$alignDropdowns
+            .children()
+            .removeClass('selected')
+            .children()
+            .filter((index, item) => item.textContent === align)
+            .parent()
+            .addClass('selected');
+        if (isPreview)
+            $(document).trigger('property-preview', [this.options]);
     };
     Stroke.prototype.destroy = function () {
         return this.$element.removeAttr('property-component').empty().removeData().hide();
@@ -105,9 +102,6 @@ export default function ($) {
         $.fn[NAME] = old;
         return this;
     };
-    $(document).on(BrowserEvents.FOCUS, `[property-component="${NAME}"] [contenteditable="true"]`, function () {
-        $(this).selectText();
-    });
     $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .stroke-val[contenteditable="true"]`, function (event) {
         if (event.type === BrowserEvents.KEY_UP && event.key !== 'Enter') {
             return;
@@ -126,16 +120,7 @@ export default function ($) {
         $(document).trigger('property-preview', [options]);
     });
     $(document).on(BrowserEvents.CLICK, '.stroke-align .dropdown-menu li a', function (event) {
-        hostData.options.align = this.textContent;
-        hostData.$alignDropdownBtnVal.text(this.textContent);
-        $(document).trigger('property-preview', [hostData.options]);
-    });
-    $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .token-item`, function (event) {
-        hostData.useToken($(this).data('token'));
-        $(document).trigger('property-preview', [hostData.options]);
-    });
-    $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .detach-token`, function (event) {
-        hostData.detachToken($(this).data('token'));
+        hostData.setAlign(this.textContent, true);
     });
     return NAME;
 }

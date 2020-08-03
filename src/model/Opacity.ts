@@ -1,10 +1,17 @@
+import { v4 } from 'uuid';
 import PropertyType from 'enums/PropertyTypes';
 
 class Opacity {
-  _type: string = PropertyType.OPACITY;
+  private _type: string = PropertyType.OPACITY;
+  id: String = v4();
+  parent: String = '';
   opacity: number = 100;
+  useToken: String = '';
 
   constructor(options?: any) {
+    if (options.id) this.id = options.id;
+    if (options.parent) this.parent = options.parent;
+    if (options.useToken) this.useToken = options.useToken;
     if (options.opacity != null) this.opacity = options.opacity;
   }
   get type (): String {

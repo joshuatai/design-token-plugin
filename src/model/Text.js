@@ -1,13 +1,16 @@
 import PropertyType from 'enums/PropertyTypes';
-class FontSize {
+class Text {
     constructor(options) {
         this._type = PropertyType.TEXT;
-        this.fontSize = 12;
-        if (options.fontSize != null)
-            this.fontSize = options.fontSize;
+        this.fontName = {
+            family: "Segoe UI",
+            style: "Regular"
+        };
+        if (options.fontName)
+            this.fontName = options.fontName;
     }
     get type() {
         return this._type;
     }
 }
-export default FontSize;
+export default Text;
