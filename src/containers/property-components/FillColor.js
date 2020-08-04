@@ -1,13 +1,13 @@
 import validator from 'validator';
 import { validateHTMLColorHex } from "validate-color";
 import BrowserEvents from 'enums/BrowserEvents';
-import { getToken, getPureToken } from 'model/DataManager';
+import { getToken } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
 import FillColor from 'model/FillColor';
 import StrokeFill from 'model/StrokeFill';
 import colorPicker from 'utils/colorPicker';
 import PropertyIcon from './PropertyIcon';
-import Token from './Token';
+import CommonSettings from './CommonSettings';
 colorPicker(jQuery);
 let hostData;
 const NAME = 'color';
@@ -18,21 +18,18 @@ export default function ($) {
         let opacityValue;
         hostData = this;
         this.options = options.type === PropertyTypes.FILL_COLOR ? new FillColor(options) : new StrokeFill(options);
-        this.$element = $(element).attr('property-component', NAME).addClass('show');
+        this.$element = $(element).attr('property-component', NAME);
         this.$customVal = $('<div class="custom-val"></div>');
         this.$valContainer = $('<div class="val-container"></div>');
-        this.$ColorIcon = PropertyIcon(this.options).$icon;
         this.$colorValue = $('<span class="color-val"></span>').attr('contenteditable', !useToken);
         this.$colorOpacity = $('<span class="opacity-val"></span>').attr('contenteditable', !useToken);
-        this.$propertyView = this.$element.data('propertyView');
-        this.tokensMap = getPureToken([PropertyTypes.FILL_COLOR, PropertyTypes.STROKE_FILL]);
-        this.$token = Token(this);
+        this.$token = CommonSettings(this).$token;
         useToken ? colorValue = useToken.name : colorValue = this.options.color;
         opacityValue = this.options.opacity;
         this.$element
             .append(this.$customVal
             .append(this.$valContainer
-            .append(this.$ColorIcon)
+            .append(this.$icon)
             .append(this.$colorValue.text(colorValue).attr('title', colorValue))
             .append(this.$colorOpacity.text(`${opacityValue * 100}%`).addClass(this.tokenList.length ? 'hasReferenceToken' : ''))
             .append(this.$token)));
@@ -41,14 +38,14 @@ export default function ($) {
     };
     Fill.prototype.setIcon = function () {
         const newIcon = PropertyIcon(this.options).$icon;
-        hostData.$ColorIcon.replaceWith(newIcon);
-        hostData.$ColorIcon = newIcon;
+        hostData.$icon.replaceWith(newIcon);
+        hostData.$icon = newIcon;
         if (this.options.useToken) {
             this.$colorOpacity.hide();
-            this.$ColorIcon.attr('disabled', true);
+            this.$icon.attr('disabled', true);
         }
         else {
-            this.$ColorIcon.attr('disabled', false);
+            this.$icon.attr('disabled', false);
         }
     };
     Fill.prototype.useToken = function (token) {
@@ -124,7 +121,7 @@ export default function ($) {
     }
     function colorPicker(event) {
         if (!$(this).is('[disabled]')) {
-            hostData.$ColorIcon.colorPicker({
+            hostData.$icon.colorPicker({
                 container: '#react-page',
                 color: `#${hostData.options.color}`,
                 opacity: hostData.options.opacity

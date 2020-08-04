@@ -3,10 +3,8 @@ import CornerRadius from 'model/CornerRadius';
 import camelize from 'utils/camelize';
 import BrowserEvents from 'enums/BrowserEvents';
 import { Mixed } from 'symbols/index';
-import { getToken, getPureToken } from 'model/DataManager';
-import PropertyTypes from 'enums/PropertyTypes';
-import PropertyIcon from './PropertyIcon';
-import Token from './Token';
+import { getToken } from 'model/DataManager';
+import CommonSettings from './CommonSettings';
 let hostData;
 const NAME = 'radius';
 const separators = ['top-left', 'top-right', 'bottom-right', 'bottom-left'];
@@ -16,18 +14,15 @@ export default function ($) {
         let radiusValue;
         hostData = this;
         this.options = new CornerRadius(options);
-        this.$element = $(element).attr('property-component', NAME).addClass('show');
+        this.$element = $(element).attr('property-component', NAME);
         this.$customVal = $('<div class="custom-val"></div>');
         this.$valContainer = $('<div class="val-container"></div>');
-        this.$radiusIcon = PropertyIcon(this.options).$icon;
         this.$radiusValue = $('<span class="corner-radius-val"></span>').attr('contenteditable', !useToken);
         this.$separateToggle = $('<button id="separator-toggle" type="button" class="btn separator-icon" data-toggle="button" aria-pressed="false" autoComplete="off"><svg class="svg" width="10" height="10" viewBox="0 0 10 10" xmlns="http://www.w3.org/2000/svg"><path d="M0 0h3v1H1v2H0V0zm7 0h3v3H9V1H7V0zM1 9V7H0v3h3V9H1zm9-2v3H7V9h2V7h1z" fill-rule="nonzero" fill-opacity="1" fill="#000" stroke="none"></path></svg></button>');
         this.$separateSetting = $('<div class="separator-vals"></div>');
         this.$separateIcon = $('<i class="separator-mode-sign" separate-type="top-left"></i>');
         this.$separatorGroup = $('<div class="btn-group"></div>');
-        this.$propertyView = this.$element.data('propertyView');
-        this.tokensMap = getPureToken(PropertyTypes.CORNER_RADIUS);
-        this.$token = Token(this);
+        this.$token = CommonSettings(this).$token;
         useToken ?
             radiusValue = useToken.name :
             radiusValue = typeof this.options.radius === 'number' ? this.options.radius : 'Mixed';
@@ -35,7 +30,7 @@ export default function ($) {
             .append(this.$customVal
             .append(this.$separateToggle[useToken ? 'hide' : 'show']())
             .append(this.$valContainer
-            .append(this.$radiusIcon)
+            .append(this.$icon)
             .append(this.$radiusValue
             .addClass(this.tokenList.length ? 'hasReferenceToken' : '')
             .text(radiusValue)
@@ -100,18 +95,21 @@ export default function ($) {
         hostData.$separateIcon.attr('separate-type', separateBtn.data('separate-type'));
     });
     $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .separator-vals [data-separate-type], [property-component="${NAME}"] .corner-radius-val[contenteditable="true"]`, function (event) {
-        if (event.type === BrowserEvents.KEY_UP && event.key !== 'Enter') {
-            return;
-        }
         const $this = $(this);
         const { separateType } = $this.data();
         const options = hostData.options;
-        const value = $this.text();
+        let value = $this.text();
         let oldVal;
+        if (event.type === BrowserEvents.KEY_UP) {
+            if (event.key === 'Enter')
+                $this.trigger('blur');
+            return;
+        }
         if (separateType) {
             oldVal = options[camelize(separateType)];
             if (validator.isInt(value)) {
-                options[camelize(separateType)] = Number(value);
+                value = Math.max(0, Number(value));
+                options[camelize(separateType)] = value;
                 const uniqueValues = [...new Set(separators.map(type => options[camelize(type)]))
                 ];
                 if (uniqueValues.length === 1) {
@@ -130,7 +128,8 @@ export default function ($) {
         else {
             oldVal = options.radius;
             if (validator.isInt(value)) {
-                options.radius = Number(value);
+                value = Math.max(0, Number(value));
+                options.radius = value;
                 separators.forEach(type => {
                     options[camelize(type)] = Number(value);
                 });

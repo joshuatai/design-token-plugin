@@ -69,30 +69,30 @@ const Renderer = {
     },
     token: function (token) {
         const { $tokenList, $expend } = $(`#${token.parent}`).data();
-        const $token = $(`<li id="${token.id}" class="token-item"></li>`)
-            .data({
-            'group': token.parent,
-            'token': token.id
-        });
-        const $tokenName = $('<span class="token-key"></span>').text(token.name);
+        let $token = $(`#${token.id}`);
         let $icon;
         if (token.propertyType !== Mixed) {
             $icon = PropertyIcon(token.properties[0]).$icon;
         }
+        if ($token.length === 0) {
+            $token = $(`<li id="${token.id}" class="token-item"></li>`)
+                .data({
+                'group': token.parent,
+                'token': token.id
+            })
+                .append($icon)
+                .append($('<span class="token-key"></span>'));
+            $tokenList.append($token);
+        }
+        $('.token-key', $token).text(token.name);
+        $token.children().not('.token-key').replaceWith($icon);
         $token.data = token;
-        $tokenList.append($token);
         $expend.show();
-        return $token
-            .append($icon)
-            .append($tokenName);
+        return $token;
     },
     updateToken: function (token) {
         const { $expend, $heading } = $(`#${token.parent}`).data();
-        const $token = $(`#${token.id}`);
-        $('.token-key', $token).text(token.name);
-        if ($token.length === 0) {
-            this.token(token);
-        }
+        this.token(token);
         if ($heading.is('[aria-expanded="false"]')) {
             $expend.trigger('click');
         }
@@ -133,7 +133,7 @@ function init(groups) {
             }
         }
     });
-    console.log(groups);
+    // console.log(groups);
 }
 function createGroup() {
     const $group = Renderer.group(new Group({

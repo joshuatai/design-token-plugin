@@ -1,27 +1,25 @@
 enum FontStyles {
-    Extalight = 0,
-    ExtaLight = 0,
-    Thin = 1,
-    Light = 2,
-    Semilight = 3,
-    SemiLight = 3,
-    Regular = 4,
-    Plain = 5,
-    Medium = 6,
-    Semibold = 7,
-    SemiBold = 7,
-    Bold = 8,
-    Extabold = 9,
-    ExtaBold = 9,
-    Black = 10,
+    'extralight' =          0,
+    'thin' =                1,
+    'ultralight' =          2,
+    'light' =               3,
+    'book' =                4,
+    'roman' =               5,
+    'semilight' =           6,
+    'regular' =             7,
 
-    'Thin Italic' = 11,
-    'Light Italic' = 12,
-    Italic = 13,
-    'Medium Italic' = 14,
-    'Bold Italic' = 15,
-    'ExtaBold Italic' = 16,
-    'Black Italic' = 17
+    'plain' =               10,
+    'medium' =              11,
+    'semibold' =            12,
+    'demi' =                13,
+    'demibold' =            13,
+    'bold' =                14,
+    'extrabold' =           15,
+    'heavy' =               16,
+    'black' =               17,
+
+    'extra' =               18,
+    'semi'  =               19
 }
 
 export default FontStyles;

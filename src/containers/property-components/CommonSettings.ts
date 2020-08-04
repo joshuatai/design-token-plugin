@@ -1,4 +1,6 @@
-import { getToken } from 'model/DataManager';
+import { getToken, getPureToken } from 'model/DataManager';
+import PropertyIcon from './PropertyIcon';
+import PropertyTypes from 'enums/PropertyTypes';
 
 const detachIcon = `
   <div class="detach-token">
@@ -14,14 +16,18 @@ const useTokenIcon = `
 `;
 
 export default (property) => {
-  const { $element, tokensMap, options } = property;
+  const { $element, options } = property;
   const _token = $element.data('token');
+  console.log(options);
+  const tokensMap = getPureToken(options.type === PropertyTypes.STROKE_FILL ? [PropertyTypes.FILL_COLOR, PropertyTypes.STROKE_FILL] : options.type);
   const tokenList = Object.keys(tokensMap)
       .map(key => tokensMap[key])
       .filter(token => token.id !== _token.id);
   const _useToken = getToken(options.useToken);
   const $detachToken = $(detachIcon).data("property", property);
   const $useToken = $(useTokenIcon);
+  const $icon = PropertyIcon(options).$icon;
+  const $propertyView = $element.data('propertyView');
   const $tokenList = $('<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>').data("property", property);
 
   property.options.parent = _token.id;
@@ -29,22 +35,26 @@ export default (property) => {
     tokenList,
     $detachToken,
     $useToken,
-    $tokenList
+    $tokenList,
+    $icon,
+    $propertyView
   });
-  $element.data('value', options);
+  $element.data('value', options).addClass('show');
 
   _useToken ? $detachToken.data('token', _useToken).css('display', 'flex') : $detachToken.hide();
 
-  return tokenList.length ?
-    $detachToken.add(
-      $useToken.append(
-        $tokenList.append(
-          tokenList.map((token, index) => 
-            $(`<li class="token-item" data-index="${index}"><a href="#">${token.name}</a></li>`)
-              .data('token', token)
-              .addClass(_useToken && token.name === _useToken.name ? 'selected' : '')
+  return {
+    $token: tokenList.length ?
+      $detachToken.add(
+        $useToken.append(
+          $tokenList.append(
+            tokenList.map((token, index) => 
+              $(`<li class="token-item" data-index="${index}"><a href="#">${token.name}</a></li>`)
+                .data('token', token)
+                .addClass(_useToken && token.name === _useToken.name ? 'selected' : '')
+            )
           )
-        )
-    )) :
-    null
+      )) :
+      null
+  }
 };

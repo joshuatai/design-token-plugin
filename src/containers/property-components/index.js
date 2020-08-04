@@ -5,7 +5,7 @@ import FillColor from './FillColor';
 import StrokeWidthAlign from './StrokeWidthAlign';
 import Opacity from './Opacity';
 import Text from './Text';
-$(document).on(`${BrowserEvents.FOCUSIN} ${BrowserEvents.FOCUSOUT}`, '.val-container [contenteditable="true"]', function (event) {
+$(document).on(`${BrowserEvents.FOCUSIN} ${BrowserEvents.FOCUSOUT}`, '.val-container [contenteditable="true"], .separator-vals [contenteditable="true"]', function (event) {
     const input = $(this);
     if (event.type === BrowserEvents.FOCUSIN)
         input['selectText']();

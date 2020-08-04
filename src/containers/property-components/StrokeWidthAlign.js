@@ -1,11 +1,9 @@
 import validator from 'validator';
 import StrokeWidthAlign from 'model/StrokeWidthAlign';
 import BrowserEvents from 'enums/BrowserEvents';
-import { getToken, getPureToken } from 'model/DataManager';
-import PropertyTypes from 'enums/PropertyTypes';
+import { getToken } from 'model/DataManager';
 import StrokeAligns from 'enums/StrokeAligns';
-import PropertyIcon from './PropertyIcon';
-import Token from './Token';
+import Token from './CommonSettings';
 let hostData;
 const NAME = 'stroke';
 export default function ($) {
@@ -14,10 +12,9 @@ export default function ($) {
         let strokeValue;
         hostData = this;
         this.options = new StrokeWidthAlign(options);
-        this.$element = $(element).attr('property-component', NAME).addClass('show');
+        this.$element = $(element).attr('property-component', NAME);
         this.$customVal = $('<div class="custom-val"></div>');
         this.$valContainer = $('<div class="val-container"></div>');
-        this.$StokeIcon = PropertyIcon(this.options).$icon;
         this.$stokeValue = $('<span class="stroke-val"></span>').attr('contenteditable', !useToken);
         this.$align = $('<div class="stroke-align btn-group" />');
         this.$alignDropdownBtn = $(`
@@ -29,14 +26,12 @@ export default function ($) {
         this.$alignDropdownBtnVal = $(`<span>${this.options.align}</span>`);
         this.$alignDropdowns = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right" />`);
         this.$alignOptions = Object.keys(StrokeAligns).reduce((calc, key) => calc.add($(`<li><a href="#">${key}</a></li>`)), $());
-        this.$propertyView = this.$element.data('propertyView');
-        this.tokensMap = getPureToken(PropertyTypes.STROKE_WIDTH_ALIGN);
         this.$token = Token(this);
         useToken ? strokeValue = useToken.name : strokeValue = this.options.width;
         this.$element
             .append(this.$customVal
             .append(this.$valContainer
-            .append(this.$StokeIcon)
+            .append(this.$icon)
             .append(this.$stokeValue.text(strokeValue).attr('title', strokeValue).addClass(this.tokenList.length ? 'hasReferenceToken' : ''))
             .append(this.$token))
             .append(this.$align[useToken ? 'hide' : 'show']()

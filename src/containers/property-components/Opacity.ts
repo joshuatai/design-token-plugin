@@ -1,10 +1,8 @@
 import validator from 'validator';
 import OpacityModel from 'model/Opacity';
 import BrowserEvents from 'enums/BrowserEvents';
-import { getToken, getPureToken } from 'model/DataManager';
-import PropertyTypes from 'enums/PropertyTypes';
-import PropertyIcon from './PropertyIcon';
-import Token from './Token';
+import { getToken } from 'model/DataManager';
+import CommonSettings from './CommonSettings';
 
 let hostData;
 const NAME = 'opacity';
@@ -16,14 +14,11 @@ export default function ($) {
 
     hostData = this;
     this.options   = new OpacityModel(options);
-    this.$element  = $(element).attr('property-component', NAME).addClass('show');
+    this.$element  = $(element).attr('property-component', NAME);
     this.$customVal = $('<div class="custom-val"></div>');
     this.$valContainer = $('<div class="val-container"></div>');
-    this.$opacityIcon = PropertyIcon(this.options).$icon;
     this.$opacityValue = $('<span class="opacity-val"></span>').attr('contenteditable', !useToken);
-    this.$propertyView = this.$element.data('propertyView');
-    this.tokensMap = getPureToken(PropertyTypes.OPACITY);
-    this.$token = Token(this);
+    this.$token = CommonSettings(this).$token;
 
     useToken ? opacityValue = useToken.name : opacityValue = `${this.options.opacity}%`;
 
@@ -32,7 +27,7 @@ export default function ($) {
         this.$customVal
           .append(
             this.$valContainer
-              .append(this.$opacityIcon)
+              .append(this.$icon)
               .append(
                 this.$opacityValue.text(opacityValue).attr('title', opacityValue).addClass(this.tokenList.length ? 'hasReferenceToken' : '')
               )

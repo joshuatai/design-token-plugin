@@ -1,16 +1,44 @@
 import validator from 'validator';
 import TextModel from 'model/Text';
 import BrowserEvents from 'enums/BrowserEvents';
-import { getToken, getPureToken, getFonts } from 'model/DataManager';
-import PropertyTypes from 'enums/PropertyTypes';
-import Token from './Token';
+import { getToken, getFonts } from 'model/DataManager';
+import CommonSettings from './CommonSettings';
 import FontStyls from 'enums/FontStyles';
 let hostData;
 const NAME = 'font';
+const fontOrders = Object.keys(FontStyls).filter(style => style.match(/[^0-9]/gi));
+const getOrder = (styleName) => {
+    let order;
+    const key = styleName.toLowerCase().replace(/\s/gi, '');
+    const matched = fontOrders.filter(style => key.match(style));
+    let style;
+    if (matched.length) {
+        style = matched[0];
+        if (matched.length === 2) {
+            matched[0].length > matched[1].length ? style = matched[0] : style = matched[1];
+        }
+    }
+    if (style === undefined) {
+        if (styleName === 'Italic' ||
+            styleName === 'Condensed' ||
+            styleName === 'Oblique') {
+            order = 9;
+        }
+        else {
+            order = 0;
+        }
+    }
+    else {
+        order = FontStyls[style];
+    }
+    return order;
+};
 const styleCompare = (a, b) => {
-    if (FontStyls[a] > FontStyls[b])
+    const aOrder = getOrder(a);
+    const bOrder = getOrder(b);
+    if (aOrder > bOrder)
         return 1;
-    if (FontStyls[a] < FontStyls[b])
+    if (aOrder < bOrder)
         return -1;
     return 0;
 };
@@ -21,7 +49,7 @@ export default function ($) {
         let familyVal;
         hostData = this;
         this.options = new TextModel(options);
-        this.$element = $(element).attr('property-component', NAME).addClass('show');
+        this.$element = $(element).attr('property-component', NAME);
         this.$customVal = $('<div class="custom-val"></div>');
         this.$familyContainer = $('<div class="val-container"></div>');
         this.$familyVal = $('<div class="input-group" />');
@@ -47,15 +75,15 @@ export default function ($) {
             return !match;
         });
         fonts = fonts.concat(...dotFonts);
-        this.$familyDropdowns = $('<ul class="dropdown-menu dropdown-menu-multi-select" />').append(fonts.map((fontName, index) => {
-            return (this[`$fontOption_${fontName}`] = $(`<li data-index="${index}"><a href="#">${fontName}</a></li>`));
+        this.$familyDropdowns = $('<ul class="dropdown-menu dropdown-menu-multi-select family-dropdowns" />').append(fonts.map((fontName, index) => {
+            return $(`<li data-index="${index}"></li>`).append(this[`$fontOption_${fontName}`] = $(`<a href="#">${fontName}</a>`));
         }));
         this.$styleContainer = $('<div class="val-container"></div>');
         this.$styleDropdownBtnGroup = $(`<div class="input-group-btn"></div>`);
         this.$styleDropdownToggleBtn = $(`
       <button
         type="button"
-        class="btn btn-border dropdown-toggle"
+        class="btn btn-border dropdown-toggle style-dropdown-toggle"
         data-toggle="dropdown"
       >
         <i class="tmicon tmicon-caret-down"></i>
@@ -63,9 +91,8 @@ export default function ($) {
     `);
         this.$styleName = $('<span></span>');
         this.$styleDropdowns = $('<ul class="dropdown-menu dropdown-menu-multi-select style-dropdown" />');
-        this.$propertyView = this.$element.data('propertyView');
-        this.tokensMap = getPureToken(PropertyTypes.TEXT);
-        this.$token = Token(this);
+        this.$fontSize = $(`<span class="font-size-val" contenteditable="true" />`);
+        this.$token = CommonSettings(this).$token;
         useToken ? familyVal = useToken.name : familyVal = this.options.fontName.family;
         this.$element
             .append(this.$customVal
@@ -75,38 +102,72 @@ export default function ($) {
             .add(this.$familyDropdownBtnGroup.append(this.$familyDropdowns)))
             .addClass(this.tokenList.length ? 'hasReferenceToken' : ''))
             .append(this.$token))
-            .append(this.$styleContainer.append(this.$styleDropdownBtnGroup
+            .append(this.$styleContainer
+            .append(this.$styleDropdownBtnGroup
             .append(this.$styleDropdownToggleBtn.prepend(this.$styleName))
-            .append(this.$styleDropdowns))));
+            .append(this.$styleDropdowns))
+            .append(this.$icon)
+            .append(this.$fontSize)));
         this.fontList = fontList;
         this.fonts = fonts;
-        this.setFontStyles(this.options.fontName.family);
+        this.select(this[`$fontOption_${this.options.fontName.family}`]);
+        this.select(this.styles[this.options.fontName.style]);
         $(document).trigger('property-preview', [this.options]);
     };
-    Text.prototype.setFontStyles = function (family) {
+    Text.prototype.setStylesList = function (family) {
         const fontStyles = this.fontList[family].map(font => font.style);
+        function genStyleList(current, next) {
+            if (current.length) {
+                return current.sort(styleCompare).map((style) => {
+                    const list = $(`<li data-index="${fontIndex}"></li>`)
+                        .append((hostData.styles[style] = $(`<a href="#">${style}</a>`)));
+                    ++fontIndex;
+                    return list;
+                }).concat(next ? genDivider(next) : null);
+            }
+            return null;
+        }
+        ;
+        function genDivider(fonts) {
+            const divider = $(`<li data-index="${fontIndex}" class="divider"></li>`);
+            if (fonts.length) {
+                ++fontIndex;
+                return divider;
+            }
+            return null;
+        }
         const italics = [];
+        const condenseds = [];
         const weights = fontStyles.filter(style => {
             const matchItalic = style.match(/italic/gi);
+            const matchCondenseds = style.match(/condensed/gi);
             if (matchItalic)
-                italics.push(matchItalic[0]);
-            return !matchItalic;
+                italics.push(style);
+            if (matchCondenseds)
+                condenseds.push(style);
+            return !matchItalic && !matchCondenseds;
         });
-        this.$styleDropdowns
-            .empty()
-            .append(weights.length &&
-            weights.sort(styleCompare)
-                .map((style, index) => {
-                return $(`<li data-index="${index}"><a href="#">${style}</a></li>`);
-            }));
-        italics.length && this.$styleDropdowns
-            .append($(`<li data-index="${weights.length + 1}" class="divider"></li>`))
-            .append(italics.sort(styleCompare)
-            .map((style, index) => {
-            return $(`<li data-index="${weights.length + 2 + index}"><a href="#">${style}</a></li>`);
-        }));
-        this.$styleName.text('Regular');
+        let fontIndex = 0;
+        this.styles = {};
+        this.$styleDropdowns.empty();
+        this.$styleDropdowns.append(genStyleList(condenseds, weights));
+        this.$styleDropdowns.append(genStyleList(weights, italics));
+        this.$styleDropdowns.append(genStyleList(italics, null));
+        this.select(this.styles['Regular'] || this.styles[fontStyles[0]]);
         this.$styleDropdownToggleBtn.attr('disabled', fontStyles.length === 1);
+    };
+    Text.prototype.select = function ($option) {
+        const value = $option.text();
+        const $dropdowns = $option.closest('.dropdown-menu');
+        $dropdowns.children().removeClass('selected');
+        $option.parent().addClass('selected');
+        if ($dropdowns.is('.family-dropdowns')) {
+            this.$familyValInput.text(value);
+            this.setStylesList(value);
+        }
+        else {
+            this.$styleName.text(value);
+        }
     };
     Text.prototype.useToken = function (token) {
         // const { fontSize } = token.properties[0];
@@ -159,13 +220,7 @@ export default function ($) {
     //   //   hostData.$familyValInput.highlight(matchFonts.replace(value, ''));
     //   }, 200);
     // });
-    $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .input-group-btn .dropdown-menu a`, function (event) {
-        const value = this.innerText;
-        hostData.$familyValInput.text(value);
-        hostData.$familyDropdowns.children().removeClass('selected');
-        $(this).parent().addClass('selected');
-        hostData.setFontStyles(value);
-    });
+    $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .input-group-btn .dropdown-menu a`, function (event) { hostData.select($(this)); });
     $(document).on(BrowserEvents.FOCUS, `[property-component="${NAME}"] [contenteditable="true"]`, function () {
         $(this).selectText();
     });
