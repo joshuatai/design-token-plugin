@@ -59,8 +59,9 @@ export default (options) => {
         title = `Opacity: ${value}`;
     }
     if (options.type === PropertyTypes.TEXT) {
-        value = options.fontSize;
-        title = `Font Size: ${value}`;
+        value = options.fontName.family;
+        secondValue = options.fontSize;
+        title = `Font Family: ${options.fontName.family}, Font Size: ${options.fontSize}`;
     }
     if (options.useToken) {
         let tokenName = getToken(options.useToken).name;

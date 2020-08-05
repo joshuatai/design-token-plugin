@@ -2,6 +2,7 @@ import Color from 'color';
 import PropertyTypes from 'enums/PropertyTypes';
 import StrokeAligns from 'enums/StrokeAligns';
 import FillType from 'enums/FillTypes';
+import fontLoader from 'utils/fontLoader';
 
 export default (properties) => {
   let color;
@@ -39,7 +40,9 @@ export default (properties) => {
       }
     }
     if (property.type === PropertyTypes.TEXT) {
+      calc["font-family"] = property.fontName.family;
       calc["font-size"] = property.fontSize;
+      fontLoader(property.fontName.family);
     }
     return calc;
   }, {});

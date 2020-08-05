@@ -37,6 +37,8 @@ export default (properties) => {
             }
         }
         if (property.type === PropertyTypes.TEXT) {
+            calc["font-family"] = property.fontName.family;
+            calc["font-family"] = property.fontName.family;
             calc["font-size"] = property.fontSize;
         }
         return calc;

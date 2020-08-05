@@ -54,7 +54,6 @@ async function assignProperty (properties, node) {
 
   if (cornerRadius) {
     const { radius, topLeft, topRight, bottomRight, bottomLeft } = cornerRadius;
-    
     if (radius !== undefined && hasCornerNode(node)) {
       node.cornerRadius = radius;
     } else if (hasMixedCornerNode(node)) {
@@ -64,6 +63,7 @@ async function assignProperty (properties, node) {
       node.bottomLeftRadius = bottomLeft;
     } 
   }
+
   if (strokeWidthAlign && hasStrokeNode(node)) {
     const { width, align } = strokeWidthAlign;
     node.strokeWeight = width;
@@ -100,9 +100,10 @@ async function assignProperty (properties, node) {
     }
   }
   if (fontSize && hasFontNode(node)) {
-    const { fontSize: size } = fontSize;
+    const { fontName, fontSize: size } = fontSize;
     let len = node.characters.length;
-    await figma.loadFontAsync(node.fontName as any)
+    await figma.loadFontAsync(fontName);
+    node.fontName = fontName;
     node.fontSize = size;
   }
 }
@@ -136,7 +137,6 @@ figma.ui.onmessage = async (msg) => {
     });
   }
   if (type === MessageTypes.SYNC_NODES) {
-    
     const token = JSON.parse(message);
     const data = JSON.parse(figma.root.getPluginData('Tokens'));
     const allProperties = [];
@@ -149,7 +149,7 @@ figma.ui.onmessage = async (msg) => {
     }, {});
     const usedTokens = getUsedTokens(allProperties, token.id);
     usedTokens.push(token.id);
- 
+
     function traverse(node) {
       if ("children" in node) {
         for (const child of node.children) {
@@ -159,10 +159,9 @@ figma.ui.onmessage = async (msg) => {
       const data = node.getPluginData('useTokens');
       const tokens = data ? JSON.parse(data) : [];
       const usedToken = usedTokens.filter(token => tokens.includes(token));
-
       if (usedToken.length > 0) {
         tokens.forEach(token => {
-          assignProperty(propertyMaps(tokensMap[token].properties), node);
+          if (tokensMap[token]) assignProperty(propertyMaps(tokensMap[token].properties), node);
         });
       }
     }

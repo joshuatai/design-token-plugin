@@ -109,9 +109,10 @@ function assignProperty(properties, node) {
             }
         }
         if (fontSize && hasFontNode(node)) {
-            const { fontSize: size } = fontSize;
+            const { fontName, fontSize: size } = fontSize;
             let len = node.characters.length;
-            yield figma.loadFontAsync(node.fontName);
+            yield figma.loadFontAsync(fontName);
+            node.fontName = fontName;
             node.fontSize = size;
         }
     });
@@ -169,7 +170,8 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
             const usedToken = usedTokens.filter(token => tokens.includes(token));
             if (usedToken.length > 0) {
                 tokens.forEach(token => {
-                    assignProperty(propertyMaps(tokensMap[token].properties), node);
+                    if (tokensMap[token])
+                        assignProperty(propertyMaps(tokensMap[token].properties), node);
                 });
             }
         }

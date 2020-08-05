@@ -16,7 +16,6 @@ const useTokenIcon = `
 export default (property) => {
     const { $element, options } = property;
     const _token = $element.data('token');
-    console.log(options);
     const tokensMap = getPureToken(options.type === PropertyTypes.STROKE_FILL ? [PropertyTypes.FILL_COLOR, PropertyTypes.STROKE_FILL] : options.type);
     const tokenList = Object.keys(tokensMap)
         .map(key => tokensMap[key])

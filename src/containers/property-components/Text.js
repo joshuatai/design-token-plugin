@@ -107,12 +107,11 @@ export default function ($) {
             .append(this.$styleDropdownToggleBtn.prepend(this.$styleName))
             .append(this.$styleDropdowns))
             .append(this.$icon)
-            .append(this.$fontSize)));
+            .append(this.$fontSize.text(this.options.fontSize))));
         this.fontList = fontList;
         this.fonts = fonts;
         this.select(this[`$fontOption_${this.options.fontName.family}`]);
         this.select(this.styles[this.options.fontName.style]);
-        $(document).trigger('property-preview', [this.options]);
     };
     Text.prototype.setStylesList = function (family) {
         const fontStyles = this.fontList[family].map(font => font.style);
@@ -154,9 +153,16 @@ export default function ($) {
         this.$styleDropdowns.append(genStyleList(weights, italics));
         this.$styleDropdowns.append(genStyleList(italics, null));
         this.select(this.styles['Regular'] || this.styles[fontStyles[0]]);
+        var request = new XMLHttpRequest();
+        request.open('GET', '/fonts/Akronim-Regular_1');
+        request.onload = () => {
+            // console.log((document as any).fonts.check(`14px ${family}`));
+            console.log(request.response);
+        };
+        request.send();
         this.$styleDropdownToggleBtn.attr('disabled', fontStyles.length === 1);
     };
-    Text.prototype.select = function ($option) {
+    Text.prototype.select = function ($option, editable = false) {
         const value = $option.text();
         const $dropdowns = $option.closest('.dropdown-menu');
         $dropdowns.children().removeClass('selected');
@@ -168,6 +174,11 @@ export default function ($) {
         else {
             this.$styleName.text(value);
         }
+        if (editable) {
+            this.options.fontName.family = this.$familyValInput.text();
+            this.options.fontName.style = this.$styleName.text();
+        }
+        $(document).trigger('property-preview', [this.options]);
     };
     Text.prototype.useToken = function (token) {
         // const { fontSize } = token.properties[0];
@@ -220,22 +231,29 @@ export default function ($) {
     //   //   hostData.$familyValInput.highlight(matchFonts.replace(value, ''));
     //   }, 200);
     // });
-    $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .input-group-btn .dropdown-menu a`, function (event) { hostData.select($(this)); });
+    $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .input-group-btn .dropdown-menu a`, function (event) {
+        hostData.select($(this), true);
+    });
     $(document).on(BrowserEvents.FOCUS, `[property-component="${NAME}"] [contenteditable="true"]`, function () {
         $(this).selectText();
     });
     $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .font-size-val[contenteditable="true"]`, function (event) {
-        if (event.type === BrowserEvents.KEY_UP && event.key !== 'Enter') {
-            return;
-        }
         const $this = $(this);
         const options = hostData.options;
         let value = $this.text();
-        if (!validator.isInt(value))
-            value = options.fontSize;
-        value = Math.max(1, value);
-        options.fontSize = value;
-        $this.text(value);
+        let oldVal = options.fontSize;
+        if (event.type === BrowserEvents.KEY_UP) {
+            if (event.key === 'Enter')
+                $this.trigger('blur');
+            return;
+        }
+        if (validator.isInt(value)) {
+            value = Math.max(1, Number(value));
+            options.fontSize = value;
+        }
+        else {
+            $this.text(oldVal);
+        }
         $(document).trigger('property-preview', [options]);
     });
     return NAME;
