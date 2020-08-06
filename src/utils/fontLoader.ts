@@ -3,20 +3,19 @@ let $link;
 
 export default function (family) {
   let hasFont = false;
+  const _document = (document as any);
 
   if ($link && $link.length) $link.remove();
   try {
-    hasFont = (document as any).fonts.check(`14px ${family}`);
+    hasFont = _document.fonts.check(`14px ${family}`);
   } catch (e) {}
-
   if (!hasFont) {
-    $head.append(
-      $(
-        `<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=${family.replace(
-          /Medium|SemiBold|ExtraBold/gi,
-          ""
-        )}">`
-      )
+    $link = $(
+      `<link id="load-font" rel="stylesheet" href="https://fonts.googleapis.com/css?family=${family.replace(
+        /Medium|SemiBold|ExtraBold/gi,
+        ""
+      )}">`
     );
+    $head.append($link);
   }
 }

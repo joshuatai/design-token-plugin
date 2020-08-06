@@ -47,7 +47,7 @@ async function assignProperty (properties, node) {
   const strokeWidthAlign = properties[PropertyTypes.STROKE_WIDTH_ALIGN];
   const strokeFill = properties[PropertyTypes.STROKE_FILL];
   const fillColor = properties[PropertyTypes.FILL_COLOR];
-  const fontSize = properties[PropertyTypes.TEXT];
+  const text = properties[PropertyTypes.TEXT];
   node.type === NodeTypes.GROUP && node.children.forEach(child => {
     assignProperty(properties, child);
   });
@@ -99,8 +99,8 @@ async function assignProperty (properties, node) {
       node.fills = [solidPaint];
     }
   }
-  if (fontSize && hasFontNode(node)) {
-    const { fontName, fontSize: size } = fontSize;
+  if (text && hasFontNode(node)) {
+    const { fontName, fontSize: size } = text;
     let len = node.characters.length;
     await figma.loadFontAsync(fontName);
     node.fontName = fontName;

@@ -4,6 +4,10 @@ import StrokeAligns from 'enums/StrokeAligns';
 import FillType from 'enums/FillTypes';
 import fontLoader from 'utils/fontLoader';
 
+enum FontStyles {
+  Light = 300,
+  Regular = 'normal'
+}
 export default (properties) => {
   let color;
   const css = properties.reduce((calc, property) => {
@@ -42,6 +46,7 @@ export default (properties) => {
     if (property.type === PropertyTypes.TEXT) {
       calc["font-family"] = property.fontName.family;
       calc["font-size"] = property.fontSize;
+      calc["font-weight"] = FontStyles[property.fontName.style];
       fontLoader(property.fontName.family);
     }
     return calc;

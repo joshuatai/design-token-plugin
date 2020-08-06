@@ -71,13 +71,14 @@ export default function ($) {
     `);
     
     let fonts = Object.keys(fontList).sort(Intl.Collator().compare);
+    // fonts.forEach(font => fontLoader(font));
     const dotFonts = [];
     fonts = fonts.filter(font => {
       const match  = font.match(/^\./gi);
       if (match) dotFonts.push(font);
       return !match;
     });
-    fonts = fonts.concat(...dotFonts);
+    // fonts = fonts.concat(...dotFonts);
     this.$familyDropdowns = $('<ul class="dropdown-menu dropdown-menu-multi-select family-dropdowns" />').append(
       fonts.map((fontName, index) => {
         return $(`<li data-index="${index}"></li>`).append(this[`$fontOption_${fontName}`] = $(`<a href="#">${fontName}</a>`));
@@ -100,7 +101,9 @@ export default function ($) {
     this.$fontSize = $(`<span class="font-size-val" contenteditable="true" />`)
     this.$token = CommonSettings(this).$token;
 
-    useToken ? familyVal = useToken.name : familyVal = this.options.fontName.family;
+    const { fontName: { family, style } } = this.options;
+
+    useToken ? familyVal = useToken.name : familyVal = family;
 
     this.$element
       .append(
@@ -133,8 +136,8 @@ export default function ($) {
     this.fontList = fontList;
     this.fonts = fonts;
 
-    this.select(this[`$fontOption_${this.options.fontName.family}`]);
-    this.select(this.styles[this.options.fontName.style]);
+    this.select(this[`$fontOption_${family}`]);
+    this.select(this.styles[style]);
   }
 
   Text.prototype.setStylesList = function (family) {
@@ -191,18 +194,16 @@ export default function ($) {
     const $dropdowns = $option.closest('.dropdown-menu');
     $dropdowns.children().removeClass('selected');
     $option.parent().addClass('selected');
+
     if ($dropdowns.is('.family-dropdowns')) {
       this.$familyValInput.text(value);
+      if (editable) this.options.fontName.family = value;
       this.setStylesList(value);
     } else {
       this.$styleName.text(value);
+      if (editable) this.options.fontName.style = value;
+      $(document).trigger('property-preview', [this.options]);
     }
-
-    if (editable) {
-      this.options.fontName.family = this.$familyValInput.text();
-      this.options.fontName.style = this.$styleName.text();
-    }
-    $(document).trigger('property-preview', [this.options]);
   }
   Text.prototype.useToken = function (token) {
     // const { fontSize } = token.properties[0];
@@ -261,6 +262,7 @@ export default function ($) {
   // });
   
   $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .input-group-btn .dropdown-menu a`, function (event) { 
+    console.log('select')
     hostData.select($(this), true);
   });
   $(document).on(BrowserEvents.FOCUS, `[property-component="${NAME}"] [contenteditable="true"]`, function () {

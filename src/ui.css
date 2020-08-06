@@ -1,10 +1,26 @@
-/* @font-face {
-  font-family: 'TMicon';
-  src: url('http://localhost:9003/themes/minimalism/1.23.0/light/fonts/TMicon.eot?i23i6y');
-  src: url('http://localhost:9003/themes/minimalism/1.23.0/light/fonts/TMicon.eot?i23i6y#iefix') format('embedded-opentype'), url('http://localhost:9003/themes/minimalism/1.23.0/light/fonts/TMicon.woff2?i23i6y') format('woff2'), url('http://localhost:9003/themes/minimalism/1.23.0/light/fonts/TMicon.ttf?i23i6y') format('truetype'), url('http://localhost:9003/themes/minimalism/1.23.0/light/fonts/TMicon.woff?i23i6y') format('woff'), url('http://localhost:9003/themes/minimalism/1.23.0/light/fonts/TMicon.svg?i23i6y#TMicon') format('svg');
+@font-face {
+  font-family: "Abyssinica SIL";
+  src: url("https://joshuatai.github.io/webfont-storage/fonts/Abyssinica%20SIL/Abyssinica%20SIL.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Aksara Bali Galang";
+  src: url("https://joshuatai.github.io/webfont-storage/fonts/Aksara%20Bali%20Galang/Aksara%20Bali%20Galang.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Andada SC";
+  src: url("https://joshuatai.github.io/webfont-storage/fonts/Andada%20SC/Andada%20SC-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Antonio";
   font-weight: normal;
-  font-style: normal;
-} */
+  src: url("https://joshuatai.github.io/webfont-storage/fonts/Antonio/Antonio-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Antonio";
+  font-weight: 300;
+  src: url("https://joshuatai.github.io/webfont-storage/fonts/Antonio/Antonio-Light.ttf") format("truetype");
+}
+
 body {
   background: #fff;
 }
