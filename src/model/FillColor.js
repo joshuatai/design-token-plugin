@@ -29,6 +29,8 @@ class FillColor {
             this.blendMode = options.blendMode;
         if (options.useToken)
             this.useToken = options.useToken;
+        if (options.themeMode)
+            this.themeMode = options.themeMode;
     }
     get type() {
         return this._type;

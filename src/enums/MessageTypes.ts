@@ -1,10 +1,14 @@
 enum MessageTypes {
+  GET_FONTS = 'Get Fonts',
+  GET_MODES = 'Get Modes',
+  GET_CURRENT_THEME_MODE = 'Get Current Theme Mode',
+  SET_CURRENT_THEME_MODE = 'Set Current Theme Mode',
+  SET_MODES = 'Set Modes',
   GET_TOKENS = 'Get Tokens',
   SET_TOKENS = 'Set Tokens',
   ASSIGN_TOKEN = 'Assign Token',
   SYNC_NODES = 'Sync Nodes',
-  SELECTION_CHANGE = 'Selection Change',
-  FONT_LIST = 'Font List'
+  SELECTION_CHANGE = 'Selection Change'
 }
 
 export default MessageTypes;

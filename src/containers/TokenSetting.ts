@@ -69,7 +69,7 @@ export default function ($) {
     const $propertyView = $('<div id="property-view" class="setting-row" />');
     const $propertyList = $('<div id="property-list" class="setting-row"></div>');
     const $createPropertyRow = $('<div class="setting-row" />');
-    const $createProperty = $('<button id="add-property" type="button">Create New Property</button>');
+    const $createProperty = $('<button id="add-property" type="button">Create a new property</button>');
     const $propertySetting = $('<div id="property-setting" />');
     const $propertyTypeRow = $('<div id="property-type-row" class="setting-row">')
     const $propertyType = $('<div id="property-type" class="btn-group" />')

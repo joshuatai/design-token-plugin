@@ -3,7 +3,8 @@ export default function ($) {
         return this.each(function () {
             const $this = $(this);
             if (!$this.is(':focus'))
-                $this.attr("contenteditable", "true").trigger("focus");
+                $this.trigger("focus");
+            $this.attr("contenteditable", "true");
             let range, selection;
             if (window.getSelection) {
                 selection = window.getSelection();

@@ -1,32 +1,34 @@
 import Color from 'color';
+
 import NodeTypes from 'enums/NodeTypes';
 import MessageTypes from 'enums/MessageTypes';
 import PropertyTypes from 'enums/PropertyTypes';
 import FillTypes from 'enums/FillTypes';
 import { hasCornerNode, hasMixedCornerNode, hasStrokeNode, hasFillsNode, hasFontNode } from 'utils/hasNodeType';
 
-function clone(val) {
-  const type = typeof val
-  if (val === null) {
-    return null
-  } else if (type === 'undefined' || type === 'number' ||
-             type === 'string' || type === 'boolean') {
-    return val
-  } else if (type === 'object') {
-    if (val instanceof Array) {
-      return val.map(x => clone(x))
-    } else if (val instanceof Uint8Array) {
-      return new Uint8Array(val)
-    } else {
-      let o = {}
-      for (const key in val) {
-        o[key] = clone(val[key])
-      }
-      return o
-    }
-  }
-  throw 'unknown'
-}
+let useThemeMode;
+// function clone(val) {
+//   const type = typeof val
+//   if (val === null) {
+//     return null
+//   } else if (type === 'undefined' || type === 'number' ||
+//              type === 'string' || type === 'boolean') {
+//     return val
+//   } else if (type === 'object') {
+//     if (val instanceof Array) {
+//       return val.map(x => clone(x))
+//     } else if (val instanceof Uint8Array) {
+//       return new Uint8Array(val)
+//     } else {
+//       let o = {}
+//       for (const key in val) {
+//         o[key] = clone(val[key])
+//       }
+//       return o
+//     }
+//   }
+//   throw 'unknown'
+// }
 function postMessage (type: String, message: String | Object): void {
   figma.ui.postMessage({ type, message });
 }
@@ -35,10 +37,16 @@ function propertyMaps (properties) {
     if (
       property._type === PropertyTypes.CORNER_RADIUS ||
       property._type === PropertyTypes.STROKE_WIDTH_ALIGN ||
-      property._type === PropertyTypes.FILL_COLOR ||
-      property._type === PropertyTypes.STROKE_FILL ||
       property._type === PropertyTypes.TEXT
-    ) calc[property._type] = property;
+    ) {
+      calc[property._type] = property;
+    } else if (
+      property._type === PropertyTypes.FILL_COLOR ||
+      property._type === PropertyTypes.STROKE_FILL
+    ) {
+      if (!calc[property._type]) calc[property._type] = [];
+      calc[property._type].push(property);
+    }
     return calc;
   }, {});
 }
@@ -86,18 +94,23 @@ async function assignProperty (properties, node) {
   }
 
   if (fillColor && hasFillsNode(node)) {
-    const { fillType, color, visible, opacity, blendMode } = fillColor;
-    const [r, g, b] = Color(`#${color}`).rgb().color;
-    if (fillType === FillTypes.SOLID) {
-      const solidPaint: SolidPaint = {
-        type: FillTypes.SOLID,
-        color: { r: r / 255, g: g / 255, b: b / 255 },
-        visible,
-        opacity,
-        blendMode
-      };
-      node.fills = [solidPaint];
-    }
+    const themeModes = JSON.parse(figma.root.getPluginData('ThemeModes'));
+    if (!useThemeMode) useThemeMode = themeModes[0];
+
+    fillColor.forEach(fill => {
+      const { fillType, color, visible, opacity, blendMode, themeMode } = fill;
+      const [r, g, b] = Color(`#${color}`).rgb().color;
+      if (themeMode === useThemeMode && fillType === FillTypes.SOLID) {
+        const solidPaint: SolidPaint = {
+          type: FillTypes.SOLID,
+          color: { r: r / 255, g: g / 255, b: b / 255 },
+          visible,
+          opacity,
+          blendMode
+        };
+        node.fills = [solidPaint];
+      }
+    });
   }
   if (text && hasFontNode(node)) {
     const { fontName, fontSize: size } = text;
@@ -113,12 +126,55 @@ function getUsedTokens (properties, token: string) {
     .map(prop => prop.parent);
   return usedTokens.concat(...usedTokens.map(token => getUsedTokens(properties, token)));
 }
+
+function getCurrentThemeMode () {
+  const themeModes = JSON.parse(figma.root.getPluginData('ThemeModes'));
+  useThemeMode = figma.currentPage.getPluginData('themeMode');
+  if (!useThemeMode) useThemeMode = themeModes[0].id;
+  postMessage(MessageTypes.GET_CURRENT_THEME_MODE, useThemeMode);
+}
+function setCurrentThemeMode (message) {
+  figma.currentPage.setPluginData('ThemeModes', message);
+  useThemeMode = message;
+}
 figma.showUI(__html__, { visible: true, width: 267, height: 600 });
 
 figma.ui.onmessage = async (msg) => {
   const { type, message } = msg;
+  if (type === MessageTypes.GET_FONTS) {
+    let fontList = await figma.clientStorage.getAsync('font-list');
+    if (!fontList) {
+      fontList = await figma.listAvailableFontsAsync();
+      figma.clientStorage.setAsync('font-list', fontList);
+    }
+    const fonts = fontList.reduce((calc, font) => {
+      if (!calc[font.fontName.family]) calc[font.fontName.family] = [];
+      calc[font.fontName.family].push(font.fontName);
+      return calc;
+    }, {});
+    postMessage(MessageTypes.GET_FONTS, fonts);
+  }
+  if (type === MessageTypes.GET_MODES) {
+    const themeModes = figma.root.getPluginData('ThemeModes');
+    let modes = [];
+    if (themeModes) {
+      modes = JSON.parse(themeModes);
+    }
+    postMessage(type, modes);
+  }
+  if (type === MessageTypes.GET_CURRENT_THEME_MODE) {
+    getCurrentThemeMode();
+  }
+  if (type === MessageTypes.SET_CURRENT_THEME_MODE) {
+    setCurrentThemeMode(message);
+  }
+  if (type === MessageTypes.SET_MODES) {
+    figma.root.setPluginData('ThemeModes', message);
+  }
   if (type === MessageTypes.GET_TOKENS) {
-    postMessage(type, JSON.parse(figma.root.getPluginData('Tokens')));    
+    let tokens = figma.root.getPluginData('Tokens');
+    if (!tokens) tokens = '[]';
+    postMessage(type, JSON.parse(tokens));
   }
   if (type === MessageTypes.SET_TOKENS) {
     figma.root.setPluginData('Tokens', message);
@@ -168,20 +224,10 @@ figma.ui.onmessage = async (msg) => {
     traverse(figma.root);
   }
 };
+figma.on('currentpagechange', () => {
+  getCurrentThemeMode();
+});
 figma.on("selectionchange", () => {
   console.log(figma.currentPage.selection);
   postMessage(MessageTypes.SELECTION_CHANGE, figma.currentPage.selection);
 });
-
-
-async function getFonts () {
-  const list = await figma.listAvailableFontsAsync();
-  const fonts = list.reduce((calc, font) => {
-    if (!calc[font.fontName.family]) calc[font.fontName.family] = [];
-    calc[font.fontName.family].push(font.fontName);
-    return calc;
-  }, {});
-  postMessage(MessageTypes.FONT_LIST, fonts);
-}
-
-getFonts();

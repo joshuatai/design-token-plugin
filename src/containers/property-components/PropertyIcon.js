@@ -1,5 +1,5 @@
 import Color from 'color';
-import { getToken } from 'model/DataManager';
+import { getToken, getThemeMode } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
 const icons = {
     [PropertyTypes.CORNER_RADIUS]: '<span class="corner-radius-icon"></span>',
@@ -15,9 +15,16 @@ export default (options) => {
     let value;
     let title;
     let secondValue;
+    let thridValue;
     const $icon = $(icons[options.type]);
     if (options.type === PropertyTypes.FILL_COLOR) {
-        css = Color(`#${options.color}`);
+        const themeModes = getThemeMode();
+        value = options.color;
+        secondValue = `${options.opacity * 100}%`;
+        if (themeModes.length > 1)
+            thridValue = getThemeMode(options.themeMode).name;
+        title = `Fill Color: #${value.toUpperCase()}`;
+        css = Color(`#${value}`);
         $icon
             .addClass('token-icon')
             .css("background", css)
@@ -25,6 +32,10 @@ export default (options) => {
             .css("opacity", (100 - (options.opacity * 100)) / 100);
     }
     if (options.type === PropertyTypes.STROKE_FILL) {
+        value = options.color;
+        secondValue = `${options.opacity * 100}%`;
+        thridValue = getThemeMode(options.themeMode).name;
+        title = `Stroke Color: #${value.toUpperCase()}`;
         const color = Color(`#${options.color}`).alpha(options.opacity);
         css = `linear-gradient(${color}, ${color}), ${opacityBg}`;
         $icon
@@ -46,14 +57,6 @@ export default (options) => {
         secondValue = options.align;
         title = `Stroke Width: ${value} and Stroke Align: ${secondValue}`;
     }
-    if (options.type === PropertyTypes.FILL_COLOR) {
-        value = options.color;
-        title = `Fill Color: #${value.toUpperCase()}`;
-    }
-    if (options.type === PropertyTypes.STROKE_FILL) {
-        value = options.color;
-        title = `Stroke Color: #${value.toUpperCase()}`;
-    }
     if (options.type === PropertyTypes.OPACITY) {
         value = `${options.opacity}%`;
         title = `Opacity: ${value}`;
@@ -73,6 +76,7 @@ export default (options) => {
         value,
         title,
         secondValue,
+        thridValue,
         $icon
     };
 };

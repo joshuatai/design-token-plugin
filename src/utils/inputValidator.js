@@ -1,5 +1,6 @@
 import validator from 'validator';
-import { getGroup, getToken, save } from '../model/DataManager';
+import ThemeMode from 'model/ThemeMode';
+import { getThemeMode, getGroup, getToken, save, saveThemeMode } from '../model/DataManager';
 const validInt = function (event) {
     if (!validator.isInt(event.key)) {
         event.stopPropagation();
@@ -35,14 +36,19 @@ function valCheck(editable, data, propName) {
         return;
     }
     data[propName] = newVal;
-    editable.text(newVal);
-    save();
+    editable.text(newVal).attr("contenteditable", "false");
+    if (data instanceof ThemeMode) {
+        saveThemeMode();
+    }
+    else {
+        save();
+    }
 }
 let valCheckTimer;
-const valChange = function (e) {
+const valChange = function () {
     const $target = $(this);
     const id = $target.data('id');
-    const data = getGroup(id) || getToken(id);
+    const data = getThemeMode(id) || getGroup(id) || getToken(id);
     if (valCheckTimer)
         clearTimeout(valCheckTimer);
     valCheckTimer = setTimeout(function () {

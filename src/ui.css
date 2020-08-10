@@ -24,6 +24,24 @@
 body {
   background: #fff;
 }
+.nav-tabs {
+  background-image: linear-gradient(rgb(251, 251, 251) 0%, rgb(236, 236, 236) 100%);
+}
+.nav-tabs > li > a,
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+  border: 0;
+  font-size: 12px;
+  padding: 6px 10px;
+  min-width: 10px;
+}
+.theme-modes {
+  float: right;
+}
+.tab-content > .tab-pane {
+  height: 100%;
+}
 .plugin-panel {
   height: 100%;
   background: #ffffff;
@@ -66,7 +84,8 @@ body {
 }
 #design-tokens-container [contenteditable="true"]:focus,
 #token-setting [contenteditable="true"]:focus,
-#color-picker-container [contenteditable="true"]:focus {
+#color-picker-container [contenteditable="true"]:focus,
+#mode-setting [contenteditable="true"]:focus  {
   border-color:#18a0fb;
   background: #fff;
   z-index: 4;
@@ -75,15 +94,19 @@ body {
 #design-tokens-container [contenteditable]::selection,
 #token-setting [contenteditable]::selection,
 #color-picker-container [contenteditable]::selection,
+#mode-setting [contenteditable]::selection,
 .property-setting-section [contenteditable]::selection {
   background: lightblue;
   color: #333333;
 }
 
-
-[contenteditable="true"][invalid="true"] {
+#design-tokens-container [contenteditable="true"][invalid="true"],
+#token-setting [contenteditable="true"][invalid="true"],
+#color-picker-container [contenteditable="true"][invalid="true"],
+#mode-setting [contenteditable="true"][invalid="true"]  {
   border-color: #E52630;
 }
+
 [contenteditable="true"] br {
   display:none;
 }
@@ -103,17 +126,19 @@ body {
   opacity: 1;
   background: #dddddd;
 }
-.group-create {
+.group-create,
+.mode-create {
   border: 1px dashed #e5e5e5;
   background: #F6F6F6;
   text-align: center;
   cursor: pointer;
-  color: #a5a5a5;
+  color: #8b8b8b;
   padding: 12px;
   align-items: center;
   margin: 5px;
 }
-.group-create:hover {
+.group-create:hover,
+.mode-create:hover {
   background: #fff;
   border-color: #aaa;
   color: #333;
@@ -122,7 +147,8 @@ body {
   margin: 0;
   padding: 0;
 }
-.token-list .token-item {
+.token-list .token-item,
+#mode-list li {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -130,6 +156,10 @@ body {
   height: 32px;
   box-sizing: border-box;
   cursor: default;
+}
+#mode-list {
+  margin: 0;
+  padding: 0;
 }
 .token-item-selected {
   background: #daebf7;
@@ -333,16 +363,23 @@ body {
   z-index: 2000;
 }
 #property-list > ul > li .property-name {
-  width: 80px;
+  width: 75px;
 }
-#property-list > ul > li .property-value {
+#property-list > ul > li .property-value,
+#mode-list li .theme-mode-name {
   flex: 1;
   white-space: nowrap;
   width: 10px;
   text-overflow: ellipsis;
   overflow: hidden;
 }
-#property-list > ul > li .remove-property {
+.property-second-value,
+.property-third-value {
+  padding-left: 5px;
+}
+
+#property-list > ul > li .remove-property,
+#mode-list li .remove-mode {
   display: flex;
   width: 16px;
   height: 16px;
@@ -351,7 +388,8 @@ body {
   margin: 6px;
   cursor: pointer;
 }
-#property-list > ul > li .remove-property[disabled] {
+#property-list > ul > li .remove-property[disabled],
+#mode-list li .remove-mode[disabled] {
   opacity: 0.3;
   cursor: not-allowed;
 }
@@ -373,7 +411,8 @@ body {
   background: #d2e9f9;
   color: #333333;
 }
-#add-property[disabled] {
+#add-property[disabled],
+#mode-creator[disabled] {
   background: #F6F6F6;
   color: #b6b6b6;
   border: 1px dashed #E5E5E5;
@@ -530,7 +569,8 @@ button[aria-expanded="true"] {
 }
 .detach-token,
 .use-token,
-.separator-icon {
+.separator-icon,
+.themem-mode-list {
   width: 30px;
   height: 30px;
   display: flex;
@@ -538,9 +578,11 @@ button[aria-expanded="true"] {
   justify-content: center;
   border-radius: 3px;
 }
+
 .detach-token:hover,
 .use-token:hover,
-.use-token[aria-expanded="true"] {
+.use-token[aria-expanded="true"],
+.themem-mode-list:hover {
   background: rgba(0,0,0,.06);
 }
 .detach-token,
@@ -742,7 +784,9 @@ span.stroke-width-icon:after {
 }
 .corner-radius-val.hasReferenceToken,
 .stroke-val.hasReferenceToken,
-.opacity-val.hasReferenceToken {
+.opacity-val.hasReferenceToken,
+.font-family-val.hasReferenceToken,
+.hasReferenceToken + .dropdown .themem-mode-list {
   border-radius: 0;
 }
 
@@ -904,4 +948,22 @@ span.stroke-width-icon:after {
 }
 .val-container .input-group-btn .style-dropdown-toggle i {
   float: right;
+}
+
+.themem-mode-list {
+  position: relative;
+}
+
+.themem-mode-list .tmicon-sun {
+  position: relative;
+  top: -2px;
+  left: 3px;
+  font-size: 14px;
+}
+
+.themem-mode-list .tmicon-moon {
+  position: relative;
+  left: -2px;
+  top: 2px;
+  font-size: 12px;
 }

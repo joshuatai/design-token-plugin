@@ -2,27 +2,32 @@ import _cloneDeep from 'lodash/cloneDeep';
 import MessageTypes from 'enums/MessageTypes';
 import PropertyTypes from 'enums/PropertyTypes';
 import { Mixed } from 'symbols/index';
-const data = [];
+const themeModes = [];
+const groups = [];
+const themeModeMap = {};
 const groupMap = {};
 const tokenMap = {};
 let fonts = {};
 let propertiesMap = {};
+let currentThemeMode;
 const pureToken = Object.keys(PropertyTypes).reduce((calc, type) => (calc[PropertyTypes[type]] = {}, calc), {});
 const clearPureToken = () => {
     Object.keys(pureToken).forEach(key => {
         pureToken[key] = {};
     });
 };
-const getFonts = () => {
-    return _cloneDeep(fonts);
+const getFonts = () => fonts;
+const fetch = () => {
+    sendMessage(MessageTypes.GET_FONTS);
+    sendMessage(MessageTypes.GET_MODES);
+    sendMessage(MessageTypes.GET_CURRENT_THEME_MODE);
+    sendMessage(MessageTypes.GET_TOKENS);
 };
-const fetch = () => sendMessage(MessageTypes.GET_TOKENS);
-const getAllGroup = () => data;
-const getGroup = (id) => groupMap[id];
-const getToken = (id) => tokenMap[id];
-const getAllToken = () => Object.values(tokenMap);
-const getProperty = id => propertiesMap[id];
-const getAllProperty = () => Object.values(propertiesMap);
+const getCurrentThemeMode = () => currentThemeMode;
+const getThemeMode = function (id) { return arguments.length ? themeModeMap[id] : themeModes; };
+const getGroup = function (id) { return arguments.length ? groupMap[id] : groups; };
+const getToken = function (id) { return arguments.length ? tokenMap[id] : Object.values(tokenMap); };
+const getProperty = function (id) { return arguments.length ? propertiesMap[id] : Object.values(propertiesMap); };
 const getPureToken = (type) => {
     if (typeof type === 'string') {
         return pureToken[type];
@@ -33,11 +38,24 @@ const getPureToken = (type) => {
         }, {});
     }
 };
+const setThemeMode = mode => {
+    themeModes.push(mode);
+    themeModeMap[mode.id] = mode;
+};
+const removeThemeMode = mode => {
+    delete themeModeMap[mode.id];
+    const index = themeModes.findIndex((_mode) => _mode.id === mode.id);
+    themeModes.splice(index, 1);
+};
+const setCurrentThemeMode = themeMode => {
+    currentThemeMode = themeMode;
+    sendMessage(MessageTypes.SET_CURRENT_THEME_MODE, themeMode);
+};
 const setFonts = _fonts => {
     fonts = _fonts;
 };
 const setGroup = (group) => {
-    data.push(group);
+    groups.push(group);
     groupMap[group.id] = group;
     return group;
 };
@@ -58,17 +76,20 @@ const removeToken = (token) => {
 };
 const setProperty = property => propertiesMap[property.id] = property;
 const setPureToken = (token) => token.propertyType && token.propertyType !== Mixed && (pureToken[token.propertyType][token.id] = token);
+const saveThemeMode = () => {
+    sendMessage(MessageTypes.SET_MODES, themeModes);
+};
 const save = () => {
-    const _data = _cloneDeep(data);
+    const _groups = _cloneDeep(groups);
     propertiesMap = {};
     clearPureToken();
-    sendMessage(MessageTypes.SET_TOKENS, _data.map(({ id, name, tokens }, groupIndex) => {
+    sendMessage(MessageTypes.SET_TOKENS, _groups.map(({ id, name, tokens }, groupIndex) => {
         tokens.forEach((token, tokenIndex) => {
             setPureToken(token);
             if (token.propertyType === Mixed)
                 token.propertyType = String(Mixed);
             token.properties.forEach((property, propIndex) => {
-                setProperty(data[groupIndex].tokens[tokenIndex].properties[propIndex]);
+                setProperty(groups[groupIndex].tokens[tokenIndex].properties[propIndex]);
                 if (property.type === PropertyTypes.CORNER_RADIUS && property.radius === Mixed) {
                     property.radius = String(Mixed);
                 }
@@ -79,7 +100,7 @@ const save = () => {
 };
 const syncToken = (token) => {
     const refer = token.properties[0];
-    getAllProperty().forEach((property) => {
+    getProperty().forEach((property) => {
         const hostToken = getToken(property.parent);
         if (property.useToken === token.id) {
             if (property.type === PropertyTypes.CORNER_RADIUS) {
@@ -105,7 +126,7 @@ const syncToken = (token) => {
         }
     });
 };
-const referByToken = (token) => getAllProperty()
+const referByToken = (token) => getProperty()
     .filter((property) => property.useToken === token.id)
     .map((property) => getToken(property.parent));
 const syncNode = (token) => {
@@ -117,4 +138,4 @@ const sendMessage = (type, message = "") => parent.postMessage({
         message: JSON.stringify(message),
     },
 }, "*");
-export { fetch, getFonts, getAllGroup, getGroup, getAllToken, getToken, getProperty, getPureToken, setFonts, setGroup, setToken, setProperty, setPureToken, removeToken, save, syncToken, syncNode, referByToken, sendMessage };
+export { fetch, getThemeMode, getCurrentThemeMode, getFonts, getGroup, getToken, getProperty, getPureToken, setThemeMode, setCurrentThemeMode, removeThemeMode, setFonts, setGroup, setToken, setProperty, setPureToken, removeToken, save, saveThemeMode, syncToken, syncNode, referByToken, sendMessage };

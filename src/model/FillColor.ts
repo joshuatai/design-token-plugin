@@ -12,6 +12,7 @@ class FillColor {
   opacity: number = 1;
   visible: Boolean = true;
   blendMode: String = BlendModes.NORMAL;
+  themeMode: String;
   useToken: String = '';
 
   constructor(options?: any) {
@@ -23,6 +24,7 @@ class FillColor {
     if (options.visible != undefined) this.visible = options.visible;
     if (options.blendMode != undefined) this.blendMode = options.blendMode;
     if (options.useToken) this.useToken = options.useToken;
+    if (options.themeMode) this.themeMode = options.themeMode;
   }
   get type (): String {
     return this._type;

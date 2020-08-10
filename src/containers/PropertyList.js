@@ -16,7 +16,7 @@ export default function ($) {
                 .append($title)
                 .append(this.$propertyContainer
                 .append(options.map((property, index) => {
-                let { $icon, value, title, secondValue } = PropertyIcon(property);
+                let { $icon, value, title, secondValue, thridValue } = PropertyIcon(property);
                 const token = getToken(property.parent);
                 const referTokens = referByToken(token);
                 const $remove = $(`<span class="remove-property">${removeIcon}</span>`);
@@ -30,6 +30,7 @@ export default function ($) {
                     .append($icon)
                     .append(`<span class="property-value" ${title ? 'title="' + title + '"' : ''}>${value}</span>`)
                     .append(secondValue ? $(`<span class="property-second-value">${secondValue}</span>`) : null)
+                    .append(thridValue ? $(`<span class="property-third-value">${thridValue}</span>`) : null)
                     .append($remove)
                     .data('property', property);
                 return propertyItem;

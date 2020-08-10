@@ -1,4 +1,4 @@
-import { getToken, getPureToken } from 'model/DataManager';
+import { getToken, getPureToken, getThemeMode } from 'model/DataManager';
 import PropertyIcon from './PropertyIcon';
 import PropertyTypes from 'enums/PropertyTypes';
 
@@ -14,9 +14,15 @@ const useTokenIcon = `
     </div>
   </div>
 `;
-
+export const themeModeIcon =  `
+  <div class="themem-mode-list" data-toggle="dropdown">
+    <span class="tmicon tmicon-sun"></span>
+    <span class="tmicon tmicon-moon"></span>
+  </div>
+`;
 export default (property) => {
   const { $element, options } = property;
+  const themeModes = getThemeMode();
   const _token = $element.data('token');
   const tokensMap = getPureToken(options.type === PropertyTypes.STROKE_FILL ? [PropertyTypes.FILL_COLOR, PropertyTypes.STROKE_FILL] : options.type);
   const tokenList = Object.keys(tokensMap)
@@ -25,14 +31,44 @@ export default (property) => {
   const _useToken = getToken(options.useToken);
   const $detachToken = $(detachIcon).data("property", property);
   const $useToken = $(useTokenIcon);
-  const $icon = PropertyIcon(options).$icon;
+  
   const $propertyView = $element.data('propertyView');
   const $tokenList = $('<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>').data("property", property);
+  const $themeModeIcon = $(themeModeIcon);
+  const $themeModeList = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>`).data("property", property);
+  let $themeMode;
+
+  if (options.type === PropertyTypes.FILL_COLOR) {
+    $themeMode = $(`<div class="dropdown"></div>`)
+      .append($themeModeIcon)
+      .append(
+        $themeModeList.append(
+          themeModes.map((mode, index) => {
+            const $item = $(`
+              <li class="mode-item" data-index="${index}" data-id="${mode.id}">
+                <a href="#">${mode.name}${mode.isDefault ? ' (Default)' : ''}</a>
+              </li>
+            `)
+            .data('themeMode', mode);
+
+            if ((!options.themeMode && mode.isDefault) || options.themeMode === mode.id) {
+              options.themeMode = mode.id;
+              $item.addClass('selected');
+              $themeModeIcon.attr('title', mode.name);
+            }
+            return $item; 
+          })
+        )
+      );
+    if (themeModes.length === 1) $themeMode = null;
+  }
+  const $icon = PropertyIcon(options).$icon;
 
   property.options.parent = _token.id;
 
   Object.assign(property, {
     tokenList,
+    $themeModeList,
     $detachToken,
     $useToken,
     $tokenList,
@@ -44,6 +80,7 @@ export default (property) => {
   _useToken ? $detachToken.data('token', _useToken).css('display', 'flex') : $detachToken.hide();
 
   return {
+    $themeMode,
     $token: tokenList.length ?
       $detachToken.add(
         $useToken.append(

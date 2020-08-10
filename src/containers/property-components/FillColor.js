@@ -23,7 +23,9 @@ export default function ($) {
         this.$valContainer = $('<div class="val-container"></div>');
         this.$colorValue = $('<span class="color-val"></span>').attr('contenteditable', !useToken);
         this.$colorOpacity = $('<span class="opacity-val"></span>').attr('contenteditable', !useToken);
-        this.$token = CommonSettings(this).$token;
+        const commonSetting = CommonSettings(this);
+        this.$token = commonSetting.$token;
+        this.$themeMode = commonSetting.$themeMode;
         useToken ? colorValue = useToken.name : colorValue = this.options.color;
         opacityValue = this.options.opacity;
         this.$element
@@ -32,6 +34,7 @@ export default function ($) {
             .append(this.$icon)
             .append(this.$colorValue.text(colorValue).attr('title', colorValue))
             .append(this.$colorOpacity.text(`${opacityValue * 100}%`).addClass(this.tokenList.length ? 'hasReferenceToken' : ''))
+            .append(this.$themeMode)
             .append(this.$token)));
         this.setIcon();
         $(document).trigger('property-preview', [this.options]);

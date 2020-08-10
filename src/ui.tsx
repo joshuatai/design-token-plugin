@@ -1,11 +1,12 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { fetch, getAllGroup, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage, setFonts } from './model/DataManager';
+import { fetch, setCurrentThemeMode, setThemeMode, removeThemeMode, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage, setFonts, saveThemeMode } from './model/DataManager';
 import TokenSetting from './containers/TokenSetting';
 import PropertyIcon from './containers/property-components/PropertyIcon';
 import BrowserEvents from 'enums/BrowserEvents';
 import preventEvent from  'utils/preventEvent';
-// import properties2css from 'utils/properties2css';
+
+import ThemeMode from 'model/ThemeMode';
 import Group from 'model/Group';
 import Token from 'model/Token';
 import Properties from 'model/Properties';
@@ -14,6 +15,7 @@ import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
 import './ui.css';
 import MessageTypes from 'enums/MessageTypes';
+import { themeModeIcon } from './containers/property-components/CommonSettings';
 import { Mixed } from './symbols';
 
 declare var $: any;
@@ -24,18 +26,17 @@ PluginDestroy(jQuery);
 
 const { useEffect } = React;
 
-let $tokenContainer,$tokenSetting, $groupCreator;
+let $tokenContainer, $desiginSystemTabs, $tokenSetting, $groupCreator, $modeCreator, $themeModeList;
 
 const $tokenEditBtn = $('<button type="button" class="token-edit-btn"><svg class="svg" width="12" height="14" viewBox="0 0 12 14" xmlns="http://www.w3.org/2000/svg"><path d="M2 7.05V0h1v7.05c1.141.232 2 1.24 2 2.45 0 1.21-.859 2.218-2 2.45V14H2v-2.05c-1.141-.232-2-1.24-2-2.45 0-1.21.859-2.218 2-2.45zM4 9.5c0 .828-.672 1.5-1.5 1.5-.828 0-1.5-.672-1.5-1.5C1 8.672 1.672 8 2.5 8 3.328 8 4 8.672 4 9.5zM9 14h1V6.95c1.141-.232 2-1.24 2-2.45 0-1.21-.859-2.218-2-2.45V0H9v2.05c-1.141.232-2 1.24-2 2.45 0 1.21.859 2.218 2 2.45V14zm2-9.5c0-.828-.672-1.5-1.5-1.5C8.672 3 8 3.672 8 4.5 8 5.328 8.672 6 9.5 6c.828 0 1.5-.672 1.5-1.5z" fill-rule="evenodd" fill-opacity="1" fill="#000" stroke="none"></path></svg></button>');
 
 const Utils = {
   newGroupName: (): string => {
-    const lastNumber = getAllGroup()
+    const lastNumber = getGroup()
       .filter((group) => (group.name.match(/^Group \d+$/) ? true : false))
       .map(group => (Number(group.name.replace('Group ', ''))))
       .sort()
       .pop();
-  
     return `Group ${lastNumber ? lastNumber + 1 : 1}`;
   },
   clearSelection: () => {
@@ -44,6 +45,64 @@ const Utils = {
 };
 
 const Renderer = {
+  themeMode: function (mode) {
+    let $mode, $name, $remove;
+
+    $themeModeList
+      .append(
+        (
+          $mode = $(`<li id="mode-${mode.id}"></li>`)
+            .append($name = $(`<span class="theme-mode-name" prop-name="name" is-required="true" contenteditable>${mode.name}</span>`).data('id', mode.id))
+            .append(
+              $remove = $(`
+                <span class="remove-mode">
+                  <svg class="svg" width="12" height="6" viewBox="0 0 12 6" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.5 3.5H.5v-1h11v1z" fill-rule="nonzero" fill-opacity="1" fill="#000" stroke="none"></path>
+                  </svg>
+                </span>
+              `).attr('disabled', mode.isDefault)
+            )
+            .data({
+              data: mode,
+              $name,
+              $remove
+            })
+        )
+      );
+
+    return $mode;
+  },
+  themeModes: function (modes) {
+    const $themeModes = $(`<div class="dropdown theme-modes"></div>`);
+    const $themeModeIcon = $(themeModeIcon);
+    const $themeModeList = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>`);
+
+    $desiginSystemTabs.find('theme-modes').remove();
+    if (modes.length > 1) {
+      $desiginSystemTabs.append(
+        $themeModes
+          .append($themeModeIcon)
+          .append(
+            $themeModeList.append(
+              modes.map((mode, index) => {
+                return `
+                  <li class="theme-mode" data-index="${index}" data-id="${mode.id}">
+                    <a href="#">${mode.name}${mode.isDefault ? ' (Default)' : ''}</a>
+                  </li>
+                `;
+              })
+            )
+          )
+      );
+    }
+  },
+  currentThemeMode: function (id) {
+    $desiginSystemTabs.find('.theme-modes ul')
+      .children()
+      .removeClass('selected')
+      .filter((index, item) => $(item).data('id') === id)
+      .addClass('selected');
+  },
   group: function (group: Group) {
     const { id, name } = group;
     const $group = $(`<div id="${id}" class="panel panel-default panel-collapse-shown"></div>`);
@@ -115,6 +174,22 @@ const Renderer = {
   }
 };
 
+function initThemeMode (modes: Array<ThemeMode>) {
+  let hasDefault = true;
+  if (!modes.length) {
+    hasDefault = false;
+    modes.push(new ThemeMode());
+  }
+  modes.forEach((mode: ThemeMode) => {
+    const $themeMode = Renderer.themeMode(new ThemeMode(mode));
+    const { data } = $themeMode.data();
+    setThemeMode(data);
+  });
+  if (!hasDefault) {
+    saveThemeMode();
+  }
+  Renderer.themeModes(modes);
+}
 function init (groups: Array<Object>) {
   let isTokenOpen = false;
   groups.forEach((group: Group) => {
@@ -142,7 +217,14 @@ function init (groups: Array<Object>) {
       }
     }
   });
-  // console.log(groups);
+}
+
+function createMode () {
+  const $mode = Renderer.themeMode(new ThemeMode({}));
+  const { data, $name } = $mode.data();
+  $name.selectText();
+  setThemeMode(data);
+
 }
 
 function createGroup () {
@@ -155,28 +237,26 @@ function createGroup () {
   save();
 }
 
-// function thumbnailsBuilder (properties) {
-//   const backgrounds = [];
-//   // properties.forEach(property => {
-//   //   const { colorMode, colorCode, opacity } = property.value;
-//   //   // if (property.propType === PropertyTypes.FILL_COLOR) {
-//   //   //   if (property.type === FillTypes.SOLID) {
-//   //   //     if (colorMode === ColorFormat.HEX) {
-//   //   //       backgrounds.push(`${colorCode}${percentToHex(opacity * 100)}`);
-//   //   //     }
-//   //   //   }
-//   //   // }
-//   // });
+function updateCurrentThemeMode () {
 
-// //   return `background-color: ${backgrounds.join(',')}`;
-// }
+}
 
 const Root = () => {
   useEffect(function () {
     $tokenContainer = $('#design-tokens-container');
+    $desiginSystemTabs = $('#desigin-system-tabs');
     $tokenSetting = $('#token-setting');
     $groupCreator = $('#group-creator');
+    $modeCreator = $('#mode-creator');
+    $themeModeList = $('#mode-list');
+    fetch();
+  });
 
+    $(document).on(`${BrowserEvents.CLICK}`, '.theme-mode', function () {
+      const themeModeId = $(this).data('id');
+      Renderer.currentThemeMode(themeModeId);
+      setCurrentThemeMode(themeModeId);
+    });
     //done
     $(document).on(`${BrowserEvents.CLICK} ${BrowserEvents.MOUSE_OVER} ${BrowserEvents.MOUSE_OUT}`, '#design-tokens-container .token-item',
       $.debounce(20, function ({ type }) {
@@ -208,19 +288,18 @@ const Root = () => {
       $(this).selectText();
       preventEvent(e);
     });
-
+    $(document).on(BrowserEvents.CLICK, '.theme-mode-name', function (e) {
+      $(this).selectText();
+      preventEvent(e);
+    });
     // need to update
     $(document).on(BrowserEvents.CLICK, '#design-tokens-container.plugin-panel', function (event) {
       const $tokenItem = $(event.target).closest('.token-item');
-      const $groupName = $(event.target).closest('.group-name');
       // const $radiusSeparateBtns = $(event.target).closest('.separator-vals .btn-group');
       if ($tokenItem.length === 0) {
         if (event.type === BrowserEvents.CLICK) {
           $('.token-item').removeClass('token-item-selected');
         }
-      }
-      if ($groupName.length === 0 || $groupName.is('[contenteditable=false]')) {
-        $('.group-name').attr('contenteditable', "false")
       }
       // if ($radiusSeparateBtns.length === 0) {
       //   $separatorModeSign.attr('separate-type', 'top-left');
@@ -232,9 +311,26 @@ const Root = () => {
       createGroup();
       preventEvent(e);
     });
-
-    $(document).on(`${BrowserEvents.BLUR}`, '.group-name', valChange);
-    $(document).on(`${BrowserEvents.KEY_UP}`, '.group-name', inputCheck);
+    $(document).on(`${BrowserEvents.BLUR}`, '.group-name, .theme-mode-name', function () {
+      valChange.call(this);
+      const $this = $(this);
+      if ($this.is('.theme-mode-name') && $this.text()) {
+        $modeCreator.removeAttr('disabled');
+      }
+    });
+    $(document).on(`${BrowserEvents.KEY_UP}`, '.group-name, .theme-mode-name', inputCheck);
+    $(document).on(BrowserEvents.CLICK, '#mode-creator', function (e) {
+      if ($(this).is('[disabled]')) return;
+      createMode();
+      $modeCreator.attr('disabled', true);
+      preventEvent(e);
+    });
+    $(document).on(BrowserEvents.CLICK, '.remove-mode:not([disabled])', function (e) {
+      const mode = $(this).parent().data('data');
+      $(`#mode-${mode.id}`).remove();
+      removeThemeMode(mode);
+      saveThemeMode();
+    });
     $(document).on('destroy:TokenSetting', (e, token: Token) => {
       if (token.name && token.properties.length > 0) {
         Renderer.updateToken(token);
@@ -245,21 +341,34 @@ const Root = () => {
       }
       save();
       $tokenContainer.addClass('show');
-    });
-    fetch();
-  });
+    });  
+  
   return (
     <React.Fragment>
-      <div id="design-tokens-container" className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show">
-        <div id="group-creator" className="group-create">Add new group</div>
+      <ul id="desigin-system-tabs" className="nav nav-tabs" role="tablist">
+        <li role="presentation" className="active"><a href="#tokens" aria-controls="tokens" role="tab" data-toggle="tab">Tokens</a></li>
+        <li role="presentation"><a href="#modes" aria-controls="modes" role="tab" data-toggle="tab">Theme Modes</a></li>
+      </ul>
+      <div className="tab-content">
+        <div role="tabpanel" className="tab-pane active" id="tokens">
+          <div id="design-tokens-container" className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show">
+            <div id="group-creator" className="group-create">Add a new group</div>
+          </div>
+          <div id="token-setting" className="plugin-panel"></div>
+        </div>
+        <div role="tabpanel" className="tab-pane" id="modes">
+          <div id="mode-setting" className="plugin-panel show">
+            <ul id="mode-list"></ul>
+            <div id="mode-creator" className="mode-create">Add a new theme mode</div>
+          </div>
+        </div>
       </div>
-      <div id="token-setting" className="plugin-panel"></div>
     </React.Fragment>
   );
 }
 class App extends React.Component {
   render() {
-    return <Root></Root>
+    return <Root></Root>;
   }
 }
 
@@ -267,11 +376,17 @@ ReactDOM.render(<App />, document.getElementById('react-page'));
 
 window.onmessage = async (event) => {
   const msg = event.data.pluginMessage;
-  if (msg.type === MessageTypes.FONT_LIST) {
+  if (msg.type === MessageTypes.GET_FONTS) {
     setFonts(msg.message);
   }
+  if (msg.type === MessageTypes.GET_MODES) {
+    initThemeMode(msg.message);
+  }
+  if (msg.type === MessageTypes.GET_CURRENT_THEME_MODE) {
+    setCurrentThemeMode(msg.message);
+    updateCurrentThemeMode();
+  }
   if (msg.type === MessageTypes.GET_TOKENS) {
-    // console.log(JSON.stringify(msg.message));
     init(msg.message);
   }
   if (msg.type === MessageTypes.SELECTION_CHANGE) {

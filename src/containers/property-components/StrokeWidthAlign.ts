@@ -4,7 +4,6 @@ import BrowserEvents from 'enums/BrowserEvents';
 import { getToken, getPureToken } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
 import StrokeAligns from 'enums/StrokeAligns';
-import PropertyIcon from './PropertyIcon';
 import Token from './CommonSettings';
 
 let hostData;

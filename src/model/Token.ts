@@ -1,5 +1,4 @@
 import { v4 } from 'uuid';
-import { Mixed } from 'symbols/index';
 class Token {
   type: string = 'Token';
   id: string = '';

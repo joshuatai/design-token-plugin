@@ -9,12 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { fetch, getAllGroup, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage, setFonts } from './model/DataManager';
+import { fetch, setCurrentThemeMode, setThemeMode, removeThemeMode, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage, setFonts, saveThemeMode } from './model/DataManager';
 import TokenSetting from './containers/TokenSetting';
 import PropertyIcon from './containers/property-components/PropertyIcon';
 import BrowserEvents from 'enums/BrowserEvents';
 import preventEvent from 'utils/preventEvent';
-// import properties2css from 'utils/properties2css';
+import ThemeMode from 'model/ThemeMode';
 import Group from 'model/Group';
 import Token from 'model/Token';
 import Properties from 'model/Properties';
@@ -23,16 +23,17 @@ import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
 import './ui.css';
 import MessageTypes from 'enums/MessageTypes';
+import { themeModeIcon } from './containers/property-components/CommonSettings';
 import { Mixed } from './symbols';
 TokenSetting(jQuery);
 SelectText(jQuery);
 PluginDestroy(jQuery);
 const { useEffect } = React;
-let $tokenContainer, $tokenSetting, $groupCreator;
+let $tokenContainer, $desiginSystemTabs, $tokenSetting, $groupCreator, $modeCreator, $themeModeList;
 const $tokenEditBtn = $('<button type="button" class="token-edit-btn"><svg class="svg" width="12" height="14" viewBox="0 0 12 14" xmlns="http://www.w3.org/2000/svg"><path d="M2 7.05V0h1v7.05c1.141.232 2 1.24 2 2.45 0 1.21-.859 2.218-2 2.45V14H2v-2.05c-1.141-.232-2-1.24-2-2.45 0-1.21.859-2.218 2-2.45zM4 9.5c0 .828-.672 1.5-1.5 1.5-.828 0-1.5-.672-1.5-1.5C1 8.672 1.672 8 2.5 8 3.328 8 4 8.672 4 9.5zM9 14h1V6.95c1.141-.232 2-1.24 2-2.45 0-1.21-.859-2.218-2-2.45V0H9v2.05c-1.141.232-2 1.24-2 2.45 0 1.21.859 2.218 2 2.45V14zm2-9.5c0-.828-.672-1.5-1.5-1.5C8.672 3 8 3.672 8 4.5 8 5.328 8.672 6 9.5 6c.828 0 1.5-.672 1.5-1.5z" fill-rule="evenodd" fill-opacity="1" fill="#000" stroke="none"></path></svg></button>');
 const Utils = {
     newGroupName: () => {
-        const lastNumber = getAllGroup()
+        const lastNumber = getGroup()
             .filter((group) => (group.name.match(/^Group \d+$/) ? true : false))
             .map(group => (Number(group.name.replace('Group ', ''))))
             .sort()
@@ -44,6 +45,49 @@ const Utils = {
     }
 };
 const Renderer = {
+    themeMode: function (mode) {
+        let $mode, $name, $remove;
+        $themeModeList
+            .append(($mode = $(`<li id="mode-${mode.id}"></li>`)
+            .append($name = $(`<span class="theme-mode-name" prop-name="name" is-required="true" contenteditable>${mode.name}</span>`).data('id', mode.id))
+            .append($remove = $(`
+                <span class="remove-mode">
+                  <svg class="svg" width="12" height="6" viewBox="0 0 12 6" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M11.5 3.5H.5v-1h11v1z" fill-rule="nonzero" fill-opacity="1" fill="#000" stroke="none"></path>
+                  </svg>
+                </span>
+              `).attr('disabled', mode.isDefault))
+            .data({
+            data: mode,
+            $name,
+            $remove
+        })));
+        return $mode;
+    },
+    themeModes: function (modes) {
+        const $themeModes = $(`<div class="dropdown theme-modes"></div>`);
+        const $themeModeIcon = $(themeModeIcon);
+        const $themeModeList = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>`);
+        $desiginSystemTabs.find('theme-modes').remove();
+        if (modes.length > 1) {
+            $desiginSystemTabs.append($themeModes
+                .append($themeModeIcon)
+                .append($themeModeList.append(modes.map((mode, index) => {
+                return `
+                  <li class="theme-mode" data-index="${index}" data-id="${mode.id}">
+                    <a href="#">${mode.name}${mode.isDefault ? ' (Default)' : ''}</a>
+                  </li>
+                `;
+            }))));
+        }
+    },
+    currentThemeMode: function (id) {
+        $desiginSystemTabs.find('.theme-modes ul')
+            .children()
+            .removeClass('selected')
+            .filter((index, item) => $(item).data('id') === id)
+            .addClass('selected');
+    },
     group: function (group) {
         const { id, name } = group;
         const $group = $(`<div id="${id}" class="panel panel-default panel-collapse-shown"></div>`);
@@ -105,6 +149,22 @@ const Renderer = {
             $expend.hide();
     }
 };
+function initThemeMode(modes) {
+    let hasDefault = true;
+    if (!modes.length) {
+        hasDefault = false;
+        modes.push(new ThemeMode());
+    }
+    modes.forEach((mode) => {
+        const $themeMode = Renderer.themeMode(new ThemeMode(mode));
+        const { data } = $themeMode.data();
+        setThemeMode(data);
+    });
+    if (!hasDefault) {
+        saveThemeMode();
+    }
+    Renderer.themeModes(modes);
+}
 function init(groups) {
     let isTokenOpen = false;
     groups.forEach((group) => {
@@ -133,7 +193,12 @@ function init(groups) {
             }
         }
     });
-    // console.log(groups);
+}
+function createMode() {
+    const $mode = Renderer.themeMode(new ThemeMode({}));
+    const { data, $name } = $mode.data();
+    $name.selectText();
+    setThemeMode(data);
 }
 function createGroup() {
     const $group = Renderer.group(new Group({
@@ -144,96 +209,122 @@ function createGroup() {
     setGroup(data);
     save();
 }
-// function thumbnailsBuilder (properties) {
-//   const backgrounds = [];
-//   // properties.forEach(property => {
-//   //   const { colorMode, colorCode, opacity } = property.value;
-//   //   // if (property.propType === PropertyTypes.FILL_COLOR) {
-//   //   //   if (property.type === FillTypes.SOLID) {
-//   //   //     if (colorMode === ColorFormat.HEX) {
-//   //   //       backgrounds.push(`${colorCode}${percentToHex(opacity * 100)}`);
-//   //   //     }
-//   //   //   }
-//   //   // }
-//   // });
-// //   return `background-color: ${backgrounds.join(',')}`;
-// }
+function updateCurrentThemeMode() {
+}
 const Root = () => {
     useEffect(function () {
         $tokenContainer = $('#design-tokens-container');
+        $desiginSystemTabs = $('#desigin-system-tabs');
         $tokenSetting = $('#token-setting');
         $groupCreator = $('#group-creator');
-        //done
-        $(document).on(`${BrowserEvents.CLICK} ${BrowserEvents.MOUSE_OVER} ${BrowserEvents.MOUSE_OUT}`, '#design-tokens-container .token-item', $.debounce(20, function ({ type }) {
-            const $tokenItem = $(this);
-            if (type === BrowserEvents.CLICK) {
-                $('.token-item-selected').removeClass('token-item-selected');
-                $tokenItem.addClass('token-item-selected');
-                sendMessage(MessageTypes.ASSIGN_TOKEN, getToken($tokenItem.data('token')));
-            }
-            if (type === BrowserEvents.MOUSE_OVER) {
-                $tokenItem.append($tokenEditBtn);
-            }
-            if (type === BrowserEvents.MOUSE_OUT) {
-                $tokenEditBtn.remove();
-            }
-        }));
-        // This event listener is to prevent collapse event.
-        $(document).on(BrowserEvents.CLICK, '.group-name:focus, .add-token', preventEvent);
-        // token setting
-        $(document).on(BrowserEvents.CLICK, '.token-edit-btn, .add-token', function () {
-            let { group, token } = $(this).parent().data();
-            Utils.clearSelection();
-            $tokenContainer.removeClass('show');
-            $tokenSetting.TokenSetting({ group, token });
-        });
-        // done
-        $(document).on(BrowserEvents.DBCLICK, '.group-name', function (e) {
-            $(this).selectText();
-            preventEvent(e);
-        });
-        // need to update
-        $(document).on(BrowserEvents.CLICK, '#design-tokens-container.plugin-panel', function (event) {
-            const $tokenItem = $(event.target).closest('.token-item');
-            const $groupName = $(event.target).closest('.group-name');
-            // const $radiusSeparateBtns = $(event.target).closest('.separator-vals .btn-group');
-            if ($tokenItem.length === 0) {
-                if (event.type === BrowserEvents.CLICK) {
-                    $('.token-item').removeClass('token-item-selected');
-                }
-            }
-            if ($groupName.length === 0 || $groupName.is('[contenteditable=false]')) {
-                $('.group-name').attr('contenteditable', "false");
-            }
-            // if ($radiusSeparateBtns.length === 0) {
-            //   $separatorModeSign.attr('separate-type', 'top-left');
-            // }
-        });
-        // done
-        $(document).on(BrowserEvents.CLICK, '.group-create', function (e) {
-            createGroup();
-            preventEvent(e);
-        });
-        $(document).on(`${BrowserEvents.BLUR}`, '.group-name', valChange);
-        $(document).on(`${BrowserEvents.KEY_UP}`, '.group-name', inputCheck);
-        $(document).on('destroy:TokenSetting', (e, token) => {
-            if (token.name && token.properties.length > 0) {
-                Renderer.updateToken(token);
-            }
-            else {
-                //need to chaeck if there is a token or component already refer this token
-                Renderer.removeToken(token);
-                removeToken(token);
-            }
-            save();
-            $tokenContainer.addClass('show');
-        });
+        $modeCreator = $('#mode-creator');
+        $themeModeList = $('#mode-list');
         fetch();
     });
+    $(document).on(`${BrowserEvents.CLICK}`, '.theme-mode', function () {
+        const themeModeId = $(this).data('id');
+        Renderer.currentThemeMode(themeModeId);
+        setCurrentThemeMode(themeModeId);
+    });
+    //done
+    $(document).on(`${BrowserEvents.CLICK} ${BrowserEvents.MOUSE_OVER} ${BrowserEvents.MOUSE_OUT}`, '#design-tokens-container .token-item', $.debounce(20, function ({ type }) {
+        const $tokenItem = $(this);
+        if (type === BrowserEvents.CLICK) {
+            $('.token-item-selected').removeClass('token-item-selected');
+            $tokenItem.addClass('token-item-selected');
+            sendMessage(MessageTypes.ASSIGN_TOKEN, getToken($tokenItem.data('token')));
+        }
+        if (type === BrowserEvents.MOUSE_OVER) {
+            $tokenItem.append($tokenEditBtn);
+        }
+        if (type === BrowserEvents.MOUSE_OUT) {
+            $tokenEditBtn.remove();
+        }
+    }));
+    // This event listener is to prevent collapse event.
+    $(document).on(BrowserEvents.CLICK, '.group-name:focus, .add-token', preventEvent);
+    // token setting
+    $(document).on(BrowserEvents.CLICK, '.token-edit-btn, .add-token', function () {
+        let { group, token } = $(this).parent().data();
+        Utils.clearSelection();
+        $tokenContainer.removeClass('show');
+        $tokenSetting.TokenSetting({ group, token });
+    });
+    // done
+    $(document).on(BrowserEvents.DBCLICK, '.group-name', function (e) {
+        $(this).selectText();
+        preventEvent(e);
+    });
+    $(document).on(BrowserEvents.CLICK, '.theme-mode-name', function (e) {
+        $(this).selectText();
+        preventEvent(e);
+    });
+    // need to update
+    $(document).on(BrowserEvents.CLICK, '#design-tokens-container.plugin-panel', function (event) {
+        const $tokenItem = $(event.target).closest('.token-item');
+        // const $radiusSeparateBtns = $(event.target).closest('.separator-vals .btn-group');
+        if ($tokenItem.length === 0) {
+            if (event.type === BrowserEvents.CLICK) {
+                $('.token-item').removeClass('token-item-selected');
+            }
+        }
+        // if ($radiusSeparateBtns.length === 0) {
+        //   $separatorModeSign.attr('separate-type', 'top-left');
+        // }
+    });
+    // done
+    $(document).on(BrowserEvents.CLICK, '.group-create', function (e) {
+        createGroup();
+        preventEvent(e);
+    });
+    $(document).on(`${BrowserEvents.BLUR}`, '.group-name, .theme-mode-name', function () {
+        valChange.call(this);
+        const $this = $(this);
+        if ($this.is('.theme-mode-name') && $this.text()) {
+            $modeCreator.removeAttr('disabled');
+        }
+    });
+    $(document).on(`${BrowserEvents.KEY_UP}`, '.group-name, .theme-mode-name', inputCheck);
+    $(document).on(BrowserEvents.CLICK, '#mode-creator', function (e) {
+        if ($(this).is('[disabled]'))
+            return;
+        createMode();
+        $modeCreator.attr('disabled', true);
+        preventEvent(e);
+    });
+    $(document).on(BrowserEvents.CLICK, '.remove-mode:not([disabled])', function (e) {
+        const mode = $(this).parent().data('data');
+        $(`#mode-${mode.id}`).remove();
+        removeThemeMode(mode);
+        saveThemeMode();
+    });
+    $(document).on('destroy:TokenSetting', (e, token) => {
+        if (token.name && token.properties.length > 0) {
+            Renderer.updateToken(token);
+        }
+        else {
+            //need to chaeck if there is a token or component already refer this token
+            Renderer.removeToken(token);
+            removeToken(token);
+        }
+        save();
+        $tokenContainer.addClass('show');
+    });
     return (React.createElement(React.Fragment, null,
-        React.createElement("div", { id: "design-tokens-container", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show" },
-            React.createElement("div", { id: "group-creator", className: "group-create" }, "Add new group")),
-        React.createElement("div", { id: "token-setting", className: "plugin-panel" })));
+        React.createElement("ul", { id: "desigin-system-tabs", className: "nav nav-tabs", role: "tablist" },
+            React.createElement("li", { role: "presentation", className: "active" },
+                React.createElement("a", { href: "#tokens", "aria-controls": "tokens", role: "tab", "data-toggle": "tab" }, "Tokens")),
+            React.createElement("li", { role: "presentation" },
+                React.createElement("a", { href: "#modes", "aria-controls": "modes", role: "tab", "data-toggle": "tab" }, "Theme Modes"))),
+        React.createElement("div", { className: "tab-content" },
+            React.createElement("div", { role: "tabpanel", className: "tab-pane active", id: "tokens" },
+                React.createElement("div", { id: "design-tokens-container", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show" },
+                    React.createElement("div", { id: "group-creator", className: "group-create" }, "Add a new group")),
+                React.createElement("div", { id: "token-setting", className: "plugin-panel" })),
+            React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "modes" },
+                React.createElement("div", { id: "mode-setting", className: "plugin-panel show" },
+                    React.createElement("ul", { id: "mode-list" }),
+                    React.createElement("div", { id: "mode-creator", className: "mode-create" }, "Add a new theme mode"))))));
 };
 class App extends React.Component {
     render() {
@@ -243,11 +334,17 @@ class App extends React.Component {
 ReactDOM.render(React.createElement(App, null), document.getElementById('react-page'));
 window.onmessage = (event) => __awaiter(void 0, void 0, void 0, function* () {
     const msg = event.data.pluginMessage;
-    if (msg.type === MessageTypes.FONT_LIST) {
+    if (msg.type === MessageTypes.GET_FONTS) {
         setFonts(msg.message);
     }
+    if (msg.type === MessageTypes.GET_MODES) {
+        initThemeMode(msg.message);
+    }
+    if (msg.type === MessageTypes.GET_CURRENT_THEME_MODE) {
+        setCurrentThemeMode(msg.message);
+        updateCurrentThemeMode();
+    }
     if (msg.type === MessageTypes.GET_TOKENS) {
-        // console.log(JSON.stringify(msg.message));
         init(msg.message);
     }
     if (msg.type === MessageTypes.SELECTION_CHANGE) {

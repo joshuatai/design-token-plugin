@@ -71,7 +71,6 @@ export default function ($) {
     `);
     
     let fonts = Object.keys(fontList).sort(Intl.Collator().compare);
-    // fonts.forEach(font => fontLoader(font));
     const dotFonts = [];
     fonts = fonts.filter(font => {
       const match  = font.match(/^\./gi);
@@ -113,12 +112,13 @@ export default function ($) {
               .append(
                 this.$familyVal
                   .append(
-                    this.$familyValInput.text(familyVal).attr('title', familyVal)
-                    .add(
-                      this.$familyDropdownBtnGroup.append(this.$familyDropdowns)
-                    )
+                    this.$familyValInput
+                      .text(familyVal).attr('title', familyVal)
+                      .addClass(this.tokenList.length ? 'hasReferenceToken' : '')
+                      .add(
+                        this.$familyDropdownBtnGroup.append(this.$familyDropdowns)
+                      )
                   )
-                  .addClass(this.tokenList.length ? 'hasReferenceToken' : '')
               )
               .append(this.$token)
           )

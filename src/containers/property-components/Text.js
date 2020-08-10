@@ -74,7 +74,7 @@ export default function ($) {
                 dotFonts.push(font);
             return !match;
         });
-        fonts = fonts.concat(...dotFonts);
+        // fonts = fonts.concat(...dotFonts);
         this.$familyDropdowns = $('<ul class="dropdown-menu dropdown-menu-multi-select family-dropdowns" />').append(fonts.map((fontName, index) => {
             return $(`<li data-index="${index}"></li>`).append(this[`$fontOption_${fontName}`] = $(`<a href="#">${fontName}</a>`));
         }));
@@ -93,14 +93,16 @@ export default function ($) {
         this.$styleDropdowns = $('<ul class="dropdown-menu dropdown-menu-multi-select style-dropdown" />');
         this.$fontSize = $(`<span class="font-size-val" contenteditable="true" />`);
         this.$token = CommonSettings(this).$token;
-        useToken ? familyVal = useToken.name : familyVal = this.options.fontName.family;
+        const { fontName: { family, style } } = this.options;
+        useToken ? familyVal = useToken.name : familyVal = family;
         this.$element
             .append(this.$customVal
             .append(this.$familyContainer
             .append(this.$familyVal
-            .append(this.$familyValInput.text(familyVal).attr('title', familyVal)
-            .add(this.$familyDropdownBtnGroup.append(this.$familyDropdowns)))
-            .addClass(this.tokenList.length ? 'hasReferenceToken' : ''))
+            .append(this.$familyValInput
+            .text(familyVal).attr('title', familyVal)
+            .addClass(this.tokenList.length ? 'hasReferenceToken' : '')
+            .add(this.$familyDropdownBtnGroup.append(this.$familyDropdowns))))
             .append(this.$token))
             .append(this.$styleContainer
             .append(this.$styleDropdownBtnGroup
@@ -110,8 +112,8 @@ export default function ($) {
             .append(this.$fontSize.text(this.options.fontSize))));
         this.fontList = fontList;
         this.fonts = fonts;
-        this.select(this[`$fontOption_${this.options.fontName.family}`]);
-        this.select(this.styles[this.options.fontName.style]);
+        this.select(this[`$fontOption_${family}`]);
+        this.select(this.styles[style]);
     };
     Text.prototype.setStylesList = function (family) {
         const fontStyles = this.fontList[family].map(font => font.style);
@@ -153,13 +155,6 @@ export default function ($) {
         this.$styleDropdowns.append(genStyleList(weights, italics));
         this.$styleDropdowns.append(genStyleList(italics, null));
         this.select(this.styles['Regular'] || this.styles[fontStyles[0]]);
-        var request = new XMLHttpRequest();
-        request.open('GET', '/fonts/Akronim-Regular_1');
-        request.onload = () => {
-            // console.log((document as any).fonts.check(`14px ${family}`));
-            console.log(request.response);
-        };
-        request.send();
         this.$styleDropdownToggleBtn.attr('disabled', fontStyles.length === 1);
     };
     Text.prototype.select = function ($option, editable = false) {
@@ -169,16 +164,16 @@ export default function ($) {
         $option.parent().addClass('selected');
         if ($dropdowns.is('.family-dropdowns')) {
             this.$familyValInput.text(value);
+            if (editable)
+                this.options.fontName.family = value;
             this.setStylesList(value);
         }
         else {
             this.$styleName.text(value);
+            if (editable)
+                this.options.fontName.style = value;
+            $(document).trigger('property-preview', [this.options]);
         }
-        if (editable) {
-            this.options.fontName.family = this.$familyValInput.text();
-            this.options.fontName.style = this.$styleName.text();
-        }
-        $(document).trigger('property-preview', [this.options]);
     };
     Text.prototype.useToken = function (token) {
         // const { fontSize } = token.properties[0];
@@ -232,6 +227,7 @@ export default function ($) {
     //   }, 200);
     // });
     $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .input-group-btn .dropdown-menu a`, function (event) {
+        console.log('select');
         hostData.select($(this), true);
     });
     $(document).on(BrowserEvents.FOCUS, `[property-component="${NAME}"] [contenteditable="true"]`, function () {

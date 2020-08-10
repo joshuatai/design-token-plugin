@@ -2,6 +2,12 @@ import Color from 'color';
 import PropertyTypes from 'enums/PropertyTypes';
 import StrokeAligns from 'enums/StrokeAligns';
 import FillType from 'enums/FillTypes';
+import fontLoader from 'utils/fontLoader';
+var FontStyles;
+(function (FontStyles) {
+    FontStyles[FontStyles["Light"] = 300] = "Light";
+    FontStyles["Regular"] = "normal";
+})(FontStyles || (FontStyles = {}));
 export default (properties) => {
     let color;
     const css = properties.reduce((calc, property) => {
@@ -38,8 +44,9 @@ export default (properties) => {
         }
         if (property.type === PropertyTypes.TEXT) {
             calc["font-family"] = property.fontName.family;
-            calc["font-family"] = property.fontName.family;
             calc["font-size"] = property.fontSize;
+            calc["font-weight"] = FontStyles[property.fontName.style];
+            fontLoader(property.fontName.family);
         }
         return calc;
     }, {});
