@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { fetch, setCurrentThemeMode, setThemeMode, removeThemeMode, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage, setFonts, saveThemeMode } from './model/DataManager';
+import { fetch, getCurrentThemeMode, setCurrentThemeMode, getThemeMode, setThemeMode, removeThemeMode, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage, setFonts, saveThemeMode } from './model/DataManager';
 import TokenSetting from './containers/TokenSetting';
 import PropertyIcon from './containers/property-components/PropertyIcon';
 import BrowserEvents from 'enums/BrowserEvents';
@@ -80,13 +80,6 @@ const Renderer = {
                 `;
             }))));
         }
-    },
-    currentThemeMode: function (id) {
-        $desiginSystemTabs.find('.theme-modes ul')
-            .children()
-            .removeClass('selected')
-            .filter((index, item) => $(item).data('id') === id)
-            .addClass('selected');
     },
     group: function (group) {
         const { id, name } = group;
@@ -210,6 +203,13 @@ function createGroup() {
     save();
 }
 function updateCurrentThemeMode() {
+    const themeMode = getCurrentThemeMode();
+    console.log(themeMode);
+    $desiginSystemTabs.find('.theme-modes ul')
+        .children()
+        .removeClass('selected')
+        .filter((index, item) => $(item).data('id') === themeMode)
+        .addClass('selected');
 }
 const Root = () => {
     useEffect(function () {
@@ -223,8 +223,8 @@ const Root = () => {
     });
     $(document).on(`${BrowserEvents.CLICK}`, '.theme-mode', function () {
         const themeModeId = $(this).data('id');
-        Renderer.currentThemeMode(themeModeId);
         setCurrentThemeMode(themeModeId);
+        updateCurrentThemeMode();
     });
     //done
     $(document).on(`${BrowserEvents.CLICK} ${BrowserEvents.MOUSE_OVER} ${BrowserEvents.MOUSE_OUT}`, '#design-tokens-container .token-item', $.debounce(20, function ({ type }) {
@@ -340,8 +340,11 @@ window.onmessage = (event) => __awaiter(void 0, void 0, void 0, function* () {
     if (msg.type === MessageTypes.GET_MODES) {
         initThemeMode(msg.message);
     }
+    if (msg.type === MessageTypes.GET_INIT_THEME_MODE) {
+        msg.message ? setCurrentThemeMode(msg.message) : setCurrentThemeMode(getThemeMode()[0].id);
+        updateCurrentThemeMode();
+    }
     if (msg.type === MessageTypes.GET_CURRENT_THEME_MODE) {
-        setCurrentThemeMode(msg.message);
         updateCurrentThemeMode();
     }
     if (msg.type === MessageTypes.GET_TOKENS) {

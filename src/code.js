@@ -13,7 +13,6 @@ import MessageTypes from 'enums/MessageTypes';
 import PropertyTypes from 'enums/PropertyTypes';
 import FillTypes from 'enums/FillTypes';
 import { hasCornerNode, hasMixedCornerNode, hasStrokeNode, hasFillsNode, hasFontNode } from 'utils/hasNodeType';
-let useThemeMode;
 // function clone(val) {
 //   const type = typeof val
 //   if (val === null) {
@@ -97,9 +96,7 @@ function assignProperty(properties, node) {
             }
         }
         if (fillColor && hasFillsNode(node)) {
-            const themeModes = JSON.parse(figma.root.getPluginData('ThemeModes'));
-            if (!useThemeMode)
-                useThemeMode = themeModes[0];
+            const useThemeMode = figma.currentPage.getPluginData('themeMode');
             fillColor.forEach(fill => {
                 const { fillType, color, visible, opacity, blendMode, themeMode } = fill;
                 const [r, g, b] = Color(`#${color}`).rgb().color;
@@ -130,16 +127,14 @@ function getUsedTokens(properties, token) {
         .map(prop => prop.parent);
     return usedTokens.concat(...usedTokens.map(token => getUsedTokens(properties, token)));
 }
+function getInitThemeMode() {
+    postMessage(MessageTypes.GET_INIT_THEME_MODE, figma.currentPage.getPluginData('themeMode'));
+}
 function getCurrentThemeMode() {
-    const themeModes = JSON.parse(figma.root.getPluginData('ThemeModes'));
-    useThemeMode = figma.currentPage.getPluginData('themeMode');
-    if (!useThemeMode)
-        useThemeMode = themeModes[0].id;
-    postMessage(MessageTypes.GET_CURRENT_THEME_MODE, useThemeMode);
+    postMessage(MessageTypes.GET_CURRENT_THEME_MODE, figma.currentPage.getPluginData('themeMode'));
 }
 function setCurrentThemeMode(message) {
-    figma.currentPage.setPluginData('ThemeModes', message);
-    useThemeMode = message;
+    figma.currentPage.setPluginData('themeMode', message);
 }
 figma.showUI(__html__, { visible: true, width: 267, height: 600 });
 figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
@@ -165,6 +160,9 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
             modes = JSON.parse(themeModes);
         }
         postMessage(type, modes);
+    }
+    if (type === MessageTypes.GET_INIT_THEME_MODE) {
+        getInitThemeMode();
     }
     if (type === MessageTypes.GET_CURRENT_THEME_MODE) {
         getCurrentThemeMode();

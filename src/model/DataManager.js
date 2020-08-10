@@ -20,7 +20,7 @@ const getFonts = () => fonts;
 const fetch = () => {
     sendMessage(MessageTypes.GET_FONTS);
     sendMessage(MessageTypes.GET_MODES);
-    sendMessage(MessageTypes.GET_CURRENT_THEME_MODE);
+    sendMessage(MessageTypes.GET_INIT_THEME_MODE);
     sendMessage(MessageTypes.GET_TOKENS);
 };
 const getCurrentThemeMode = () => currentThemeMode;
@@ -135,7 +135,7 @@ const syncNode = (token) => {
 const sendMessage = (type, message = "") => parent.postMessage({
     pluginMessage: {
         type,
-        message: JSON.stringify(message),
+        message: typeof message === 'string' ? message : JSON.stringify(message),
     },
 }, "*");
 export { fetch, getThemeMode, getCurrentThemeMode, getFonts, getGroup, getToken, getProperty, getPureToken, setThemeMode, setCurrentThemeMode, removeThemeMode, setFonts, setGroup, setToken, setProperty, setPureToken, removeToken, save, saveThemeMode, syncToken, syncNode, referByToken, sendMessage };

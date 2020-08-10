@@ -25,7 +25,7 @@ const getFonts = () => fonts;
 const fetch = () => {
   sendMessage(MessageTypes.GET_FONTS);
   sendMessage(MessageTypes.GET_MODES);
-  sendMessage(MessageTypes.GET_CURRENT_THEME_MODE);
+  sendMessage(MessageTypes.GET_INIT_THEME_MODE);
   sendMessage(MessageTypes.GET_TOKENS);
 };
 const getCurrentThemeMode = () => currentThemeMode;
@@ -153,7 +153,7 @@ const sendMessage = (type: MessageTypes | String, message: String | object = "")
   {
     pluginMessage: {
       type,
-      message: JSON.stringify(message),
+      message: typeof message === 'string' ?  message : JSON.stringify(message),
     },
   },
   "*"
