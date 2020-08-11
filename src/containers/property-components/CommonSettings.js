@@ -35,7 +35,7 @@ export default (property) => {
     const $themeModeIcon = $(themeModeIcon);
     const $themeModeList = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>`).data("property", property);
     let $themeMode;
-    if (options.type === PropertyTypes.FILL_COLOR) {
+    if (options.type === PropertyTypes.FILL_COLOR || options.type === PropertyTypes.STROKE_FILL) {
         $themeMode = $(`<div class="dropdown"></div>`)
             .append($themeModeIcon)
             .append($themeModeList.append(themeModes.map((mode, index) => {
@@ -55,7 +55,7 @@ export default (property) => {
         if (themeModes.length === 1)
             $themeMode = null;
     }
-    const $icon = PropertyIcon(options).$icon;
+    const $icon = PropertyIcon([options]).$icon;
     property.options.parent = _token.id;
     Object.assign(property, {
         tokenList,

@@ -10,6 +10,7 @@ var MessageTypes;
     MessageTypes["SET_TOKENS"] = "Set Tokens";
     MessageTypes["ASSIGN_TOKEN"] = "Assign Token";
     MessageTypes["SYNC_NODES"] = "Sync Nodes";
+    MessageTypes["SYNC_CURRENT_THEME_MODE"] = "Sync Current Theme Mode";
     MessageTypes["SELECTION_CHANGE"] = "Selection Change";
 })(MessageTypes || (MessageTypes = {}));
 export default MessageTypes;

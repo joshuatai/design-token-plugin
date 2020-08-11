@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { fetch, getCurrentThemeMode, setCurrentThemeMode, getThemeMode, setThemeMode, removeThemeMode, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage, setFonts, saveThemeMode } from './model/DataManager';
+import { fetch, getCurrentThemeMode, setCurrentThemeMode, getThemeMode, setThemeMode, removeThemeMode, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage, setFonts, saveThemeMode, syncPageThemeMode } from './model/DataManager';
 import TokenSetting from './containers/TokenSetting';
 import PropertyIcon from './containers/property-components/PropertyIcon';
 import BrowserEvents from 'enums/BrowserEvents';
@@ -64,11 +64,12 @@ const Renderer = {
         })));
         return $mode;
     },
-    themeModes: function (modes) {
+    themeModes: function () {
+        const modes = getThemeMode();
         const $themeModes = $(`<div class="dropdown theme-modes"></div>`);
         const $themeModeIcon = $(themeModeIcon);
         const $themeModeList = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>`);
-        $desiginSystemTabs.find('theme-modes').remove();
+        $desiginSystemTabs.find('.theme-modes').remove();
         if (modes.length > 1) {
             $desiginSystemTabs.append($themeModes
                 .append($themeModeIcon)
@@ -87,7 +88,7 @@ const Renderer = {
         const $heading = $('<div class="panel-heading" data-toggle="collapse" aria-expanded="false"></div>').attr('data-target', `#group-${id}`).data('group', id);
         const $title = $('<h6 class="panel-title"></h6>');
         const $expend = $('<span class="tmicon tmicon-caret-right tmicon-hoverable"></span>').hide();
-        const $name = $('<span class="group-name" prop-name="name" contenteditable is-required="true"></span>').text(name).data('id', id);
+        const $name = $('<span class="group-name" prop-name="name" is-required="true"></span>').text(name).data('id', id);
         const $addTokenBtn = $('<button type="button" class="add-token" title="Create a token"><svg class="svg" width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 5.5v-5h1v5h5v1h-5v5h-1v-5h-5v-1h5z" fill-rule="nonzero" fill-opacity="1" fill="#000" stroke="none"></path></svg></button>');
         const $tokenListPanel = $('<div class="panel-collapse collapse" aria-expanded="false"></div>').attr('id', `group-${id}`);
         const $tokenList = $('<ul class="token-list"></ul>');
@@ -109,7 +110,7 @@ const Renderer = {
         let $token = $(`#${token.id}`);
         let $icon;
         if (token.propertyType !== Mixed) {
-            $icon = PropertyIcon(token.properties[0]).$icon;
+            $icon = PropertyIcon(token.properties, true).$icon;
         }
         if ($token.length === 0) {
             $token = $(`<li id="${token.id}" class="token-item"></li>`)
@@ -134,6 +135,12 @@ const Renderer = {
             $expend.trigger('click');
         }
     },
+    updateThemeMode: function () {
+        $('.fill-color-icon').parent().each((index, item) => {
+            const { token } = $(item).data();
+            this.token(getToken(token));
+        });
+    },
     removeToken: function (token) {
         const group = getGroup(token.parent);
         const { $expend } = $(`#${token.parent}`).data();
@@ -156,7 +163,7 @@ function initThemeMode(modes) {
     if (!hasDefault) {
         saveThemeMode();
     }
-    Renderer.themeModes(modes);
+    Renderer.themeModes();
 }
 function init(groups) {
     let isTokenOpen = false;
@@ -204,12 +211,13 @@ function createGroup() {
 }
 function updateCurrentThemeMode() {
     const themeMode = getCurrentThemeMode();
-    console.log(themeMode);
     $desiginSystemTabs.find('.theme-modes ul')
         .children()
         .removeClass('selected')
         .filter((index, item) => $(item).data('id') === themeMode)
         .addClass('selected');
+    Renderer.updateThemeMode();
+    syncPageThemeMode();
 }
 const Root = () => {
     useEffect(function () {
@@ -282,6 +290,10 @@ const Root = () => {
         const $this = $(this);
         if ($this.is('.theme-mode-name') && $this.text()) {
             $modeCreator.removeAttr('disabled');
+            setTimeout(function () {
+                Renderer.themeModes();
+                updateCurrentThemeMode();
+            }, 400);
         }
     });
     $(document).on(`${BrowserEvents.KEY_UP}`, '.group-name, .theme-mode-name', inputCheck);
@@ -292,11 +304,24 @@ const Root = () => {
         $modeCreator.attr('disabled', true);
         preventEvent(e);
     });
+    $(document).on(BrowserEvents.CLICK, `#token-setting .mode-item`, function (event) {
+        const $this = $(this);
+        const useMode = $this.data('themeMode');
+        const property = $this.parent().data('property');
+        property.options.themeMode = useMode.id;
+        property.$themeModeList
+            .children()
+            .removeClass('selected')
+            .filter((index, item) => $(item).data('id') === useMode.id)
+            .addClass('selected');
+    });
     $(document).on(BrowserEvents.CLICK, '.remove-mode:not([disabled])', function (e) {
         const mode = $(this).parent().data('data');
         $(`#mode-${mode.id}`).remove();
         removeThemeMode(mode);
         saveThemeMode();
+        Renderer.themeModes();
+        updateCurrentThemeMode();
     });
     $(document).on('destroy:TokenSetting', (e, token) => {
         if (token.name && token.properties.length > 0) {
@@ -348,6 +373,7 @@ window.onmessage = (event) => __awaiter(void 0, void 0, void 0, function* () {
         updateCurrentThemeMode();
     }
     if (msg.type === MessageTypes.GET_TOKENS) {
+        // console.log(JSON.stringify(msg.message));
         init(msg.message);
     }
     if (msg.type === MessageTypes.SELECTION_CHANGE) {

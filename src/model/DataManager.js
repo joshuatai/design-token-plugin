@@ -126,6 +126,9 @@ const syncToken = (token) => {
         }
     });
 };
+const syncPageThemeMode = () => {
+    sendMessage(MessageTypes.SYNC_CURRENT_THEME_MODE);
+};
 const referByToken = (token) => getProperty()
     .filter((property) => property.useToken === token.id)
     .map((property) => getToken(property.parent));
@@ -138,4 +141,4 @@ const sendMessage = (type, message = "") => parent.postMessage({
         message: typeof message === 'string' ? message : JSON.stringify(message),
     },
 }, "*");
-export { fetch, getThemeMode, getCurrentThemeMode, getFonts, getGroup, getToken, getProperty, getPureToken, setThemeMode, setCurrentThemeMode, removeThemeMode, setFonts, setGroup, setToken, setProperty, setPureToken, removeToken, save, saveThemeMode, syncToken, syncNode, referByToken, sendMessage };
+export { fetch, getThemeMode, getCurrentThemeMode, getFonts, getGroup, getToken, getProperty, getPureToken, setThemeMode, setCurrentThemeMode, removeThemeMode, setFonts, setGroup, setToken, setProperty, setPureToken, removeToken, save, saveThemeMode, syncToken, syncNode, syncPageThemeMode, referByToken, sendMessage };

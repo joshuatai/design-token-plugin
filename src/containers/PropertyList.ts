@@ -19,7 +19,7 @@ export default function ($) {
         .append(
           this.$propertyContainer
             .append(options.map((property, index) => {
-              let { $icon, value, title, secondValue, thridValue } = PropertyIcon(property);
+              let { $icon, value, title, secondValue, thridValue } = PropertyIcon([property]);
               const token = getToken(property.parent);
               const referTokens = referByToken(token);
               const $remove = $(`<span class="remove-property">${removeIcon}</span>`);

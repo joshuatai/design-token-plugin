@@ -18,8 +18,12 @@ const hasFillsNode = function (node) {
     const { COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR } = NodeTypes;
     return [COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR].includes(node.type);
 };
+const hasOpacityNode = function (node) {
+    const { COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR } = NodeTypes;
+    return [COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR].includes(node.type);
+};
 const hasFontNode = function (node) {
     const { TEXT } = NodeTypes;
     return [TEXT].includes(node.type);
 };
-export { hasMixedCornerNode, hasCornerNode, hasStrokeNode, hasFillsNode, hasFontNode };
+export { hasMixedCornerNode, hasCornerNode, hasStrokeNode, hasFillsNode, hasOpacityNode, hasFontNode };

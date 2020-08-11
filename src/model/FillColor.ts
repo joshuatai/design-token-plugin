@@ -12,7 +12,7 @@ class FillColor {
   opacity: number = 1;
   visible: Boolean = true;
   blendMode: String = BlendModes.NORMAL;
-  themeMode: String;
+  themeMode: String = "";
   useToken: String = '';
 
   constructor(options?: any) {

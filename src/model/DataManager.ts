@@ -51,7 +51,6 @@ const removeThemeMode = mode => {
   delete themeModeMap[mode.id];
   const index = themeModes.findIndex((_mode: ThemeMode) => _mode.id === mode.id);
   themeModes.splice(index, 1);
-
 }
 const setCurrentThemeMode = themeMode => {
   currentThemeMode = themeMode;
@@ -139,6 +138,11 @@ const syncToken = (token: Token) => {
     }
   });
 };
+const syncPageThemeMode = () => {
+  sendMessage(
+    MessageTypes.SYNC_CURRENT_THEME_MODE
+  );
+}
 const referByToken = (token: Token): Array<Token> =>
   getProperty()
     .filter((property: any) => property.useToken === token.id)
@@ -183,6 +187,7 @@ export {
   saveThemeMode,
   syncToken,
   syncNode,
+  syncPageThemeMode,
   referByToken,
   sendMessage
 };

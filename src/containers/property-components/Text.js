@@ -227,7 +227,6 @@ export default function ($) {
     //   }, 200);
     // });
     $(document).on(BrowserEvents.CLICK, `[property-component="${NAME}"] .input-group-btn .dropdown-menu a`, function (event) {
-        console.log('select');
         hostData.select($(this), true);
     });
     $(document).on(BrowserEvents.FOCUS, `[property-component="${NAME}"] [contenteditable="true"]`, function () {

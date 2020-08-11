@@ -124,7 +124,7 @@ export default function ($) {
         const color = Color().hex(this.options.color);
         this.setFormat(ColorFormat.HEX);
         this.setColor(color);
-        this.setOpacity(this.options.opacity * 100);
+        this.setOpacity(Math.floor(this.options.opacity * 100));
         this.setVal();
         this.setHandler();
     };

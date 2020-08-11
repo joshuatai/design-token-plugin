@@ -53,17 +53,6 @@ $(document).on(BrowserEvents.CLICK, `#token-setting .token-item`, function (even
     property.useToken(useToken);
     $(document).trigger('property-preview', [property.options]);
 });
-$(document).on(BrowserEvents.CLICK, `#token-setting .mode-item`, function (event) {
-    const $this = $(this);
-    const useMode = $this.data('themeMode');
-    const property = $this.parent().data('property');
-    property.options.themeMode = useMode.id;
-    property.$themeModeList
-        .children()
-        .removeClass('selected')
-        .filter((index, item) => $(item).data('id') === useMode.id)
-        .addClass('selected');
-});
 $(document).on(BrowserEvents.CLICK, `#token-setting .detach-token`, function (event) {
     const { token, property } = $(this).data();
     property.options.useToken = '';

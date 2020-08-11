@@ -9,6 +9,7 @@ enum MessageTypes {
   SET_TOKENS = 'Set Tokens',
   ASSIGN_TOKEN = 'Assign Token',
   SYNC_NODES = 'Sync Nodes',
+  SYNC_CURRENT_THEME_MODE = 'Sync Current Theme Mode',
   SELECTION_CHANGE = 'Selection Change'
 }
 

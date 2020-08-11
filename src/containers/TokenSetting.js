@@ -171,7 +171,7 @@ export default function ($) {
     TokenSetting.prototype.createProperty = function () {
         const { value } = this.$propertySettingSections.data();
         const existIndex = _findIndex(this.token.properties, prop => prop.id === value.id);
-        existIndex > -1 ? this.token.properties[existIndex] = value : this.token.properties.push(value);
+        existIndex > -1 ? this.token.properties.splice(existIndex, 1, value) : this.token.properties.push(value);
         this.updateProperty();
     };
     TokenSetting.prototype.removeProperty = function (property) {
@@ -241,6 +241,9 @@ export default function ($) {
         const { token } = hostData;
         hostData.$element.trigger('destroy:TokenSetting', [token]).destroy();
     }));
+    $(document).on(BrowserEvents.DBCLICK, '.token-name, .token-description', function (e) {
+        $(this).selectText();
+    });
     $(document).on(`${BrowserEvents.KEY_UP}`, '.token-name, .token-description', canAddProperty(inputCheck));
     $(document).on(`${BrowserEvents.BLUR}`, '.token-name, .token-description', canAddProperty(valChange));
     $(document).on(BrowserEvents.CLICK, '#add-property, #property-setting-cancel', function () {

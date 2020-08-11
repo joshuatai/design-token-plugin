@@ -1,7 +1,7 @@
 import validator from 'validator';
 import { validateHTMLColorHex } from "validate-color";
 import BrowserEvents from 'enums/BrowserEvents';
-import { getToken } from 'model/DataManager';
+import { getToken, getCurrentThemeMode } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
 import FillColor from 'model/FillColor';
 import StrokeFill from 'model/StrokeFill';
@@ -33,14 +33,14 @@ export default function ($) {
             .append(this.$valContainer
             .append(this.$icon)
             .append(this.$colorValue.text(colorValue).attr('title', colorValue))
-            .append(this.$colorOpacity.text(`${opacityValue * 100}%`).addClass(this.tokenList.length ? 'hasReferenceToken' : ''))
+            .append(this.$colorOpacity.text(`${Math.floor(opacityValue * 100)}%`).addClass(this.tokenList.length ? 'hasReferenceToken' : ''))
             .append(this.$themeMode)
             .append(this.$token)));
         this.setIcon();
         $(document).trigger('property-preview', [this.options]);
     };
     Fill.prototype.setIcon = function () {
-        const newIcon = PropertyIcon(this.options).$icon;
+        const newIcon = PropertyIcon([this.options]).$icon;
         hostData.$icon.replaceWith(newIcon);
         hostData.$icon = newIcon;
         if (this.options.useToken) {
@@ -52,7 +52,8 @@ export default function ($) {
         }
     };
     Fill.prototype.useToken = function (token) {
-        const { color, blendMode, fillType, opacity, visible } = token.properties[0];
+        const property = token.properties.find(prop => prop.themeMode === getCurrentThemeMode());
+        const { color, blendMode, fillType, opacity, visible } = property;
         Object.assign(this.options, { color, blendMode, fillType, opacity, visible });
         this.$colorValue
             .text(token.name)
@@ -66,7 +67,7 @@ export default function ($) {
             .text(usedProperty.color)
             .attr('contenteditable', true)
             .removeAttr('title');
-        this.$colorOpacity.text(`${usedProperty.opacity * 100}%`).attr('contenteditable', true).show();
+        this.$colorOpacity.text(`${Math.floor(usedProperty.opacity * 100)}%`).attr('contenteditable', true).show();
         this.setIcon();
     };
     Fill.prototype.destroy = function () {
@@ -114,7 +115,7 @@ export default function ($) {
         else {
             value = value.replace('%', '');
             if (!validator.isInt(value))
-                value = options.opacity * 100;
+                value = Math.floor(options.opacity * 100);
             value = Math.min(Math.max(0, value), 100);
             options.opacity = value / 100;
             $this.text(`${value}%`);
@@ -133,7 +134,7 @@ export default function ($) {
     }
     function colorPickerChange(event, picker) {
         hostData.$colorValue.text(picker.color.replace('#', '')).trigger('blur');
-        hostData.$colorOpacity.text(`${picker.opacity * 100}%`).trigger('blur');
+        hostData.$colorOpacity.text(`${Math.floor(picker.opacity * 100)}%`).trigger('blur');
     }
     $(document)
         .off(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .color-val[contenteditable="true"], [property-component="${NAME}"] .opacity-val[contenteditable="true"]`)

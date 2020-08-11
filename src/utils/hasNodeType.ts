@@ -29,6 +29,13 @@ const hasFillsNode = function (node):
   return [COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR].includes(node.type); 
 };
 
+const hasOpacityNode = function (node) :
+  node is ComponentNode | EllipseNode | FrameNode | GroupNode | InstanceNode | LineNode | PolygonNode | RectangleNode | StarNode | TextNode | VectorNode
+{
+  const { COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR } = NodeTypes;
+  return [COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR].includes(node.type);
+}
+
 const hasFontNode = function (node):
 node is TextNode
 {
@@ -41,5 +48,6 @@ export {
     hasCornerNode,
     hasStrokeNode,
     hasFillsNode,
+    hasOpacityNode,
     hasFontNode
 }

@@ -12,6 +12,7 @@ class FillColor {
         this.opacity = 1;
         this.visible = true;
         this.blendMode = BlendModes.NORMAL;
+        this.themeMode = "";
         this.useToken = '';
         if (options.id)
             this.id = options.id;

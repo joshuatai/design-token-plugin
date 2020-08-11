@@ -188,7 +188,7 @@ export default function ($) {
   TokenSetting.prototype.createProperty = function () {
     const { value } = this.$propertySettingSections.data();
     const existIndex = _findIndex(this.token.properties, prop => prop.id === value.id);
-    existIndex > -1 ? this.token.properties[existIndex] = value : this.token.properties.push(value);
+    existIndex > -1 ? this.token.properties.splice(existIndex, 1, value): this.token.properties.push(value);
     this.updateProperty();
   };
   TokenSetting.prototype.removeProperty = function (property) {
@@ -202,19 +202,17 @@ export default function ($) {
   TokenSetting.prototype.updateProperty = function () {
     this.$element.append(this.$propertySetting); // prevent remove data once propetyList destroy
     if (this.token.properties.length > 0) {
-        this.$propertyList.propertyList(this.token.properties);
+      this.$propertyList.propertyList(this.token.properties);
         const propertyTypes = Object.keys(this.token.properties.reduce((calc, property) => {
           calc[property.type] = property.type;
           return calc;
         }, {}));
-        
         this.token.propertyType = propertyTypes.length === 1 ? propertyTypes[0] : Mixed;
     } else {
         this.$propertyList.destroy();
     }
     this.propertyEdit(false);
     this.$propertyView.propertyView(this.token.properties);
-    
     syncToken(this.token);
     save();
     syncNode(this.token);
@@ -263,6 +261,9 @@ export default function ($) {
     const { token } = hostData;
     hostData.$element.trigger('destroy:TokenSetting', [token]).destroy();
   }));
+  $(document).on(BrowserEvents.DBCLICK, '.token-name, .token-description', function (e) {
+    $(this).selectText();
+  });
   $(document).on(`${BrowserEvents.KEY_UP}`, '.token-name, .token-description', canAddProperty(inputCheck));
   $(document).on(`${BrowserEvents.BLUR}`, '.token-name, .token-description', canAddProperty(valChange));
   $(document).on(BrowserEvents.CLICK, '#add-property, #property-setting-cancel', function () {
