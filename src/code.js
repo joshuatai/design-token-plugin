@@ -59,7 +59,7 @@ function assignProperty(properties, node) {
     return __awaiter(this, void 0, void 0, function* () {
         const _themeModes = figma.root.getPluginData('ThemeModes');
         const themeModes = _themeModes ? JSON.parse(_themeModes) : [];
-        const defaultThemeMode = themeModes.find(mode => mode.isDefault);
+        const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
         const useThemeMode = figma.currentPage.getPluginData('themeMode');
         const cornerRadius = properties[PropertyTypes.CORNER_RADIUS];
         const strokeWidthAlign = properties[PropertyTypes.STROKE_WIDTH_ALIGN];
@@ -92,7 +92,7 @@ function assignProperty(properties, node) {
             strokeFill.forEach(fill => {
                 const { fillType, color, opacity, visible, blendMode, themeMode } = fill;
                 const [r, g, b] = Color(`#${color}`).rgb().color;
-                if (((!existCurrentMode && defaultThemeMode.id === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
+                if (((!existCurrentMode && defaultThemeMode === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
                     const solidPaint = {
                         type: FillTypes.SOLID,
                         color: { r: r / 255, g: g / 255, b: b / 255 },
@@ -109,7 +109,7 @@ function assignProperty(properties, node) {
             fillColor.forEach(fill => {
                 const { fillType, color, visible, opacity, blendMode, themeMode } = fill;
                 const [r, g, b] = Color(`#${color}`).rgb().color;
-                if (((!existCurrentMode && defaultThemeMode.id === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
+                if (((!existCurrentMode && defaultThemeMode === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
                     const solidPaint = {
                         type: FillTypes.SOLID,
                         color: { r: r / 255, g: g / 255, b: b / 255 },

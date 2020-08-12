@@ -16,7 +16,7 @@ export default function ($) {
 
     if (options.length) {
       const css = properties2css(options);
-      // this.$element.addClass('hasProperty');
+      this.$element.addClass('hasProperty');
       $viewBox.css(
         Object.assign({
           "background": "#FFFFFF"

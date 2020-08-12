@@ -53,7 +53,7 @@ function propertyMaps (properties) {
 async function assignProperty (properties, node) {
   const _themeModes = figma.root.getPluginData('ThemeModes');
   const themeModes = _themeModes ? JSON.parse(_themeModes) : [];
-  const defaultThemeMode = themeModes.find(mode => mode.isDefault);
+  const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
   const useThemeMode = figma.currentPage.getPluginData('themeMode');
   const cornerRadius = properties[PropertyTypes.CORNER_RADIUS];
   const strokeWidthAlign = properties[PropertyTypes.STROKE_WIDTH_ALIGN];
@@ -88,7 +88,7 @@ async function assignProperty (properties, node) {
     strokeFill.forEach(fill => {
       const { fillType, color, opacity, visible, blendMode, themeMode } = fill;
       const [r, g, b] = Color(`#${color}`).rgb().color;
-      if (((!existCurrentMode && defaultThemeMode.id === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
+      if (((!existCurrentMode && defaultThemeMode === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
         const solidPaint: SolidPaint = {
           type: FillTypes.SOLID,
           color: { r: r / 255, g: g / 255, b: b / 255 },
@@ -106,7 +106,7 @@ async function assignProperty (properties, node) {
     fillColor.forEach(fill => {
       const { fillType, color, visible, opacity, blendMode, themeMode } = fill;
       const [r, g, b] = Color(`#${color}`).rgb().color;
-      if (((!existCurrentMode && defaultThemeMode.id === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
+      if (((!existCurrentMode && defaultThemeMode === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
         const solidPaint: SolidPaint = {
           type: FillTypes.SOLID,
           color: { r: r / 255, g: g / 255, b: b / 255 },

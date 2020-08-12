@@ -11,7 +11,7 @@ var FontStyles;
 })(FontStyles || (FontStyles = {}));
 export default (properties) => {
     const themeModes = getThemeMode();
-    const defaultThemeMode = themeModes.filter(mode => mode.isDefault).id;
+    const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
     const currentThemeMode = getCurrentThemeMode();
     const existCurrentMode = properties.find(prop => prop.themeMode === currentThemeMode);
     let color;
@@ -29,7 +29,12 @@ export default (properties) => {
         }
         if (property.type === PropertyTypes.FILL_COLOR) {
             if (((existCurrentMode && property.themeMode === currentThemeMode) || (!existCurrentMode && property.themeMode === defaultThemeMode)) && property.fillType === FillType.SOLID) {
-                color = Color(`#${property.color}`).alpha(property.opacity);
+                if (property.color === 'transparent' || property.color === 'null') {
+                    color = 'transparent';
+                }
+                else {
+                    color = Color(`#${property.color}`).alpha(property.opacity);
+                }
                 calc["background"] = color;
                 // if (color.isLight()) hostData.$element.addClass("hasLight");
             }

@@ -56,15 +56,19 @@ export default function ($) {
     const newIcon = PropertyIcon([this.options]).$icon;
     hostData.$icon.replaceWith(newIcon);
     hostData.$icon = newIcon;
-    if (this.options.useToken) {
+    if (this.options.useToken || this.options.color === 'transparent' || this.options.color === 'null') {
       this.$colorOpacity.hide();
       this.$icon.attr('disabled', true);
     } else {
+      this.$colorOpacity.show();
       this.$icon.attr('disabled', false);
     }
   }
   Fill.prototype.useToken = function (token) {
-    const property = token.properties.find(prop => prop.themeMode === getCurrentThemeMode());
+    const themeModes = getThemeMode();
+    const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
+    let property = token.properties.find(prop => prop.themeMode === getCurrentThemeMode());
+    if (!property) property = token.properties.find(prop => prop.themeMode === defaultThemeMode);
     const { color, blendMode, fillType, opacity, visible } = property;
     Object.assign(this.options, { color, blendMode, fillType, opacity, visible });
     this.$colorValue
@@ -121,7 +125,10 @@ export default function ($) {
     let value =  $this.text().replace('#', '');
 
     if ($this.is('.color-val')) {
-      if (!validateHTMLColorHex(`#${value}`)) value = options.color;
+      if (!validateHTMLColorHex(`#${value}`) && value.toLowerCase() !== 'transparent' && value.toLowerCase() !== 'null') {
+        value = options.color;
+      }
+      if (value.toLowerCase() === 'transparent' || value.toLowerCase() === 'null') value = value.toLowerCase();
       options.color = value;
       $this.text(value);
     } else {

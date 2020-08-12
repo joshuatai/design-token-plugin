@@ -34,19 +34,28 @@ export default (options, isCalc = false) => {
     }
     if (property.type === PropertyTypes.FILL_COLOR) {
         value = property.color;
-        secondValue = `${Math.floor(property.opacity * 100)}%`;
+        $icon.addClass('token-icon');
         if (themeModes.length > 1)
             thridValue = getThemeMode(property.themeMode).name;
-        title = `Fill Color: #${value.toUpperCase()}`;
-        const color = Color(`#${value}`);
-        $icon
-            .addClass('token-icon')
-            .css({
-            background: color,
-            borderColor: color.isLight() ? '#dddddd' : '#FFFFFF'
-        })
-            .children()
-            .css("opacity", (100 - Math.floor(property.opacity * 100)) / 100);
+        if (value === 'transparent' || value === 'null') {
+            title = `Fill Color: ${value}`;
+            $icon
+                .css('background', 'transparent')
+                .children()
+                .css({ opacity: 1, width: '14px' });
+        }
+        else {
+            title = `#${value.toUpperCase()}`;
+            secondValue = `${Math.floor(property.opacity * 100)}%`;
+            const color = Color(`#${value}`);
+            $icon
+                .css({
+                background: color,
+                borderColor: color.isLight() ? '#dddddd' : '#FFFFFF'
+            })
+                .children()
+                .css("opacity", (100 - Math.floor(property.opacity * 100)) / 100);
+        }
     }
     if (property.type === PropertyTypes.STROKE_FILL) {
         value = property.color;
