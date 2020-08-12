@@ -160,7 +160,7 @@ const Renderer = {
     }
   },
   updateThemeMode: function () {
-    $('.fill-color-icon').parent().each((index, item) => {
+    $('#design-tokens-container .fill-color-icon').parent().each((index, item) => {
       const { token } = $(item).data();
       this.token(getToken(token));
     });
@@ -245,6 +245,7 @@ function updateCurrentThemeMode () {
     .addClass('selected');
   
   Renderer.updateThemeMode();
+  $tokenSetting.TokenSetting('changeThemeMode');
   syncPageThemeMode();
 }
 

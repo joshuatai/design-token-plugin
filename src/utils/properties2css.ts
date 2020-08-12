@@ -1,4 +1,5 @@
 import Color from 'color';
+import { getThemeMode, getCurrentThemeMode } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
 import StrokeAligns from 'enums/StrokeAligns';
 import FillType from 'enums/FillTypes';
@@ -9,6 +10,10 @@ enum FontStyles {
   Regular = 'normal'
 }
 export default (properties) => {
+  const themeModes = getThemeMode();
+  const defaultThemeMode = themeModes.filter(mode => mode.isDefault).id;
+  const currentThemeMode = getCurrentThemeMode();
+  const existCurrentMode = properties.find(prop => prop.themeMode === currentThemeMode);
   let color;
   const css = properties.reduce((calc, property) => {
     if (property.type === PropertyTypes.CORNER_RADIUS) {
@@ -23,21 +28,20 @@ export default (properties) => {
         calc["box-sizing"] = "content-box";
     }
     if (property.type === PropertyTypes.FILL_COLOR) {
-      if (property.fillType === FillType.SOLID) {
+      if (((existCurrentMode && property.themeMode === currentThemeMode) || (!existCurrentMode && property.themeMode === defaultThemeMode)) && property.fillType === FillType.SOLID) {
         color = Color(`#${property.color}`).alpha(property.opacity);
         calc["background"] = color;
         // if (color.isLight()) hostData.$element.addClass("hasLight");
       }
     }
     if (property.type === PropertyTypes.STROKE_FILL) {
-      if (property.fillType === FillType.SOLID) {
+      if (((existCurrentMode && property.themeMode === currentThemeMode) || (!existCurrentMode && property.themeMode === defaultThemeMode)) && property.fillType === FillType.SOLID) {
         color = Color(`#${property.color}`).alpha(property.opacity);
         calc["border-color"] = color;
         calc["border-style"] = "solid";
       }
       // hostData.$element.removeClass("hasLight");
     }
-
     if (property.type === PropertyTypes.OPACITY) {
       if (property.opacity < 100) {
         calc["opacity"] = property.opacity / 100;

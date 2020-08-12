@@ -136,7 +136,7 @@ const Renderer = {
         }
     },
     updateThemeMode: function () {
-        $('.fill-color-icon').parent().each((index, item) => {
+        $('#design-tokens-container .fill-color-icon').parent().each((index, item) => {
             const { token } = $(item).data();
             this.token(getToken(token));
         });
@@ -217,6 +217,7 @@ function updateCurrentThemeMode() {
         .filter((index, item) => $(item).data('id') === themeMode)
         .addClass('selected');
     Renderer.updateThemeMode();
+    $tokenSetting.TokenSetting('changeThemeMode');
     syncPageThemeMode();
 }
 const Root = () => {

@@ -226,6 +226,9 @@ export default function ($) {
     }
     this.$propertyView.propertyView(tmpProperties);
   }
+  TokenSetting.prototype.changeThemeMode = function () {
+    this.$propertyView.propertyView('rerender');
+  }
   TokenSetting.prototype.destroy = function () {
       return this.$element.empty().removeData().hide();
   };
@@ -234,9 +237,13 @@ export default function ($) {
       var $this   = $(this)
       var data    = $this.data('TokenSetting');
       var options = typeof option == 'object' && option;
-
-      if (data) data.destroy();
-        else $this.data('TokenSetting', (data = new TokenSetting(this, options)));
+      if (typeof option === 'string') {
+        data && data[option]();
+      } else if (data) {
+        data.destroy();
+      } else {
+        $this.data('TokenSetting', (data = new TokenSetting(this, options)));
+      }
     })
   }
 

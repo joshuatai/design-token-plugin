@@ -1,4 +1,5 @@
 import properties2css from 'utils/properties2css';
+import PropertyTypes from 'enums/PropertyTypes';
 
 let hostData;
 const viewerBG = ['#707070', '#9F9F9F', '#606060','#A7A7A7'];
@@ -8,6 +9,7 @@ export default function ($) {
     const $viewBox = $('<div class="preview-box">Preview</div>');
     hostData = this;
 
+    this.options = options;
     this.$element = $(element)
       .removeClass('hasLight')
       .append($viewBox);
@@ -29,10 +31,14 @@ export default function ($) {
    
   function Plugin(option) {
     return this.each(function () {
-      var $this   = $(this)
-      var data    = $this.data('property-view');
-      var options = typeof option == 'object' && option;
+      let $this   = $(this)
+      let data    = $this.data('property-view');
+      let options = typeof option == 'object' && option;
 
+      if (data && typeof option === 'string' && option === 'rerender') {
+        options = data.options;
+      }
+      
       if (data) data.destroy(), data = undefined;
       if (!data) $this.data('property-view', (data = new PropertyView(this, options)));
     })
