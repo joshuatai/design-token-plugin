@@ -12,7 +12,8 @@ enum BrowserEvents {
     CHANG = 'change',
     KEY_PRESS = 'keypress',
     KEY_DOWN = 'keydown',
-    KEY_UP = 'keyup'
+    KEY_UP = 'keyup',
+    CONTEXTMENU = 'contextmenu'
 }
 
 export default BrowserEvents;

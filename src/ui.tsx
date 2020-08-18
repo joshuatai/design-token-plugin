@@ -1,6 +1,8 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { fetch, getCurrentThemeMode, setCurrentThemeMode, getThemeMode, setThemeMode, removeThemeMode, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage, setFonts, saveThemeMode, syncPageThemeMode } from './model/DataManager';
+import { v4 } from 'uuid';
+import _cloneDeep from 'lodash/cloneDeep';
+import { fetch, referByToken, getCurrentThemeMode, setCurrentThemeMode, getThemeMode, setThemeMode, removeThemeMode, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage, setFonts, saveThemeMode, syncPageThemeMode } from './model/DataManager';
 import TokenSetting from './containers/TokenSetting';
 import PropertyIcon from './containers/property-components/PropertyIcon';
 import BrowserEvents from 'enums/BrowserEvents';
@@ -28,7 +30,22 @@ const { useEffect } = React;
 
 let $tokenContainer, $desiginSystemTabs, $tokenSetting, $groupCreator, $modeCreator, $themeModeList;
 
+const $groupActionDropdown = $(`
+  <ul class="dropdown-menu pull-right ">
+    <li class="delete-group"><a href="#">Delete Group</a></li>
+  </ul>
+`);
+const $tokenActionWrapper = $(`<div id="token-action-wrapper" class="dropdown"></div>`);
 const $tokenEditBtn = $('<button type="button" class="token-edit-btn"><svg class="svg" width="12" height="14" viewBox="0 0 12 14" xmlns="http://www.w3.org/2000/svg"><path d="M2 7.05V0h1v7.05c1.141.232 2 1.24 2 2.45 0 1.21-.859 2.218-2 2.45V14H2v-2.05c-1.141-.232-2-1.24-2-2.45 0-1.21.859-2.218 2-2.45zM4 9.5c0 .828-.672 1.5-1.5 1.5-.828 0-1.5-.672-1.5-1.5C1 8.672 1.672 8 2.5 8 3.328 8 4 8.672 4 9.5zM9 14h1V6.95c1.141-.232 2-1.24 2-2.45 0-1.21-.859-2.218-2-2.45V0H9v2.05c-1.141.232-2 1.24-2 2.45 0 1.21.859 2.218 2 2.45V14zm2-9.5c0-.828-.672-1.5-1.5-1.5C8.672 3 8 3.672 8 4.5 8 5.328 8.672 6 9.5 6c.828 0 1.5-.672 1.5-1.5z" fill-rule="evenodd" fill-opacity="1" fill="#000" stroke="none"></path></svg></button>');
+const $tokenActionDropdown = $(`<ul class="dropdown-menu pull-right "></ul>`);
+const $tokenActionClone = $(`<li class="clone-token"><a href="#">Clone token</a></li>`);
+const $tokenActionDelete = $(`<li class="delete-token"><a href="#">Delete Token</a></li>`);
+$tokenActionWrapper
+  .append($tokenEditBtn)
+  .append($tokenActionDropdown
+    .append($tokenActionClone)
+    .append($tokenActionDelete)
+  );
 
 const Utils = {
   newGroupName: (): string => {
@@ -100,7 +117,7 @@ const Renderer = {
   group: function (group: Group) {
     const { id, name } = group;
     const $group = $(`<div id="${id}" class="panel panel-default panel-collapse-shown"></div>`);
-    const $heading = $('<div class="panel-heading" data-toggle="collapse" aria-expanded="false"></div>').attr('data-target', `#group-${id}`).data('group', id);
+    const $heading = $('<div class="panel-heading group-item" data-toggle="collapse" aria-expanded="false"></div>').attr('data-target', `#group-${id}`).data('group', id);
     const $title = $('<h6 class="panel-title"></h6>');
     const $expend = $('<span class="tmicon tmicon-caret-right tmicon-hoverable"></span>').hide();
     const $name = $('<span class="group-name" prop-name="name" is-required="true"></span>').text(name).data('id', id);
@@ -110,10 +127,26 @@ const Renderer = {
   
     $group
       .append(
-        $heading.append($title.append($expend).append($name)).append($addTokenBtn)
+        $heading
+          .append(
+            $title
+              .append($expend)
+              .append($name)
+          )
+          .append($addTokenBtn)
       )
       .append(
-        $tokenListPanel.append($tokenList)
+        $tokenListPanel
+          .append(
+            $tokenList
+              .addClass('sortable')
+              .sortable({
+                containment: "parent",
+                placeholder: 'ui-sortable-placeholder',
+                handle: '.ui-sortable-handle',
+                axis: "y"
+              })
+          )
       )
       .data({
         data: group,
@@ -141,20 +174,23 @@ const Renderer = {
           'group': token.parent,
           'token': token.id
         })
-        .append($icon)
+        .append($(`<span class="ui-sortable-handle"></span>`))
         .append($('<span class="token-key"></span>'));
 
       $tokenList.append($token);
     }
-    $('.token-key', $token).text(token.name);
-    $token.children().not('.token-key').replaceWith($icon);
+    const $tokenKey = $('.token-key', $token).text(token.name);
+    $token.find('[data-role="token-icon"]').remove();
+    $icon && $icon.insertBefore($tokenKey);
     $token.data = token;
     $expend.show();
     return $token;
   },
   updateToken: function (token: Token) {
     const { $expend, $heading } = $(`#${token.parent}`).data();
-    this.token(token);
+    getToken().forEach(_token => {
+      this.token(_token);
+    });
     if ($heading.is('[aria-expanded="false"]')) {
       $expend.trigger('click');
     }
@@ -266,19 +302,29 @@ const Root = () => {
       updateCurrentThemeMode();
     });
     //done
-    $(document).on(`${BrowserEvents.CLICK} ${BrowserEvents.MOUSE_OVER} ${BrowserEvents.MOUSE_OUT}`, '#design-tokens-container .token-item',
+    $(document).on(`${BrowserEvents.CLICK} ${BrowserEvents.MOUSE_OVER} ${BrowserEvents.MOUSE_OUT}`, '#design-tokens-container .token-item, #design-tokens-container .group-item',
       $.debounce(20, function ({ type }) {
-        const $tokenItem = $(this);
-        if ( type === BrowserEvents.CLICK) {
-          $('.token-item-selected').removeClass('token-item-selected');
-          $tokenItem.addClass('token-item-selected');
-          sendMessage(MessageTypes.ASSIGN_TOKEN ,getToken($tokenItem.data('token')));
-        }
-        if (type === BrowserEvents.MOUSE_OVER) {
-          $tokenItem.append($tokenEditBtn);
-        }
-        if (type === BrowserEvents.MOUSE_OUT) {
-          $tokenEditBtn.remove();
+        const $item = $(this);
+        if ($item.is('.token-item')) {
+          if ( type === BrowserEvents.CLICK) {
+            $('.token-item-selected').removeClass('token-item-selected');
+            $item.addClass('token-item-selected');
+            sendMessage(MessageTypes.ASSIGN_TOKEN ,getToken($item.data('token')));
+          }
+          if (type === BrowserEvents.MOUSE_OVER) {
+            if (!$item.is($tokenActionWrapper.data('hoveredItem'))) {
+              $tokenActionWrapper.data('hoveredItem', $item);
+              $item.append($tokenActionWrapper);
+              $('.open').removeClass('open');
+            }
+          }
+        } else {
+          if (type === BrowserEvents.MOUSE_OVER) {
+            if (!$item.is($groupActionDropdown.data('hoveredItem'))) {
+              $groupActionDropdown.data('hoveredItem', $item);
+              $('.open').removeClass('open');
+            }
+          }
         }
       })
     );
@@ -286,11 +332,52 @@ const Root = () => {
     $(document).on(BrowserEvents.CLICK, '.group-name:focus, .add-token', preventEvent);
     // token setting
     $(document).on(BrowserEvents.CLICK, '.token-edit-btn, .add-token', function () {
-      let { group, token } = $(this).parent().data();
+      let { group, token } = $(this).closest('.token-item, .panel-heading').data();
       Utils.clearSelection();
       $tokenContainer.removeClass('show');
       $tokenSetting.TokenSetting({ group, token });
     });
+    $(document).on(BrowserEvents.CONTEXTMENU, '.token-edit-btn, .panel-heading .panel-title', function (e) {
+      let { group, token } = $(this).closest('.token-item, .panel-heading').data();
+      const $dropdownContainer = $(this).parent();
+      $('.dropdown').removeClass('open');
+      $dropdownContainer.addClass('open');
+      $tokenActionDelete
+        .removeClass('disabled')
+        .removeAttr('title');
+      Utils.clearSelection();
+      if (token) {
+        const refers = referByToken(getToken(token));
+        if (refers.length > 0) {
+          $tokenActionDelete
+            .addClass('disabled')
+            .attr('title', `This token has been linked by token: ${refers.map(refer => refer.name)}`);
+        }
+      } else {
+        $dropdownContainer.append($groupActionDropdown);
+      }
+    });
+
+    $(document).on(BrowserEvents.CLICK, '.delete-token:not(".disabled"), .clone-token', function (e) {
+      const $this = $(this);
+      const { group, token } = $this.closest('.token-item, .panel-heading').data();
+      const _token = getToken(token);
+      const _cloneToken = _cloneDeep(_token);
+      if ($this.is('.delete-token')) {
+        Renderer.removeToken(_token);
+        removeToken(_token);
+        save();
+      } else {
+        _cloneToken.id = v4();
+        _cloneToken.name = `${_cloneToken.name}-copy`;
+        setToken(_cloneToken);
+        Utils.clearSelection();
+        $tokenContainer.removeClass('show');
+        $tokenSetting.TokenSetting({ group, token: _cloneToken.id });
+      }
+      preventEvent(e);
+    });
+  
     // done
     $(document).on(BrowserEvents.DBCLICK, '.group-name', function (e) {
       $(this).selectText();
@@ -301,14 +388,20 @@ const Root = () => {
       preventEvent(e);
     });
     // need to update
-    $(document).on(BrowserEvents.CLICK, '#design-tokens-container.plugin-panel', function (event) {
-      const $tokenItem = $(event.target).closest('.token-item');
+    $(document).on(`${BrowserEvents.CLICK} ${BrowserEvents.MOUSE_OVER}`, '#design-tokens-container.plugin-panel', function ({type}) {
+      const $target = $(event.target);
+      const $tokenItem = $target.closest('.token-item');
+      const $groupItem = $target.closest('.group-item');
       // const $radiusSeparateBtns = $(event.target).closest('.separator-vals .btn-group');
-      if ($tokenItem.length === 0) {
-        if (event.type === BrowserEvents.CLICK) {
+      if ( type === BrowserEvents.CLICK) {
+        if ($tokenItem.length === 0) {
           $('.token-item').removeClass('token-item-selected');
         }
+        $('.open').removeClass('open');
+      } else if (type === BrowserEvents.MOUSE_OVER && $groupItem.length === 0) {
+        $('.open').removeClass('open');
       }
+      
       // if ($radiusSeparateBtns.length === 0) {
       //   $separatorModeSign.attr('separate-type', 'top-left');
       // }
@@ -368,7 +461,17 @@ const Root = () => {
       save();
       $tokenContainer.addClass('show');
     });  
-  
+    $(document).on( "sortupdate", '.token-list', function(event, ui) {
+      const $sortedItem = $(ui.item[0]);
+      const $sortableContainer = $sortedItem.parent();
+      const group = getGroup($sortedItem.data('group'));
+      const tokens = $.makeArray($sortableContainer.children()).map($token => {
+        const tokenId = $($token).data('token');
+        return getToken(tokenId);;
+      });
+      group.tokens = tokens;
+      save();
+    });
   return (
     <React.Fragment>
       <ul id="desigin-system-tabs" className="nav nav-tabs" role="tablist">

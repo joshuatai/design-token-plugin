@@ -41,7 +41,6 @@ export default function ($) {
     hostData = this;
     this.group = getGroup(group);
     this.token = getToken(token) || setToken(new Token({ parent: group }));
-    
     const $headerRow = $(`
       <div class="setting-row">${backIcon}
         <h6 id="panel-group-name">${this.group.name}</h6>
@@ -203,11 +202,11 @@ export default function ($) {
     this.$element.append(this.$propertySetting); // prevent remove data once propetyList destroy
     if (this.token.properties.length > 0) {
       this.$propertyList.propertyList(this.token.properties);
-        const propertyTypes = Object.keys(this.token.properties.reduce((calc, property) => {
-          calc[property.type] = property.type;
-          return calc;
-        }, {}));
-        this.token.propertyType = propertyTypes.length === 1 ? propertyTypes[0] : Mixed;
+      const propertyTypes = Object.keys(this.token.properties.reduce((calc, property) => {
+        calc[property.type] = property.type;
+        return calc;
+      }, {}));
+      this.token.propertyType = propertyTypes.length === 1 ? propertyTypes[0] : Mixed;
     } else {
         this.$propertyList.destroy();
     }
@@ -227,6 +226,7 @@ export default function ($) {
     this.$propertyView.propertyView(tmpProperties);
   }
   TokenSetting.prototype.changeThemeMode = function () {
+    this.$propertyView.propertyView('rerender');
     this.$propertyView.propertyView('rerender');
   }
   TokenSetting.prototype.destroy = function () {

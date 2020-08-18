@@ -1,4 +1,5 @@
 import validator from 'validator';
+import Color from 'color';
 import { validateHTMLColorHex } from "validate-color";
 import BrowserEvents from 'enums/BrowserEvents';
 import { getToken, getThemeMode, getCurrentThemeMode } from 'model/DataManager';
@@ -78,14 +79,14 @@ export default function ($) {
     this.setIcon();
   }
   Fill.prototype.detachToken = function (token) {
-    const usedProperty = token.properties[0];
+    // const usedProperty = token.properties[0];
 
-    this.$colorValue
-      .text(usedProperty.color)
-      .attr('contenteditable', true)
-      .removeAttr('title');
-    this.$colorOpacity.text(`${Math.floor(usedProperty.opacity * 100)}%`).attr('contenteditable', true).show();
-    this.setIcon();
+    // this.$colorValue
+    //   .text(usedProperty.color)
+    //   .attr('contenteditable', true)
+    //   .removeAttr('title');
+    // this.$colorOpacity.text(`${Math.floor(usedProperty.opacity * 100)}%`).attr('contenteditable', true).show();
+    // this.setIcon();
   }
   Fill.prototype.destroy = function () {
     return this.$element.removeAttr('property-component').empty().removeData().hide();
@@ -123,12 +124,15 @@ export default function ($) {
     }
     const options: FillColor = hostData.options;
     let value =  $this.text().replace('#', '');
-
     if ($this.is('.color-val')) {
       if (!validateHTMLColorHex(`#${value}`) && value.toLowerCase() !== 'transparent' && value.toLowerCase() !== 'null') {
         value = options.color;
       }
-      if (value.toLowerCase() === 'transparent' || value.toLowerCase() === 'null') value = value.toLowerCase();
+      if (value.toLowerCase() === 'transparent' || value.toLowerCase() === 'null') {
+        value = value.toLowerCase();
+      } else {
+        value = Color(`#${value}`).hex().replace('#', '');
+      }
       options.color = value;
       $this.text(value);
     } else {

@@ -61,6 +61,7 @@ body {
   padding: 0;
   display: flex;
   align-items: center;
+  position: relative;
 }
 #design-tokens-container .panel-heading .panel-title {
   margin: 0;
@@ -183,10 +184,12 @@ body {
   flex: 1;
   color: #333;
 }
+#token-action-wrapper {
+  margin-right: -12px;
+  float: right;
+}
 .token-edit-btn,
 .add-token {
-  float: right;
-  margin-right: -12px;
   align-items: center;
   justify-content: center;
   display: flex;
@@ -198,6 +201,9 @@ body {
   opacity: .6;
   background: transparent;
   outline: none;
+}
+.token-edit-btn {
+  margin-right: 0;
 }
 .token-edit-btn:hover {
   background: #f4f4f4;
@@ -219,9 +225,9 @@ body {
   border: 1px solid #426990;
   border-radius: 0;
   outline: 1px solid #afafaf;
-  width: 30px;
-  height: 30px;
-  margin-right: -11px;
+  width: 31px;
+  height: 31px;
+  margin-right: 1px;
 }
 .token-item-selected .token-edit-btn svg {
   color: #ffffff;
@@ -328,8 +334,10 @@ body {
   cursor: pointer;
   padding: 0 8px;
 }
-#property-list > ul.sortable > li {
-  padding-left: 12px;
+
+ul.sortable > li {
+  padding-left: 12px !important;
+  position: relative;
 }
 .ui-sortable-placeholder {
   background: #f4f4f4;
@@ -342,7 +350,7 @@ body {
   left: 2px;
   cursor: move;
   position: absolute;
-  background-image: url(./img/icon_indicator.png);
+  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAgCAYAAAAv8DnQAAABS2lUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4KPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNS42LWMxMzggNzkuMTU5ODI0LCAyMDE2LzA5LzE0LTAxOjA5OjAxICAgICAgICAiPgogPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIi8+CiA8L3JkZjpSREY+CjwveDp4bXBtZXRhPgo8P3hwYWNrZXQgZW5kPSJyIj8+IEmuOgAAAD1JREFUOI3tjjEKADAIA8/Sr/lqH6eTUFwCnc12YOKBiAFERL4MJIC721ELdzSZLBf6IPvv5HVYh3X4cJApbc8hPB2ESEQAAAAASUVORK5CYII=');
   background-repeat: no-repeat;
   background-position: center center;
   display: none;
@@ -350,11 +358,11 @@ body {
 #property-list > ul > li:hover {
   background: #f4f4f4;
 }
-#property-list > ul > li.ui-sortable-helper:hover {
+ul > li.ui-sortable-helper:hover {
   background: #ffffff;
   border: 1px solid #ccc;
 }
-#property-list > ul.sortable > li:hover .ui-sortable-handle {
+ul.sortable > li:hover .ui-sortable-handle {
   display: block;
 }
 .dragged {

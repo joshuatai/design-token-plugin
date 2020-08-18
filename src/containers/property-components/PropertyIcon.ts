@@ -23,7 +23,7 @@ export default (options, isCalc = false) => {
   let secondValue;
   let thridValue;
 
-  const $icon = $(icons[options[0].type]);
+  const $icon = $(icons[options[0].type]).attr('data-role', 'token-icon');
 
   property = options.length === 1 ? _cloneDeep(options[0]) : _cloneDeep(options);
 

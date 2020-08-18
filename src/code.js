@@ -13,6 +13,10 @@ import MessageTypes from 'enums/MessageTypes';
 import PropertyTypes from 'enums/PropertyTypes';
 import FillTypes from 'enums/FillTypes';
 import { hasCornerNode, hasMixedCornerNode, hasStrokeNode, hasFillsNode, hasOpacityNode, hasFontNode } from 'utils/hasNodeType';
+let groups;
+let tokens = [];
+let tokensMap = {};
+let allProperties = [];
 // function clone(val) {
 //   const type = typeof val
 //   if (val === null) {
@@ -55,7 +59,22 @@ function propertyMaps(properties) {
         return calc;
     }, {});
 }
-function assignProperty(properties, node) {
+function traversingUseToken(token) {
+    const _themeModes = figma.root.getPluginData('ThemeModes');
+    const themeModes = _themeModes ? JSON.parse(_themeModes) : [];
+    const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
+    const useThemeMode = figma.currentPage.getPluginData('themeMode');
+    const existCurrentMode = token.properties.find(prop => prop.themeMode === useThemeMode);
+    const defaultMode = token.properties.find(prop => prop.themeMode === defaultThemeMode);
+    const property = existCurrentMode ? existCurrentMode : defaultMode;
+    if (property.useToken) {
+        return traversingUseToken(tokensMap[property.useToken]);
+    }
+    else {
+        return property;
+    }
+}
+function assignProperty(properties, node, setNodeUseTheme = true) {
     return __awaiter(this, void 0, void 0, function* () {
         const _themeModes = figma.root.getPluginData('ThemeModes');
         const themeModes = _themeModes ? JSON.parse(_themeModes) : [];
@@ -90,9 +109,14 @@ function assignProperty(properties, node) {
         if (strokeFill && hasStrokeNode(node)) {
             const existCurrentMode = strokeFill.find(fill => fill.themeMode === useThemeMode);
             strokeFill.forEach(fill => {
-                const { fillType, color, opacity, visible, blendMode, themeMode } = fill;
-                const [r, g, b] = Color(`#${color}`).rgb().color;
+                let { fillType, themeMode, useToken } = fill;
+                let prop = fill;
                 if (((!existCurrentMode && defaultThemeMode === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
+                    if (useToken) {
+                        prop = traversingUseToken(tokensMap[useToken]);
+                    }
+                    let { color, visible, opacity, blendMode } = prop;
+                    const [r, g, b] = Color(`#${color}`).rgb().color;
                     const solidPaint = {
                         type: FillTypes.SOLID,
                         color: { r: r / 255, g: g / 255, b: b / 255 },
@@ -101,23 +125,34 @@ function assignProperty(properties, node) {
                         blendMode
                     };
                     node.strokes = [solidPaint];
+                    node.setPluginData('themeMode', fill.themeMode);
                 }
             });
         }
         if (fillColor && hasFillsNode(node)) {
             const existCurrentMode = fillColor.find(fill => fill.themeMode === useThemeMode);
             fillColor.forEach(fill => {
-                const { fillType, color, visible, opacity, blendMode, themeMode } = fill;
-                const [r, g, b] = Color(`#${color}`).rgb().color;
+                let { fillType, themeMode, useToken } = fill;
+                let prop = fill;
                 if (((!existCurrentMode && defaultThemeMode === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
-                    const solidPaint = {
-                        type: FillTypes.SOLID,
-                        color: { r: r / 255, g: g / 255, b: b / 255 },
-                        visible,
-                        opacity,
-                        blendMode
-                    };
-                    node.fills = [solidPaint];
+                    if (useToken) {
+                        prop = traversingUseToken(tokensMap[useToken]);
+                    }
+                    let { color, visible, opacity, blendMode } = prop;
+                    if (color === 'transparent' || color === 'null') {
+                        node.fills = [];
+                    }
+                    else {
+                        const [r, g, b] = Color(`#${color}`).rgb().color;
+                        const solidPaint = {
+                            type: FillTypes.SOLID,
+                            color: { r: r / 255, g: g / 255, b: b / 255 },
+                            visible,
+                            opacity,
+                            blendMode
+                        };
+                        node.fills = [solidPaint];
+                    }
                 }
             });
         }
@@ -133,6 +168,19 @@ function assignProperty(properties, node) {
         }
     });
 }
+function setTokens(groups) {
+    tokens = [];
+    tokensMap = {};
+    allProperties = [];
+    groups.forEach(group => {
+        group.tokens.length &&
+            (tokens = tokens.concat(group.tokens.map(token => {
+                tokensMap[token.id] = token;
+                allProperties.push(...token.properties);
+                return token;
+            })));
+    });
+}
 function getUsedTokens(properties, token) {
     const usedTokens = properties
         .filter(prop => prop.useToken && prop.useToken === token)
@@ -143,22 +191,13 @@ function getInitThemeMode() {
     postMessage(MessageTypes.GET_INIT_THEME_MODE, figma.currentPage.getPluginData('themeMode'));
 }
 function getCurrentThemeMode() {
-    postMessage(MessageTypes.GET_CURRENT_THEME_MODE, figma.currentPage.getPluginData('themeMode'));
+    return figma.currentPage.getPluginData('themeMode');
 }
 function setCurrentThemeMode(message) {
     figma.currentPage.setPluginData('themeMode', message);
 }
 function syncCurrentThemeMode(node) {
-    const data = figma.root.getPluginData('Tokens');
-    const groups = data ? JSON.parse(data) : [];
-    const allProperties = [];
-    const tokensMap = groups.reduce((calc, group) => {
-        group.tokens.forEach(token => {
-            allProperties.push(...token.properties);
-            calc[token.id] = token;
-        });
-        return calc;
-    }, {});
+    const currentThemeMode = getCurrentThemeMode();
     function traverse(node) {
         if ("children" in node) {
             for (const child of node.children) {
@@ -171,6 +210,7 @@ function syncCurrentThemeMode(node) {
             });
             return;
         }
+        // if (node.getPluginData('themeMode') === currentThemeMode) return;
         const data = node.getPluginData('useTokens');
         const tokens = data ? JSON.parse(data) : [];
         tokens.forEach(token => {
@@ -208,7 +248,7 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
         getInitThemeMode();
     }
     if (type === MessageTypes.GET_CURRENT_THEME_MODE) {
-        getCurrentThemeMode();
+        postMessage(MessageTypes.GET_CURRENT_THEME_MODE, getCurrentThemeMode());
     }
     if (type === MessageTypes.SET_CURRENT_THEME_MODE) {
         setCurrentThemeMode(message);
@@ -223,13 +263,22 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
         }
         figma.root.setPluginData('ThemeModes', message);
     }
+    //Done
     if (type === MessageTypes.GET_TOKENS) {
-        let tokens = figma.root.getPluginData('Tokens');
-        if (!tokens)
-            tokens = '[]';
-        postMessage(type, JSON.parse(tokens));
+        groups = figma.root.getPluginData('Tokens');
+        if (groups) {
+            groups = JSON.parse(groups);
+        }
+        else {
+            groups = [];
+        }
+        setTokens(groups);
+        postMessage(type, groups);
     }
+    //Done
     if (type === MessageTypes.SET_TOKENS) {
+        groups = JSON.parse(message);
+        setTokens(groups);
         figma.root.setPluginData('Tokens', message);
     }
     if (type === MessageTypes.ASSIGN_TOKEN) {
@@ -248,15 +297,6 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
     }
     if (type === MessageTypes.SYNC_NODES) {
         const token = JSON.parse(message);
-        const groups = JSON.parse(figma.root.getPluginData('Tokens'));
-        const allProperties = [];
-        const tokensMap = groups.reduce((calc, group) => {
-            group.tokens.forEach(token => {
-                allProperties.push(...token.properties);
-                calc[token.id] = token;
-            });
-            return calc;
-        }, {});
         const usedTokens = getUsedTokens(allProperties, token.id);
         usedTokens.push(token.id);
         function traverse(node) {
@@ -285,6 +325,7 @@ figma.on('currentpagechange', () => {
     getInitThemeMode();
 });
 figma.on("selectionchange", () => {
+    // console.log(figma.currentPage.selection);
     syncCurrentThemeMode(figma.currentPage.selection);
     postMessage(MessageTypes.SELECTION_CHANGE, figma.currentPage.selection);
 });

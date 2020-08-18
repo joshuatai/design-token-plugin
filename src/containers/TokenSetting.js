@@ -211,6 +211,7 @@ export default function ($) {
     };
     TokenSetting.prototype.changeThemeMode = function () {
         this.$propertyView.propertyView('rerender');
+        this.$propertyView.propertyView('rerender');
     };
     TokenSetting.prototype.destroy = function () {
         return this.$element.empty().removeData().hide();

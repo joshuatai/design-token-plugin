@@ -16,10 +16,10 @@ const hasMixedCornerNode = function (node):
 };
 
 const hasStrokeNode = function (node):
-  node is EllipseNode | LineNode | RectangleNode | PolygonNode | StarNode | TextNode
+  node is FrameNode | EllipseNode | LineNode | RectangleNode | PolygonNode | StarNode | TextNode
 {
-  const { ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR } = NodeTypes;
-  return [ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR].includes(node.type);
+  const { FRAME, ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR } = NodeTypes;
+  return [ FRAME, ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR].includes(node.type);
 };
 
 const hasFillsNode = function (node):
@@ -32,8 +32,8 @@ const hasFillsNode = function (node):
 const hasOpacityNode = function (node) :
   node is ComponentNode | EllipseNode | FrameNode | GroupNode | InstanceNode | LineNode | PolygonNode | RectangleNode | StarNode | TextNode | VectorNode
 {
-  const { COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR } = NodeTypes;
-  return [COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR].includes(node.type);
+  const { COMPONENT, ELLIPSE, FRAME, GROUP, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR } = NodeTypes;
+  return [COMPONENT, ELLIPSE, FRAME, GROUP, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR].includes(node.type);
 }
 
 const hasFontNode = function (node):

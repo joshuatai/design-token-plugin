@@ -14,5 +14,6 @@ var BrowserEvents;
     BrowserEvents["KEY_PRESS"] = "keypress";
     BrowserEvents["KEY_DOWN"] = "keydown";
     BrowserEvents["KEY_UP"] = "keyup";
+    BrowserEvents["CONTEXTMENU"] = "contextmenu";
 })(BrowserEvents || (BrowserEvents = {}));
 export default BrowserEvents;

@@ -42,7 +42,6 @@ const getPureToken = (type): Object => {
     }, {});
   }
 };
-
 const setThemeMode = mode => {
   themeModes.push(mode);
   themeModeMap[mode.id] = mode;
