@@ -13,19 +13,38 @@ const icons = {
 }
 const opacityBg = `url("data:image/svg+xml;utf8,%3Csvg%20width%3D%226%22%20height%3D%226%22%20viewBox%3D%220%200%206%206%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M0%200H3V3H0V0Z%22%20fill%3D%22%23E1E1E1%22/%3E%3Cpath%20d%3D%22M3%200H6V3H3V0Z%22%20fill%3D%22white%22/%3E%3Cpath%20d%3D%22M3%203H6V6H3V3Z%22%20fill%3D%22%23E1E1E1%22/%3E%3Cpath%20d%3D%22M0%203H3V6H0V3Z%22%20fill%3D%22white%22/%3E%3C/svg%3E%0A")`;
 
+
+function traversingUseToken (token) {
+  const themeModes = getThemeMode();
+  const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
+  const useThemeMode = formTokenList ? getCurrentThemeMode() : applyThemeMode;
+  const existCurrentMode = token.properties.find(prop => prop.themeMode === useThemeMode);
+  const defaultMode = token.properties.find(prop => prop.themeMode === defaultThemeMode);
+  const property = existCurrentMode ? existCurrentMode : defaultMode;
+  if (property.useToken) {
+    return traversingUseToken(getToken(property.useToken));
+  } else {
+    return property;
+  }
+}
+
+let property;
+let css;
+let value;
+let title;
+let secondValue;
+let thridValue;
+let formTokenList;
+let applyThemeMode;
+
 export default (options, isCalc = false) => {
   const themeModes = getThemeMode();
   const defaultMode = themeModes.filter(mode => mode.isDefault === true)[0];
-  let property;
-  let css;
-  let value;
-  let title;
-  let secondValue;
-  let thridValue;
-
   const $icon = $(icons[options[0].type]).attr('data-role', 'token-icon');
 
   property = options.length === 1 ? _cloneDeep(options[0]) : _cloneDeep(options);
+  css = value = title = secondValue = thridValue = applyThemeMode = '';
+  formTokenList = isCalc;
 
   if (isCalc && property instanceof Array) {
     const currentThemeMode = getCurrentThemeMode();
@@ -37,20 +56,30 @@ export default (options, isCalc = false) => {
     }
   }
   if (property.type === PropertyTypes.FILL_COLOR) {
-    value = property.color;
+    const isUseToken = property.useToken;
     $icon.addClass('token-icon');
-
-    if (themeModes.length > 1) thridValue = getThemeMode(property.themeMode).name;
-    if (value === 'transparent' || value === 'null') {
-      title = `Fill Color: ${value}`;
+    if (themeModes.length > 1) {
+      applyThemeMode = property.themeMode;
+      thridValue = getThemeMode(applyThemeMode).name;
+    }
+    value = property.color;
+    secondValue = `${Math.floor(property.opacity * 100)}%`;
+    if (isUseToken) {
+      const useToken = getToken(property.useToken);
+      value = useToken.name;
+      secondValue = '';
+      property = traversingUseToken(useToken);
+    }
+    
+    if (property.color === 'transparent' || property.color === 'null') {
+      title = `Fill Color: transparent`;
       $icon
         .css('background', 'transparent')
         .children()
         .css({ opacity: 1, width: '14px' });
     } else {
-      title = `#${value.toUpperCase()}`;
-      secondValue = `${Math.floor(property.opacity * 100)}%`;
-      const color = Color(`#${value}`);
+      title = `Fill Color: #${property.color.toUpperCase()}; Opacity: ${Math.floor(property.opacity * 100)}%;`;
+      const color = Color(`#${property.color}`);
       $icon
         .css({
           background: color,
@@ -61,11 +90,24 @@ export default (options, isCalc = false) => {
     } 
   }
   if (property.type === PropertyTypes.STROKE_FILL) {
+    const isUseToken = property.useToken;
+    $icon.addClass('token-icon');
+    if (themeModes.length > 1) {
+      applyThemeMode = property.themeMode;
+      thridValue = getThemeMode(applyThemeMode).name;
+    }
     value = property.color;
-    secondValue = `${property.opacity * 100}%`;
-    if (themeModes.length > 1) thridValue = getThemeMode(property.themeMode).name;
-    title = `Stroke Color: #${value.toUpperCase()}`;
-    const color = Color(`#${value}`).alpha(property.opacity);
+    secondValue = `${Math.floor(property.opacity * 100)}%`;
+
+    if (isUseToken) {
+      const useToken = getToken(property.useToken);
+      value = useToken.name;
+      secondValue = '';
+      property = traversingUseToken(useToken);
+    }
+
+    title = `Stroke Color: #${property.color.toUpperCase()}`;
+    const color = Color(`#${property.color}`).alpha(property.opacity);
     css = `linear-gradient(${color}, ${color}), ${opacityBg}`;
     $icon
       .addClass('token-icon')
@@ -97,10 +139,10 @@ export default (options, isCalc = false) => {
     secondValue = property.fontSize;
     title = `Font Family: ${property.fontName.family}, Font Size: ${property.fontSize}`;
   }
+  
   if (property.useToken) {
     let tokenName = getToken(property.useToken).name;
     value = tokenName;
-    title = `Token: ${tokenName}`;
   }
 
   $icon.attr('title', title);

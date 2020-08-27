@@ -37,6 +37,14 @@ $(document).on("shown.bs.dropdown hidden.bs.dropdown", ".input-group-btn, .dropd
         }
     }
 });
+$(document).on(BrowserEvents.CLICK, '#token-setting .mode-item', function (event) {
+    const $this = $(this);
+    const useThemeMode = $this.data('id');
+    const $propertySetting = $(this).closest('[property-component]');
+    const value = $propertySetting.data('value');
+    value.themeMode = useThemeMode;
+    $propertySetting.data('color').setIcon();
+});
 $(document).on(BrowserEvents.CLICK, `#token-setting .token-item`, function (event) {
     const $this = $(this);
     const useToken = $this.data('token');

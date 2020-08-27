@@ -73,11 +73,24 @@ const setToken = (token: Token): Token => {
   }
   return token;
 };
+const removeGroup = (group: Group) => {
+  if (getGroup(group.id)) {
+    const index = groups.findIndex((_group: Group) => _group.id === group.id);
+    group.tokens.forEach(token => {
+      removeToken(token);
+    });
+    delete groupMap[group.id];
+    groups.splice(index, 1);
+  }
+}
 const removeToken = (token: Token) => {
   if (getToken(token.id)) {
-    delete tokenMap[token.id];
+    token.properties.forEach((prop: any) => {
+      delete propertiesMap[prop.id];
+    });
     const tokens = getGroup(token.parent).tokens;
     const index = tokens.findIndex((_token: Token) => _token.id === token.id);
+    delete tokenMap[token.id];
     tokens.splice(index, 1);
   }
 };
@@ -181,6 +194,7 @@ export {
   setToken,
   setProperty,
   setPureToken,
+  removeGroup,
   removeToken,
   save,
   saveThemeMode,

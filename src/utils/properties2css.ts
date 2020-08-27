@@ -1,5 +1,5 @@
 import Color from 'color';
-import { getThemeMode, getCurrentThemeMode } from 'model/DataManager';
+import { getThemeMode, getCurrentThemeMode, getToken } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
 import StrokeAligns from 'enums/StrokeAligns';
 import FillType from 'enums/FillTypes';
@@ -9,6 +9,21 @@ enum FontStyles {
   Light = 300,
   Regular = 'normal'
 }
+
+function traversingUseToken (token) {
+  const themeModes = getThemeMode();
+  const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
+  const useThemeMode = getCurrentThemeMode();
+  const existCurrentMode = token.properties.find(prop => prop.themeMode === useThemeMode);
+  const defaultMode = token.properties.find(prop => prop.themeMode === defaultThemeMode);
+  const property = existCurrentMode ? existCurrentMode : defaultMode;
+  if (property.useToken) {
+    return traversingUseToken(getToken(property.useToken));
+  } else {
+    return property;
+  }
+}
+
 export default (properties) => {
   const themeModes = getThemeMode();
   const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
@@ -29,6 +44,9 @@ export default (properties) => {
     }
     if (property.type === PropertyTypes.FILL_COLOR) {
       if (((existCurrentMode && property.themeMode === currentThemeMode) || (!existCurrentMode && property.themeMode === defaultThemeMode)) && property.fillType === FillType.SOLID) {
+        if (property.useToken) {
+          property = traversingUseToken(getToken(property.useToken));
+        }
         if (property.color === 'transparent' || property.color === 'null') {
           color = 'transparent';
         } else {
@@ -40,6 +58,9 @@ export default (properties) => {
     }
     if (property.type === PropertyTypes.STROKE_FILL) {
       if (((existCurrentMode && property.themeMode === currentThemeMode) || (!existCurrentMode && property.themeMode === defaultThemeMode)) && property.fillType === FillType.SOLID) {
+        if (property.useToken) {
+          property = traversingUseToken(getToken(property.useToken));
+        }
         color = Color(`#${property.color}`).alpha(property.opacity);
         calc["border-color"] = color;
         calc["border-style"] = "solid";

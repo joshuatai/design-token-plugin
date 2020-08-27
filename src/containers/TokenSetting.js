@@ -34,6 +34,13 @@ PropertyView(jQuery);
 PropertyList(jQuery);
 export default function ($) {
     const NAME = 'TokenSetting';
+    const getPropertySettingSection = (prop) => {
+        return $('<div class="property-setting-section"></div>')
+            .data({
+            token: hostData.token,
+            propertyView: hostData.$propertyView
+        })[PropertyConponents[prop.type]](prop);
+    };
     var TokenSetting = function (element, { group, token }) {
         hostData = this;
         this.group = getGroup(group);
@@ -84,7 +91,7 @@ export default function ($) {
         const $propertyTypeDropdowns = $('<ul class="dropdown-menu" />').append(Object.keys(PropertyTypes).map(type => {
             return (this[`$propertyOption_${type}`] = $(`<li class="property-type-${type}"><a href="#">${PropertyTypes[type]}</a></li>`));
         }));
-        const $propertySettingSections = $('<div class="setting-row property-setting-section" />');
+        const $propertySettingSections = $('<div class="setting-row property-setting-sections" />');
         const $settingButtonsRow = $('<div class="setting-row" />');
         const $settingCreateBtn = $(`<button id="property-setting-create" type="button" class="btn btn-sm btn-primary">Create</button>`);
         const $settingUpdateBtn = $(`<button id="property-setting-update" type="button" class="btn btn-sm btn-primary">Update</button>`);
@@ -131,13 +138,13 @@ export default function ($) {
     };
     TokenSetting.prototype.propertyEdit = function (editable, property) {
         this.$createProperty.parent()[editable ? 'hide' : 'show']();
-        this.$element.append(this.$propertySetting[editable ? 'show' : 'hide']());
+        this.$propertySetting[editable ? 'show' : 'hide']();
         this.$propertyTypeRow[property ? 'hide' : 'show']();
         this.$propertyTypeBtn.val(0).children('span').text('Choose a type of property');
         this.$settingCreateBtn
             .add(this.$settingUpdateBtn)
             .hide();
-        this.$propertySettingSections.hide().destroy();
+        this.$propertySettingSections.hide().empty();
         this.$propertyTypeDropdowns.children().show();
         this.token.properties.forEach(property => {
             if (property.type === PropertyTypes.CORNER_RADIUS)
@@ -146,32 +153,46 @@ export default function ($) {
                 this.$propertyOption_STROKE_WIDTH_ALIGN.hide();
         });
         if (property) {
-            this.choosePropertyType(property);
+            const properties = [];
+            if (!property.length)
+                properties.push(property);
+            else
+                properties.push(...property);
+            this.choosePropertyType(properties);
         }
     };
     TokenSetting.prototype.choosePropertyType = function (param) {
         let type = param;
+        let settings;
+        this.$propertySettingSections.empty();
         if (typeof param === 'object') {
-            type = param.type;
+            type = param[0].type;
             this.$settingUpdateBtn.show();
+            settings = param.map(prop => getPropertySettingSection(prop));
             $('.property-item:hover').after(this.$propertySetting);
         }
         else {
             this.$settingCreateBtn.show();
+            settings = getPropertySettingSection({ type });
         }
         this.$propertyTypeBtn.val(type).children('span').text(type);
         this.$propertySettingSections
-            .destroy()
-            .data({
-            token: this.token,
-            propertyView: this.$propertyView
-        });
-        this.$propertySettingSections[PropertyConponents[type]](param);
+            .append(settings)
+            .show();
     };
     TokenSetting.prototype.createProperty = function () {
-        const { value } = this.$propertySettingSections.data();
-        const existIndex = _findIndex(this.token.properties, prop => prop.id === value.id);
-        existIndex > -1 ? this.token.properties.splice(existIndex, 1, value) : this.token.properties.push(value);
+        const settings = $.makeArray(this.$propertySettingSections.children()).map(setting => $(setting).data('value'));
+        let referedProperty;
+        let referPropIndex = -1;
+        if (settings.length > 1) {
+            referedProperty = this.$propertySetting.prev().data('property');
+            referPropIndex = _findIndex(this.token.properties, prop => prop.id === referedProperty.id);
+            this.token.properties.splice(referPropIndex, 1, ...settings);
+        }
+        else {
+            const existIndex = _findIndex(this.token.properties, prop => prop.id === settings[0].id);
+            existIndex > -1 ? hostData.token.properties.splice(existIndex, 1, settings[0]) : this.token.properties.push(settings[0]);
+        }
         this.updateProperty();
     };
     TokenSetting.prototype.removeProperty = function (property) {
@@ -210,7 +231,6 @@ export default function ($) {
         this.$propertyView.propertyView(tmpProperties);
     };
     TokenSetting.prototype.changeThemeMode = function () {
-        this.$propertyView.propertyView('rerender');
         this.$propertyView.propertyView('rerender');
     };
     TokenSetting.prototype.destroy = function () {
@@ -256,6 +276,7 @@ export default function ($) {
     $(document).on(`${BrowserEvents.KEY_UP}`, '.token-name, .token-description', canAddProperty(inputCheck));
     $(document).on(`${BrowserEvents.BLUR}`, '.token-name, .token-description', canAddProperty(valChange));
     $(document).on(BrowserEvents.CLICK, '#add-property, #property-setting-cancel', function () {
+        hostData.$element.append(hostData.$propertySetting);
         if ($(this).is('#add-property'))
             hostData.propertyEdit(true);
         else

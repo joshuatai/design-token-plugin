@@ -9,6 +9,8 @@ var MessageTypes;
     MessageTypes["GET_TOKENS"] = "Get Tokens";
     MessageTypes["SET_TOKENS"] = "Set Tokens";
     MessageTypes["ASSIGN_TOKEN"] = "Assign Token";
+    MessageTypes["REORDER_ASSIGN_TOKEN"] = "Reorder Assign Token";
+    MessageTypes["UNASSIGN_TOKEN"] = "Unassign Token";
     MessageTypes["SYNC_NODES"] = "Sync Nodes";
     MessageTypes["SYNC_CURRENT_THEME_MODE"] = "Sync Current Theme Mode";
     MessageTypes["SELECTION_CHANGE"] = "Selection Change";

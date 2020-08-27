@@ -12,8 +12,24 @@ import CommonSettings from './CommonSettings';
 
 colorPicker(jQuery);
 
+let $host;
 let hostData;
 const NAME = 'color';
+
+function traversingUseToken (token) {
+  const themeModes = getThemeMode();
+  const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
+  const useThemeMode = getCurrentThemeMode();
+  const existCurrentMode = token.properties.find(prop => prop.themeMode === useThemeMode);
+  const defaultMode = token.properties.find(prop => prop.themeMode === defaultThemeMode);
+  const property = existCurrentMode ? existCurrentMode : defaultMode;
+  if (property.useToken) {
+    return traversingUseToken(getToken(property.useToken));
+  } else {
+    return property;
+  }
+}
+
 export default function ($) {
   var Fill = function (element, options) {
     const useToken = getToken(options.useToken);
@@ -21,7 +37,7 @@ export default function ($) {
     let opacityValue;
     hostData = this;
     this.options   = options.type === PropertyTypes.FILL_COLOR ? new FillColor(options) : new StrokeFill(options);
-    this.$element  = $(element).attr('property-component', NAME);
+    $host = this.$element  = $(element).attr('property-component', NAME);
     this.$customVal = $('<div class="custom-val"></div>');
     this.$valContainer = $('<div class="val-container"></div>');
     this.$colorValue = $('<span class="color-val"></span>').attr('contenteditable', !useToken);
@@ -79,14 +95,22 @@ export default function ($) {
     this.setIcon();
   }
   Fill.prototype.detachToken = function (token) {
-    // const usedProperty = token.properties[0];
-
-    // this.$colorValue
-    //   .text(usedProperty.color)
-    //   .attr('contenteditable', true)
-    //   .removeAttr('title');
-    // this.$colorOpacity.text(`${Math.floor(usedProperty.opacity * 100)}%`).attr('contenteditable', true).show();
-    // this.setIcon();
+    if (token.properties.length === 1) {
+      let usedProperty = token.properties[0];
+      if (usedProperty.useToken) {
+        usedProperty = traversingUseToken(getToken(usedProperty.useToken));
+      }
+      this.$colorValue
+        .text(usedProperty.color)
+        .attr({
+          'contenteditable': true,
+          'title': usedProperty.color
+        });
+      this.$colorOpacity.text(`${Math.floor(usedProperty.opacity * 100)}%`).attr('contenteditable', true).show();
+      this.setIcon();
+    } else {
+      $host.trigger('property-edit', [token.properties]);
+    }
   }
   Fill.prototype.destroy = function () {
     return this.$element.removeAttr('property-component').empty().removeData().hide();

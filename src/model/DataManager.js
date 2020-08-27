@@ -66,11 +66,24 @@ const setToken = (token) => {
     }
     return token;
 };
+const removeGroup = (group) => {
+    if (getGroup(group.id)) {
+        const index = groups.findIndex((_group) => _group.id === group.id);
+        group.tokens.forEach(token => {
+            removeToken(token);
+        });
+        delete groupMap[group.id];
+        groups.splice(index, 1);
+    }
+};
 const removeToken = (token) => {
     if (getToken(token.id)) {
-        delete tokenMap[token.id];
+        token.properties.forEach((prop) => {
+            delete propertiesMap[prop.id];
+        });
         const tokens = getGroup(token.parent).tokens;
         const index = tokens.findIndex((_token) => _token.id === token.id);
+        delete tokenMap[token.id];
         tokens.splice(index, 1);
     }
 };
@@ -141,4 +154,4 @@ const sendMessage = (type, message = "") => parent.postMessage({
         message: typeof message === 'string' ? message : JSON.stringify(message),
     },
 }, "*");
-export { fetch, getThemeMode, getCurrentThemeMode, getFonts, getGroup, getToken, getProperty, getPureToken, setThemeMode, setCurrentThemeMode, removeThemeMode, setFonts, setGroup, setToken, setProperty, setPureToken, removeToken, save, saveThemeMode, syncToken, syncNode, syncPageThemeMode, referByToken, sendMessage };
+export { fetch, getThemeMode, getCurrentThemeMode, getFonts, getGroup, getToken, getProperty, getPureToken, setThemeMode, setCurrentThemeMode, removeThemeMode, setFonts, setGroup, setToken, setProperty, setPureToken, removeGroup, removeToken, save, saveThemeMode, syncToken, syncNode, syncPageThemeMode, referByToken, sendMessage };

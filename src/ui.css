@@ -53,23 +53,30 @@ body {
 .plugin-panel.show  {
   display: block;
 }
-#design-tokens-container > .panel {
+#design-tokens-container > .panel,
+#assigned-tokens-node-list > .panel {
   border: 0;
   border-bottom: 1px solid #e5e5e5;
 }
-#design-tokens-container .panel-heading {
+#design-tokens-container .panel-heading,
+#assigned-tokens-node-list .panel-heading {
   padding: 0;
   display: flex;
   align-items: center;
   position: relative;
 }
-#design-tokens-container .panel-heading .panel-title {
+#assigned-tokens-node-list .panel-heading {
+  padding: 6px 0;
+}
+#design-tokens-container .panel-heading .panel-title,
+#assigned-tokens-node-list .panel-heading .panel-title  {
   margin: 0;
   padding: 0 12px;
   font-size: 13px;
   flex: 1;
 }
-#design-tokens-container .panel-heading .panel-title .tmicon-caret-right {
+#design-tokens-container .panel-heading .panel-title .tmicon-caret-right,
+#assigned-tokens-node-list .panel-heading .panel-title .tmicon-caret-right {
   margin: 0;
 }
 [contenteditable] {
@@ -96,7 +103,7 @@ body {
 #token-setting [contenteditable]::selection,
 #color-picker-container [contenteditable]::selection,
 #mode-setting [contenteditable]::selection,
-.property-setting-section [contenteditable]::selection {
+.property-setting-sections [contenteditable]::selection {
   background: lightblue;
   color: #333333;
 }
@@ -313,7 +320,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-  color: rgb(0,0,0,.4);
+  color: #999999;
   font-size: 18px;
   position: relative;
 }
@@ -428,7 +435,8 @@ ul.sortable > li:hover .ui-sortable-handle {
 }
 #property-setting {
   display: none;
-  margin-bottom: 8px;
+  border-bottom: 1px dashed #aaa;
+  padding: 8px 0;
 }
 #property-setting [contenteditable="true"] {
   width: auto;
@@ -469,11 +477,15 @@ button[aria-expanded="true"] {
 #property-setting-create {
   display: none;
 }
-.property-setting-section {
+.property-setting-sections {
   display: none;
+  margin-top: 0 !important;
 }
-.property-setting-section [contenteditable] {
+.property-setting-sections [contenteditable] {
   border-color: transparent;
+}
+.property-setting-section + .property-setting-section {
+  margin-top: 8px;
 }
 .custom-val {
   display: flex;
@@ -977,4 +989,9 @@ span.stroke-width-icon:after {
   left: -2px;
   top: 2px;
   font-size: 12px;
+}
+
+.no-node-selected {
+  padding: 12px;
+  color: #666666;
 }

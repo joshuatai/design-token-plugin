@@ -213,11 +213,36 @@ function syncCurrentThemeMode(node) {
         // if (node.getPluginData('themeMode') === currentThemeMode) return;
         const data = node.getPluginData('useTokens');
         const tokens = data ? JSON.parse(data) : [];
+        const length = tokens.length;
+        let removedTokens = [];
         tokens.forEach(token => {
-            assignProperty(propertyMaps(tokensMap[token].properties), node);
+            if (tokensMap[token]) {
+                assignProperty(propertyMaps(tokensMap[token].properties), node);
+            }
+            else {
+                removedTokens.push(token);
+            }
         });
+        removedTokens.forEach(remove => {
+            const index = tokens.findIndex((token) => token === remove);
+            if (index > -1)
+                tokens.splice(index, 1);
+        });
+        if (tokens.length !== length)
+            node.setPluginData('useTokens', JSON.stringify(tokens));
     }
     traverse(node);
+}
+function selectionchange() {
+    const selections = figma.currentPage.selection.map(node => {
+        const useTokens = node.getPluginData('useTokens');
+        return {
+            id: node.id,
+            name: node.name,
+            useTokens: useTokens ? JSON.parse(useTokens) : []
+        };
+    });
+    postMessage(MessageTypes.SELECTION_CHANGE, selections);
 }
 figma.showUI(__html__, { visible: true, width: 267, height: 600 });
 figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
@@ -246,6 +271,7 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
     }
     if (type === MessageTypes.GET_INIT_THEME_MODE) {
         getInitThemeMode();
+        setTimeout(selectionchange, 1000);
     }
     if (type === MessageTypes.GET_CURRENT_THEME_MODE) {
         postMessage(MessageTypes.GET_CURRENT_THEME_MODE, getCurrentThemeMode());
@@ -294,6 +320,30 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
             node.setPluginData('useTokens', JSON.stringify(usedTokens));
             assignProperty(propertyMaps(properties), node);
         });
+        selectionchange();
+    }
+    if (type === MessageTypes.UNASSIGN_TOKEN) {
+        const { nodeId, tokenId } = JSON.parse(message);
+        const unassignNode = figma.currentPage.findOne(node => node.id === nodeId);
+        const useTokens = unassignNode.getPluginData('useTokens');
+        let tokens = useTokens ? JSON.parse(useTokens) : [];
+        tokens = tokens.filter(token => token !== tokenId);
+        unassignNode.setPluginData('useTokens', JSON.stringify(tokens));
+        tokens.forEach(token => {
+            if (tokensMap[token])
+                assignProperty(propertyMaps(tokensMap[token].properties), unassignNode);
+        });
+        selectionchange();
+    }
+    if (type === MessageTypes.REORDER_ASSIGN_TOKEN) {
+        const { nodeId, tokens } = JSON.parse(message);
+        const unassignNode = figma.currentPage.findOne(node => node.id === nodeId);
+        unassignNode.setPluginData('useTokens', JSON.stringify(tokens));
+        tokens.forEach(token => {
+            if (tokensMap[token])
+                assignProperty(propertyMaps(tokensMap[token].properties), unassignNode);
+        });
+        selectionchange();
     }
     if (type === MessageTypes.SYNC_NODES) {
         const token = JSON.parse(message);
@@ -323,9 +373,9 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
 });
 figma.on('currentpagechange', () => {
     getInitThemeMode();
+    selectionchange();
 });
 figma.on("selectionchange", () => {
-    // console.log(figma.currentPage.selection);
     syncCurrentThemeMode(figma.currentPage.selection);
-    postMessage(MessageTypes.SELECTION_CHANGE, figma.currentPage.selection);
+    selectionchange();
 });
