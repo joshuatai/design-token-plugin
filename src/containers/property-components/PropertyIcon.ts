@@ -131,8 +131,20 @@ export default (options, isCalc = false) => {
     title = `Stroke Width: ${value} and Stroke Align: ${secondValue}`;
   }
   if (property.type === PropertyTypes.OPACITY) {
+    const isUseToken = property.useToken;
+    if (themeModes.length > 1) {
+      applyThemeMode = property.themeMode;
+      applyThemeMode ? thridValue = getThemeMode(applyThemeMode).name : thridValue = defaultMode.name;
+    }
     value = `${property.opacity}%`;
-    title = `Opacity: ${value}`; 
+    if (isUseToken) {
+      const useToken = getToken(property.useToken);
+      value = useToken.name;
+      secondValue = '';
+      property = traversingUseToken(useToken);
+    }
+    console.log(property.opacity);
+    title = `Opacity: ${property.opacity}%`; 
   }
   if (property.type === PropertyTypes.TEXT) {
     value = property.fontName.family;

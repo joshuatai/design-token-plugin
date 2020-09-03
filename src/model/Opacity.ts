@@ -6,6 +6,7 @@ class Opacity {
   id: String = v4();
   parent: String = '';
   opacity: number = 100;
+  themeMode: String = "";
   useToken: String = '';
 
   constructor(options?: any) {
@@ -13,6 +14,7 @@ class Opacity {
     if (options.parent) this.parent = options.parent;
     if (options.useToken) this.useToken = options.useToken;
     if (options.opacity != null) this.opacity = options.opacity;
+    if (options.themeMode) this.themeMode = options.themeMode;
   }
   get type (): String {
     return this._type;

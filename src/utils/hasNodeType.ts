@@ -1,12 +1,13 @@
 import NodeTypes from 'enums/NodeTypes';
 
 const hasCornerNode = function (node):
-  node is RectangleNode | PolygonNode | StarNode | VectorNode {
-    const { RECTANGLE, POLYGON, STAR, VECTOR } = NodeTypes;
+  node is InstanceNode | RectangleNode | PolygonNode | StarNode | VectorNode {
+    const { RECTANGLE, POLYGON, STAR, VECTOR, INSTANCE } = NodeTypes;
     return node.type === RECTANGLE ||
            node.type === POLYGON ||
            node.type === STAR ||
-           node.type === VECTOR
+           node.type === VECTOR,
+           node.type === INSTANCE
 };
 
 const hasMixedCornerNode = function (node):

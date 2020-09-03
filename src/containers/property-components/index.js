@@ -41,9 +41,11 @@ $(document).on(BrowserEvents.CLICK, '#token-setting .mode-item', function (event
     const $this = $(this);
     const useThemeMode = $this.data('id');
     const $propertySetting = $(this).closest('[property-component]');
+    const propertyComponent = $propertySetting.data('color') || $propertySetting.data('opacity');
     const value = $propertySetting.data('value');
     value.themeMode = useThemeMode;
-    $propertySetting.data('color').setIcon();
+    if (propertyComponent)
+        propertyComponent.setIcon();
 });
 $(document).on(BrowserEvents.CLICK, `#token-setting .token-item`, function (event) {
     const $this = $(this);

@@ -27,7 +27,12 @@ export default (properties) => {
     const themeModes = getThemeMode();
     const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
     const currentThemeMode = getCurrentThemeMode();
-    const existCurrentMode = properties.find(prop => prop.themeMode === currentThemeMode);
+    const existCurrentMode = {};
+    properties.forEach(prop => {
+        if (prop.themeMode === currentThemeMode) {
+            existCurrentMode[prop.type] = prop;
+        }
+    });
     let color;
     const css = properties.reduce((calc, property) => {
         if (property.type === PropertyTypes.CORNER_RADIUS) {
@@ -42,7 +47,7 @@ export default (properties) => {
                 calc["box-sizing"] = "content-box";
         }
         if (property.type === PropertyTypes.FILL_COLOR) {
-            if (((existCurrentMode && property.themeMode === currentThemeMode) || (!existCurrentMode && property.themeMode === defaultThemeMode)) && property.fillType === FillType.SOLID) {
+            if (((existCurrentMode[property.type] && property.themeMode === currentThemeMode) || (!existCurrentMode[property.type] && property.themeMode === defaultThemeMode)) && property.fillType === FillType.SOLID) {
                 if (property.useToken) {
                     property = traversingUseToken(getToken(property.useToken));
                 }
@@ -57,7 +62,7 @@ export default (properties) => {
             }
         }
         if (property.type === PropertyTypes.STROKE_FILL) {
-            if (((existCurrentMode && property.themeMode === currentThemeMode) || (!existCurrentMode && property.themeMode === defaultThemeMode)) && property.fillType === FillType.SOLID) {
+            if (((existCurrentMode[property.type] && property.themeMode === currentThemeMode) || (!existCurrentMode[property.type] && property.themeMode === defaultThemeMode)) && property.fillType === FillType.SOLID) {
                 if (property.useToken) {
                     property = traversingUseToken(getToken(property.useToken));
                 }
@@ -68,8 +73,13 @@ export default (properties) => {
             // hostData.$element.removeClass("hasLight");
         }
         if (property.type === PropertyTypes.OPACITY) {
-            if (property.opacity < 100) {
-                calc["opacity"] = property.opacity / 100;
+            if ((existCurrentMode[property.type] && property.themeMode === currentThemeMode) || (!existCurrentMode[property.type] && property.themeMode === defaultThemeMode)) {
+                if (property.useToken) {
+                    property = traversingUseToken(getToken(property.useToken));
+                }
+                if (property.opacity < 100) {
+                    calc["opacity"] = property.opacity / 100;
+                }
             }
         }
         if (property.type === PropertyTypes.TEXT) {

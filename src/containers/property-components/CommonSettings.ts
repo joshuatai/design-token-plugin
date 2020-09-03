@@ -38,7 +38,7 @@ export default (property) => {
   const $themeModeList = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>`).data("property", property);
   let $themeMode;
 
-  if (options.type === PropertyTypes.FILL_COLOR || options.type === PropertyTypes.STROKE_FILL) {
+  if (options.type === PropertyTypes.OPACITY || options.type === PropertyTypes.FILL_COLOR || options.type === PropertyTypes.STROKE_FILL) {
     $themeMode = $(`<div class="dropdown"></div>`)
       .append($themeModeIcon)
       .append(

@@ -40,13 +40,13 @@ function propertyMaps (properties) {
     if (
       property._type === PropertyTypes.CORNER_RADIUS ||
       property._type === PropertyTypes.STROKE_WIDTH_ALIGN ||
-      property._type === PropertyTypes.OPACITY ||
       property._type === PropertyTypes.TEXT
     ) {
       calc[property._type] = property;
     } else if (
       property._type === PropertyTypes.FILL_COLOR ||
-      property._type === PropertyTypes.STROKE_FILL
+      property._type === PropertyTypes.STROKE_FILL ||
+      property._type === PropertyTypes.OPACITY
     ) {
       if (!calc[property._type]) calc[property._type] = [];
       calc[property._type].push(property);
@@ -82,6 +82,7 @@ async function assignProperty (properties, node, setNodeUseTheme = true) {
   const fillColor = properties[PropertyTypes.FILL_COLOR];
   const opacity = properties[PropertyTypes.OPACITY];
   const text = properties[PropertyTypes.TEXT];
+  
   node.type === NodeTypes.GROUP && node.children.forEach(child => {
     assignProperty(properties, child);
   });
@@ -124,7 +125,6 @@ async function assignProperty (properties, node, setNodeUseTheme = true) {
           blendMode
         };
         node.strokes = [solidPaint];
-        node.setPluginData('themeMode', fill.themeMode);
       }
     });
   }
@@ -158,7 +158,17 @@ async function assignProperty (properties, node, setNodeUseTheme = true) {
   }
 
   if (opacity && hasOpacityNode(node)) {
-    node.opacity = opacity.opacity / 100;
+    const existCurrentMode = opacity.find(fill => fill.themeMode === useThemeMode);
+    opacity.forEach(_opacity => {
+      let { themeMode, useToken } = _opacity;
+      let prop = _opacity;
+      if (((!existCurrentMode && defaultThemeMode === themeMode) || themeMode === useThemeMode)) {
+        if (useToken) {
+          prop = traversingUseToken(tokensMap[useToken]);
+        }
+        node.opacity = prop.opacity / 100;
+      }
+    });
   }
 
   if (text && hasFontNode(node)) {
@@ -348,7 +358,6 @@ figma.ui.onmessage = async (msg) => {
     const token = JSON.parse(message);
     const usedTokens = getUsedTokens(allProperties, token.id);
     usedTokens.push(token.id);
-
     function traverse(node) {
       if ("children" in node) {
         for (const child of node.children) {
@@ -358,6 +367,7 @@ figma.ui.onmessage = async (msg) => {
       const data = node.getPluginData('useTokens');
       const tokens = data ? JSON.parse(data) : [];
       const usedToken = usedTokens.filter(token => tokens.includes(token));
+
       if (usedToken.length > 0) {
         tokens.forEach(token => {
           if (tokensMap[token]) assignProperty(propertyMaps(tokensMap[token].properties), node);

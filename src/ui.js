@@ -550,7 +550,9 @@ const Root = () => {
             React.createElement("li", { role: "presentation" },
                 React.createElement("a", { href: "#tokens-assigned", "aria-controls": "selections", role: "tab", "data-toggle": "tab" }, "Assigned")),
             React.createElement("li", { role: "presentation" },
-                React.createElement("a", { href: "#modes", "aria-controls": "modes", role: "tab", "data-toggle": "tab" }, "Modes"))),
+                React.createElement("a", { href: "#modes", "aria-controls": "modes", role: "tab", "data-toggle": "tab" }, "Modes")),
+            React.createElement("li", { role: "presentation" },
+                React.createElement("a", { href: "#io", "aria-controls": "io", role: "tab", "data-toggle": "tab" }, "I/O"))),
         React.createElement("div", { className: "tab-content" },
             React.createElement("div", { role: "tabpanel", className: "tab-pane active", id: "tokens" },
                 React.createElement("div", { id: "design-tokens-container", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show" },
@@ -561,7 +563,9 @@ const Root = () => {
             React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "modes" },
                 React.createElement("div", { id: "mode-setting", className: "plugin-panel show" },
                     React.createElement("ul", { id: "mode-list" }),
-                    React.createElement("div", { id: "mode-creator", className: "mode-create" }, "Add a new theme mode"))))));
+                    React.createElement("div", { id: "mode-creator", className: "mode-create" }, "Add a new theme mode"))),
+            React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "io" },
+                React.createElement("div", { className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show" })))));
 };
 class App extends React.Component {
     render() {

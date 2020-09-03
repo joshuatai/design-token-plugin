@@ -46,12 +46,12 @@ function propertyMaps(properties) {
     return properties.reduce((calc, property) => {
         if (property._type === PropertyTypes.CORNER_RADIUS ||
             property._type === PropertyTypes.STROKE_WIDTH_ALIGN ||
-            property._type === PropertyTypes.OPACITY ||
             property._type === PropertyTypes.TEXT) {
             calc[property._type] = property;
         }
         else if (property._type === PropertyTypes.FILL_COLOR ||
-            property._type === PropertyTypes.STROKE_FILL) {
+            property._type === PropertyTypes.STROKE_FILL ||
+            property._type === PropertyTypes.OPACITY) {
             if (!calc[property._type])
                 calc[property._type] = [];
             calc[property._type].push(property);
@@ -125,7 +125,6 @@ function assignProperty(properties, node, setNodeUseTheme = true) {
                         blendMode
                     };
                     node.strokes = [solidPaint];
-                    node.setPluginData('themeMode', fill.themeMode);
                 }
             });
         }
@@ -157,7 +156,17 @@ function assignProperty(properties, node, setNodeUseTheme = true) {
             });
         }
         if (opacity && hasOpacityNode(node)) {
-            node.opacity = opacity.opacity / 100;
+            const existCurrentMode = opacity.find(fill => fill.themeMode === useThemeMode);
+            opacity.forEach(_opacity => {
+                let { themeMode, useToken } = _opacity;
+                let prop = _opacity;
+                if (((!existCurrentMode && defaultThemeMode === themeMode) || themeMode === useThemeMode)) {
+                    if (useToken) {
+                        prop = traversingUseToken(tokensMap[useToken]);
+                    }
+                    node.opacity = prop.opacity / 100;
+                }
+            });
         }
         if (text && hasFontNode(node)) {
             const { fontName, fontSize: size } = text;

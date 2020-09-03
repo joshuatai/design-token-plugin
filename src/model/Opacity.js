@@ -6,6 +6,7 @@ class Opacity {
         this.id = v4();
         this.parent = '';
         this.opacity = 100;
+        this.themeMode = "";
         this.useToken = '';
         if (options.id)
             this.id = options.id;
@@ -15,6 +16,8 @@ class Opacity {
             this.useToken = options.useToken;
         if (options.opacity != null)
             this.opacity = options.opacity;
+        if (options.themeMode)
+            this.themeMode = options.themeMode;
     }
     get type() {
         return this._type;

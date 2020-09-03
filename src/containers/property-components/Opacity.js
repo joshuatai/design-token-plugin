@@ -3,6 +3,7 @@ import OpacityModel from 'model/Opacity';
 import BrowserEvents from 'enums/BrowserEvents';
 import { getToken } from 'model/DataManager';
 import CommonSettings from './CommonSettings';
+import PropertyIcon from './PropertyIcon';
 let hostData;
 const NAME = 'opacity';
 export default function ($) {
@@ -15,15 +16,29 @@ export default function ($) {
         this.$customVal = $('<div class="custom-val"></div>');
         this.$valContainer = $('<div class="val-container"></div>');
         this.$opacityValue = $('<span class="opacity-val"></span>').attr('contenteditable', !useToken);
-        this.$token = CommonSettings(this).$token;
+        const commonSetting = CommonSettings(this);
+        this.$token = commonSetting.$token;
+        this.$themeMode = commonSetting.$themeMode;
         useToken ? opacityValue = useToken.name : opacityValue = `${this.options.opacity}%`;
         this.$element
             .append(this.$customVal
             .append(this.$valContainer
             .append(this.$icon)
             .append(this.$opacityValue.text(opacityValue).attr('title', opacityValue).addClass(this.tokenList.length ? 'hasReferenceToken' : ''))
+            .append(this.$themeMode)
             .append(this.$token)));
         $(document).trigger('property-preview', [this.options]);
+    };
+    Opacity.prototype.setIcon = function () {
+        const newIcon = PropertyIcon([this.options]).$icon;
+        this.$icon.replaceWith(newIcon);
+        this.$icon = newIcon;
+        if (this.options.useToken) {
+            this.$icon.attr('disabled', true);
+        }
+        else {
+            this.$icon.attr('disabled', false);
+        }
     };
     Opacity.prototype.useToken = function (token) {
         this.options.opacity = token.properties[0].opacity;

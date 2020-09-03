@@ -582,6 +582,7 @@ const Root = () => {
         <li role="presentation" className="active"><a href="#tokens" aria-controls="tokens" role="tab" data-toggle="tab" aria-expanded="true">Tokens</a></li>
         <li role="presentation"><a href="#tokens-assigned" aria-controls="selections" role="tab" data-toggle="tab">Assigned</a></li>
         <li role="presentation"><a href="#modes" aria-controls="modes" role="tab" data-toggle="tab">Modes</a></li>
+        <li role="presentation"><a href="#io" aria-controls="io" role="tab" data-toggle="tab">I/O</a></li>
       </ul>
       <div className="tab-content">
         <div role="tabpanel" className="tab-pane active" id="tokens">
@@ -598,6 +599,9 @@ const Root = () => {
             <ul id="mode-list"></ul>
             <div id="mode-creator" className="mode-create">Add a new theme mode</div>
           </div>
+        </div>
+        <div role="tabpanel" className="tab-pane" id="io">
+          <div className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show"></div>     
         </div>
       </div>
     </React.Fragment>
