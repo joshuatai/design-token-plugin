@@ -12,8 +12,8 @@ const hasMixedCornerNode = function (node) {
         node.type === NodeTypes.COMPONENT;
 };
 const hasStrokeNode = function (node) {
-    const { FRAME, ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR } = NodeTypes;
-    return [FRAME, ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR].includes(node.type);
+    const { FRAME, ELLIPSE, LINE, INSTANCE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR } = NodeTypes;
+    return [FRAME, ELLIPSE, LINE, INSTANCE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR].includes(node.type);
 };
 const hasFillsNode = function (node) {
     const { COMPONENT, ELLIPSE, FRAME, INSTANCE, LINE, POLYGON, RECTANGLE, STAR, TEXT, VECTOR } = NodeTypes;

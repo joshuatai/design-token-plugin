@@ -96,7 +96,7 @@ export default function ($) {
       </button>
     `);
     const $propertyTypeDropdowns = $('<ul class="dropdown-menu" />').append(
-      Object.keys(PropertyTypes).map(type => {
+      Object.keys(PropertyTypes).sort().map(type => {
         return (this[`$propertyOption_${type}`] = $(`<li class="property-type-${type}"><a href="#">${PropertyTypes[type]}</a></li>`));
       })
     );

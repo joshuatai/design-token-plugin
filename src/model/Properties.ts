@@ -3,7 +3,8 @@ import StrokeWidthAlign from './StrokeWidthAlign';
 import FillColor from './FillColor';
 import StrokeFill from 'model/StrokeFill';
 import Opacity from 'model/Opacity';
-import Text from 'model/Text';
+import Font from 'model/Font';
+import Spacing from 'model/Spacing';
 
 export default {
     CornerRadius,
@@ -11,5 +12,6 @@ export default {
     Opacity,
     StrokeFill,
     StrokeWidthAlign,
-    Text
+    Font,
+    Spacing
 }

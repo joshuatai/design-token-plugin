@@ -1,5 +1,5 @@
 import validator from 'validator';
-import TextModel from 'model/Text';
+import FontModel from 'model/Font';
 import BrowserEvents from 'enums/BrowserEvents';
 import { getToken, getFonts } from 'model/DataManager';
 import CommonSettings from './CommonSettings';
@@ -43,12 +43,12 @@ const styleCompare = (a, b) => {
     return 0;
 };
 export default function ($) {
-    var Text = function (element, options) {
+    var Font = function (element, options) {
         const useToken = getToken(options.useToken);
         const fontList = getFonts();
         let familyVal;
         hostData = this;
-        this.options = new TextModel(options);
+        this.options = new FontModel(options);
         this.$element = $(element).attr('property-component', NAME);
         this.$customVal = $('<div class="custom-val"></div>');
         this.$familyContainer = $('<div class="val-container"></div>');
@@ -115,7 +115,7 @@ export default function ($) {
         this.select(this[`$fontOption_${family}`]);
         this.select(this.styles[style]);
     };
-    Text.prototype.setStylesList = function (family) {
+    Font.prototype.setStylesList = function (family) {
         const fontStyles = this.fontList[family].map(font => font.style);
         function genStyleList(current, next) {
             if (current.length) {
@@ -157,7 +157,7 @@ export default function ($) {
         this.select(this.styles['Regular'] || this.styles[fontStyles[0]]);
         this.$styleDropdownToggleBtn.attr('disabled', fontStyles.length === 1);
     };
-    Text.prototype.select = function ($option, editable = false) {
+    Font.prototype.select = function ($option, editable = false) {
         const value = $option.text();
         const $dropdowns = $option.closest('.dropdown-menu');
         $dropdowns.children().removeClass('selected');
@@ -175,20 +175,20 @@ export default function ($) {
             $(document).trigger('property-preview', [this.options]);
         }
     };
-    Text.prototype.useToken = function (token) {
+    Font.prototype.useToken = function (token) {
         // const { fontSize } = token.properties[0];
         // this.options.useToken = token.id;
         // this.options.fontSize = fontSize;
         // this.$fontSizeValue.text(token.name).attr('contenteditable', false).attr('title', token.name);
         // this.$detachToken.data('token', token).show();
     };
-    Text.prototype.detachToken = function (token) {
+    Font.prototype.detachToken = function (token) {
         // const usedProperty = token.properties[0];
         // this.options.useToken = '';
         // this.$fontSizeValue.text(usedProperty.fontSize).attr('contenteditable', true).removeAttr('title');
         // this.$detachToken.removeData('token').hide();
     };
-    Text.prototype.destroy = function () {
+    Font.prototype.destroy = function () {
         return this.$element.removeAttr('property-component').empty().removeData().hide();
     };
     function Plugin(option) {
@@ -199,12 +199,12 @@ export default function ($) {
             if (data)
                 data.destroy(), data = undefined;
             if (!data)
-                $this.data(NAME, (data = new Text(this, options)));
+                $this.data(NAME, (data = new Font(this, options)));
         });
     }
     var old = $.fn[NAME];
     $.fn[NAME] = Plugin;
-    $.fn[NAME].Constructor = Text;
+    $.fn[NAME].Constructor = Font;
     $.fn[NAME].noConflict = function () {
         $.fn[NAME] = old;
         return this;
@@ -239,7 +239,7 @@ export default function ($) {
         let oldVal = options.fontSize;
         if (event.type === BrowserEvents.KEY_UP) {
             if (event.key === 'Enter')
-                $this.trigger('blur');
+                $('.btn-primary').trigger('focus');
             return;
         }
         if (validator.isInt(value)) {

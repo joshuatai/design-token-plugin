@@ -1,15 +1,11 @@
 [
   {
-    "id": "537068cb-a42b-4313-9024-a3121b8e2b34",
     "name": "Palette",
     "tokens": [
       {
-        "id": "dec096af-t110-4adc-ac5f-0b547e5c5b73",
-        "name": "red:10",
-        "key": "@red:10",
+        "key": "$red:10",
         "description": "This is one color of the red serious.",
         "type": "FILLS",
-        "parent": "537068cb-a42b-4313-9024-a3121b8e2b34",
         "properties": [
           {
             "propType": "FILLS",
@@ -23,12 +19,9 @@
         ]
       },
       {
-        "id": "b6081840-ad59-4a18-8ab1-340fb2812aae",
-        "name": "red:20",
-        "key": "@red:20",
+        "key": "$red:20",
         "description": "This is one color of the red serious.",
         "type": "FILLS",
-        "parent": "537068cb-a42b-4313-9024-a3121b8e2b34",
         "properties": [
           {
             "propType": "FILLS",

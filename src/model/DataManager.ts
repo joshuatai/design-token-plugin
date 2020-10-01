@@ -5,12 +5,26 @@ import { Mixed } from 'symbols/index';
 import ThemeMode from './ThemeMode';
 import Group from './Group';
 import Token from './Token';
+import Version from './Version';
 
+export const JSONBIN_URL = `https://api.jsonbin.io`;
+const versions: Array<Version> = [];
 const themeModes: Array<ThemeMode> = [];
+
+
 const groups: Array<Group> = [];
+
+
+const versionMap = {};
 const themeModeMap = {};
 const groupMap = {};
 const tokenMap = {};
+let APIKey;
+let collectionID;
+let tokensBinID;
+let VersionsBinID;
+let isAdmin = false;
+let saveData;
 let fonts = {};
 let propertiesMap = {};
 let currentThemeMode;
@@ -22,14 +36,222 @@ const clearPureToken = () => {
   });
 };
 const getFonts = () => fonts;
-const fetch = () => {
-  sendMessage(MessageTypes.GET_FONTS);
-  sendMessage(MessageTypes.GET_MODES);
-  sendMessage(MessageTypes.GET_INIT_THEME_MODE);
-  sendMessage(MessageTypes.GET_TOKENS);
+
+
+const fetchInitial = () => {
+  
+  // sendMessage(MessageTypes.GET_FONTS);
+  // sendMessage(MessageTypes.GET_VERSIONS);
+  // sendMessage(MessageTypes.GET_MODES);
+  // sendMessage(MessageTypes.GET_INIT_THEME_MODE);
+  // sendMessage(MessageTypes.GET_TOKENS);
 };
-const getCurrentThemeMode = () => currentThemeMode;
+
+
+const initialize = function (data) {
+  // console.log(data);
+  // console.log(APIKey, collectionID, tokensBinID, VersionsBinID, isAdmin);
+
+  // initThemeMode(data.themeMode);
+  
+  // useThemeModes();
+  // sendMessage(
+  //   MessageTypes.SET_API,
+  //   {
+  //     'api-key': APIKey,
+  //     'collection-id': collectionID,
+  //     'tokens-bin-id': tokensBinID,
+  //     'versions-bin-id': VersionsBinID,
+  //     'admin': isAdmin
+  //   }
+  // );
+}
+function initThemeMode (modes: Array<ThemeMode> | undefined) {
+  // let hasDefault = true;
+  // if (!modes) {
+  //   hasDefault = false;
+  //   modes = [new ThemeMode()];
+  // }
+  // modes.forEach((mode: ThemeMode) => {
+  //   // const $themeMode = Renderer.themeMode();
+  //   // const { data } = $themeMode.data();
+  //   setThemeMode(new ThemeMode(mode));
+  // });
+  // if (!hasDefault) {
+  //   saveThemeMode();
+  // }
+  // Renderer.themeModes();
+}
+
+const getAPI = function () { 
+  // return {
+  //   'api-key': APIKey,
+  //   'tokens-id': tokensBinID,
+  //   'collection-id': collectionID,
+  //   'versions-id': VersionsBinID,
+  //   'admin-id': adminBinID,
+  //   'admin': isAdmin
+  // }
+};
+// const setAPI = async (key, binID, password?) => {
+//   const options = {
+//     method: 'GET',
+//     headers: {
+//       'secret-key': null
+//     },
+//     body: null
+//   };
+//   let response;
+
+//   if (key) {
+//     APIKey = key;
+//     options.headers['secret-key'] = key;
+//     if (binID) {
+//       let data;
+//       response = fetch(`${JSONBIN_URL}/b/${binID}`, options)
+//         .then(res => res.json())
+//         .then(res => {
+//           if (res.message === undefined) {
+//             data = res.data;
+//             tokensBinID = binID;
+//             collectionID = res['collection-id'];
+//             VersionsBinID = res['versions-bin-id'];
+//           } else {
+//             return Promise.reject({
+//               message: res.message,
+//             });
+//           }
+//           if (password) {
+//             return fetch(`${JSONBIN_URL}/b/${res['admin-id']}`, options)
+//               .then(res => res.json())
+//               .then(res => {
+//                 if (res.password === password) {
+//                   isAdmin = true;
+//                   initialize(data);
+//                   return Promise.resolve({
+//                     id: binID,
+//                     admin: true,
+//                     success: true
+//                   });
+//                 } 
+//                 return Promise.reject({
+//                   message: 'Invalid password'
+//                 });
+//               });
+//           } else {
+//             if (password === '') isAdmin = false;
+//             if (isAdmin) {
+//               initialize(data);
+//               return Promise.resolve({
+//                 id: binID,
+//                 admin: true,
+//                 success: true
+//               });
+//             } else {
+//               return fetch(`${JSONBIN_URL}/b/${VersionsBinID}`, options)
+//                 .then(res => res.json())
+//                 .then(res => {
+//                   if (res['last-version'] === 0) {
+//                     data = {};
+//                     initialize(data);
+//                     return Promise.resolve({
+//                       id: binID,
+//                       admin: false,
+//                       success: true
+//                     });
+//                   }
+//                 });
+//             }
+//           }
+//         });
+//     } else {
+//       // Create Collection
+//       options.headers['Content-Type'] = 'application/json';
+//       options.method = 'POST';
+//       options.body = JSON.stringify({ name: 'Tonic Design Tokens (Collection)' })
+//       response = fetch(`${JSONBIN_URL}/c`, options)
+//         .then(res => res.json())
+//         .then(res => {
+//           if (res.success) {
+//             collectionID = res.id;
+//             options.headers['private'] = 'true';
+//             options.headers['name'] = 'Tonic Design Tokens (Versions)';
+//             options.headers['collection-id'] = res.id;
+//             options.body = JSON.stringify({ 'last-version': 0, versions: {} });
+//             const versions = fetch(`${JSONBIN_URL}/b`, options);
+
+//             options.headers['name'] = 'Tonic Design Tokens (Admin)';
+//             options.body = JSON.stringify({ password });
+//             const admin = fetch(`${JSONBIN_URL}/b`, options);
+//             return Promise.all([versions, admin]);
+//           }
+//           return Promise.reject({ message: res.message });
+//         })
+//         .then(([versions, admin]) => Promise.all([versions.json(), admin.json()]))
+//         .then(([versions, admin]) => {
+//           if (versions.success, admin.success) {
+//             VersionsBinID = versions.id;
+//             options.headers['name'] = 'Tonic Design Tokens';
+//             options.body = JSON.stringify({
+//               'collection-id': collectionID,
+//               'admin-id': admin.id, //remove it once the collection api is back!!
+//               'last-version': 0,
+//               'versions-bin-id': versions.id,
+//               'data': {}
+//             });
+//             return fetch(`${JSONBIN_URL}/b`, options)
+//               .then(res => res.json())
+//               .then(res => {
+//                 if (res.success) {
+//                   tokensBinID = res.id;
+//                   isAdmin = true;
+//                   initialize(res.data.data);
+//                   return Promise.resolve({
+//                     id: res.id,
+//                     admin: true,
+//                     success: res.success
+//                   });
+//                 }
+//                 return Promise.reject(false);
+//               })
+//           }
+//           return Promise.reject(false);
+//         });
+//     }
+//   }
+//   return response;
+// }
 const getThemeMode = function (id?) { return arguments.length ? themeModeMap[id] : themeModes; };
+const setThemeMode = mode => {
+  themeModes.push(mode);
+  themeModeMap[mode.id] = mode;
+}
+const saveThemeMode = () => {
+  sendMessage(
+    MessageTypes.SET_MODES,
+    themeModes
+  );
+}
+const onMessageReceived = (event) => {
+  // const msg = event.data.pluginMessage;
+  // if (msg.type === MessageTypes.GET_API) {
+  //   const settings = msg.message;
+  //   APIKey = settings['api-key'];
+  //   tokensBinID = settings['tokens-bin-id'];
+  //   VersionsBinID = settings['versions-bin-id'];
+  //   isAdmin = settings['admin'];
+  // }
+}
+window.addEventListener("message", onMessageReceived, false);
+
+
+
+const getCurrentThemeMode = () => currentThemeMode;
+
+const getSaveData = function () {
+  return group2saveData();
+};
+const getVersion = function (id?) { return arguments.length ? versionMap[id] : versions; }
 const getGroup = function (id?) { return arguments.length ? groupMap[id] : groups; };
 const getToken = function (id?) { return arguments.length ? tokenMap[id] : Object.values(tokenMap); };
 const getProperty = function (id?) { return arguments.length ? propertiesMap[id] : Object.values(propertiesMap); };
@@ -42,10 +264,7 @@ const getPureToken = (type): Object => {
     }, {});
   }
 };
-const setThemeMode = mode => {
-  themeModes.push(mode);
-  themeModeMap[mode.id] = mode;
-}
+
 const removeThemeMode = mode => {
   delete themeModeMap[mode.id];
   const index = themeModes.findIndex((_mode: ThemeMode) => _mode.id === mode.id);
@@ -96,33 +315,71 @@ const removeToken = (token: Token) => {
 };
 const setProperty = property => propertiesMap[property.id] = property;
 const setPureToken = (token: Token) => token.propertyType && token.propertyType !== Mixed && (pureToken[token.propertyType][token.id] = token);
-const saveThemeMode = () => {
-  sendMessage(
-    MessageTypes.SET_MODES,
-    themeModes
-  );
+
+
+const saveData2Group = () => {
+  let isTokenOpen = false;
+    // groups.forEach((group: Group) => {
+    //   const $group = Renderer.group(new Group({
+    //     id: group.id,
+    //     name: group.name
+    //   }));
+    //   const { $expend, data } = $group.data();
+    //   setGroup(data);
+    //   if (group.tokens.length > 0) {
+    //     group.tokens.forEach(token => {
+    //       token.properties = token.properties.map((property: any) => {
+    //         const data = new Properties[property._type.replace(/[^A-Za-z]/g, '')](property);
+    //         setProperty(data);
+    //         return data;
+    //       });
+    //       if (token.propertyType === String(Mixed)) token.propertyType = Mixed;
+    //       const $token = Renderer.token(new Token(token));
+    //       setToken($token.data);
+    //       setPureToken($token.data);
+    //     });
+    //     if (!isTokenOpen) {
+    //       isTokenOpen = true;
+    //       $expend.trigger('click');
+    //     }
+    //   }
+    // });
 }
-const save = () => {
+const group2saveData = () => {
   const _groups = _cloneDeep(groups);
   propertiesMap = {};
   clearPureToken();
+  saveData = _groups.map(({ id, name, tokens }, groupIndex) => {
+    tokens.forEach((token: Token, tokenIndex) => {
+      setPureToken(token);
+      if (token.propertyType === Mixed) token.propertyType = String(Mixed);
+      token.properties.forEach((property: any, propIndex) => {
+        setProperty(groups[groupIndex].tokens[tokenIndex].properties[propIndex]);
+        if (property.type === PropertyTypes.CORNER_RADIUS && property.radius === Mixed) {
+          property.radius = String(Mixed);
+        }
+      })
+    });
+    return { id, name, tokens };
+  });
+  return saveData;
+};
+const save = () => {
   sendMessage(
     MessageTypes.SET_TOKENS,
-    _groups.map(({ id, name, tokens }, groupIndex) => {
-      tokens.forEach((token: Token, tokenIndex) => {
-        setPureToken(token);
-        if (token.propertyType === Mixed) token.propertyType = String(Mixed);
-        token.properties.forEach((property: any, propIndex) => {
-          setProperty(groups[groupIndex].tokens[tokenIndex].properties[propIndex]);
-          if (property.type === PropertyTypes.CORNER_RADIUS && property.radius === Mixed) {
-            property.radius = String(Mixed);
-          }
-        })
-      });
-      return { id, name, tokens };
-    })
+    group2saveData()
   );
 };
+const setVersion = (version: Version) => {
+  versions.push(version);
+  versionMap[version.id] = version;
+};
+const saveVersion = () => {
+  sendMessage(
+    MessageTypes.SET_VERSION,
+    versions
+  );
+}
 const syncToken = (token: Token) => {
   const refer: any = token.properties[0];
   getProperty().forEach((property: any) => {
@@ -155,6 +412,13 @@ const syncPageThemeMode = () => {
     MessageTypes.SYNC_CURRENT_THEME_MODE
   );
 }
+const restore = (id) => {
+  
+  sendMessage(
+    MessageTypes.RESTRORE_VERSION,
+    id
+  );
+};
 const referByToken = (token: Token): Array<Token> =>
   getProperty()
     .filter((property: any) => property.useToken === token.id)
@@ -176,8 +440,10 @@ const sendMessage = (type: MessageTypes | String, message: String | object = "")
 );
 
 export {
-  fetch,
-  
+  // checkApiKey,
+  getAPI,
+  fetchInitial,
+  getVersion,
   getThemeMode,
   getCurrentThemeMode,
   getFonts,
@@ -185,7 +451,10 @@ export {
   getToken,
   getProperty,
   getPureToken,
+  getSaveData,
 
+  // setAPI,
+  setVersion,
   setThemeMode,
   setCurrentThemeMode,
   removeThemeMode,
@@ -198,9 +467,11 @@ export {
   removeToken,
   save,
   saveThemeMode,
+  saveVersion,
   syncToken,
   syncNode,
   syncPageThemeMode,
+  restore,
   referByToken,
   sendMessage
 };

@@ -88,7 +88,7 @@ export default function ($) {
         <span>Choose a type of property</span>
       </button>
     `);
-        const $propertyTypeDropdowns = $('<ul class="dropdown-menu" />').append(Object.keys(PropertyTypes).map(type => {
+        const $propertyTypeDropdowns = $('<ul class="dropdown-menu" />').append(Object.keys(PropertyTypes).sort().map(type => {
             return (this[`$propertyOption_${type}`] = $(`<li class="property-type-${type}"><a href="#">${PropertyTypes[type]}</a></li>`));
         }));
         const $propertySettingSections = $('<div class="setting-row property-setting-sections" />');

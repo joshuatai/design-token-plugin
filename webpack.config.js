@@ -18,6 +18,18 @@ module.exports = (env, argv) => ({
       // Converts TypeScript code to JavaScript
       { test: /\.tsx?$/, use: 'ts-loader', exclude: /node_modules/ },
 
+      {
+        test: /\.s[ac]ss$/i,
+        use: [
+          // Creates `style` nodes from JS strings
+          'style-loader',
+          // Translates CSS into CommonJS
+          'css-loader',
+          // Compiles Sass to CSS
+          'sass-loader',
+        ],
+      },
+      
       // Enables including CSS by doing "import './file.css'" in your TypeScript code
       { test: /\.css$/, loader: [{ loader: 'style-loader' }, { loader: 'css-loader' }] },
 
@@ -35,6 +47,7 @@ module.exports = (env, argv) => ({
     extensions: ['.tsx', '.ts', '.jsx', '.js'],
     alias: {
       'model': path.resolve(__dirname, 'src/model/'),
+      'hooks': path.resolve(__dirname, 'src/hooks/'),
       'utils': path.resolve(__dirname, 'src/utils/'),
       'enums': path.resolve(__dirname, 'src/enums/'),
       'symbols': path.resolve(__dirname, 'src/symbols/')

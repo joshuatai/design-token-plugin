@@ -17,10 +17,10 @@ const hasMixedCornerNode = function (node):
 };
 
 const hasStrokeNode = function (node):
-  node is FrameNode | EllipseNode | LineNode | RectangleNode | PolygonNode | StarNode | TextNode
+  node is FrameNode | EllipseNode | InstanceNode | LineNode | RectangleNode | PolygonNode | StarNode | TextNode
 {
-  const { FRAME, ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR } = NodeTypes;
-  return [ FRAME, ELLIPSE, LINE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR].includes(node.type);
+  const { FRAME, ELLIPSE, LINE, INSTANCE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR } = NodeTypes;
+  return [ FRAME, ELLIPSE, LINE, INSTANCE, RECTANGLE, POLYGON, STAR, TEXT, VECTOR].includes(node.type);
 };
 
 const hasFillsNode = function (node):

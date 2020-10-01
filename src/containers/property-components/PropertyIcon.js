@@ -8,7 +8,17 @@ const icons = {
     [PropertyTypes.STROKE_FILL]: '<div class="stroke-fill-icon"></div>',
     [PropertyTypes.FILL_COLOR]: '<div class="fill-color-icon"><div class="color-icon-opacity"></div></div>',
     [PropertyTypes.OPACITY]: '<div class="opacity-icon color-icon-opacity"></div>',
-    [PropertyTypes.TEXT]: '<div class="font-size-icon">A</div>',
+    [PropertyTypes.FONT]: '<div class="font-icon">A</div>',
+    [PropertyTypes.SPACING]: `
+    <div class="spacing-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M1 8.38237L3.71667 5.45318L3.71667 11.3116L1 8.38237Z" fill="black"/>
+      <path d="M3 8.5L13 8.5" stroke="black"/>
+      <path d="M15 8.38234L12.2833 11.3115V5.45315L15 8.38234Z" fill="black"/>
+      <line x1="0.5" y1="2.45985e-08" x2="0.499999" y2="16" stroke="black"/>
+      <line x1="15.5" y1="2.63555e-08" x2="15.5" y2="16" stroke="black"/>
+      </svg>
+    </div>`
 };
 const opacityBg = `url("data:image/svg+xml;utf8,%3Csvg%20width%3D%226%22%20height%3D%226%22%20viewBox%3D%220%200%206%206%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M0%200H3V3H0V0Z%22%20fill%3D%22%23E1E1E1%22/%3E%3Cpath%20d%3D%22M3%200H6V3H3V0Z%22%20fill%3D%22white%22/%3E%3Cpath%20d%3D%22M3%203H6V6H3V3Z%22%20fill%3D%22%23E1E1E1%22/%3E%3Cpath%20d%3D%22M0%203H3V6H0V3Z%22%20fill%3D%22white%22/%3E%3C/svg%3E%0A")`;
 function traversingUseToken(token) {
@@ -137,13 +147,16 @@ export default (options, isCalc = false) => {
             secondValue = '';
             property = traversingUseToken(useToken);
         }
-        console.log(property.opacity);
         title = `Opacity: ${property.opacity}%`;
     }
-    if (property.type === PropertyTypes.TEXT) {
+    if (property.type === PropertyTypes.FONT) {
         value = property.fontName.family;
         secondValue = property.fontSize;
         title = `Font Family: ${property.fontName.family}, Font Size: ${property.fontSize}`;
+    }
+    if (property.type === PropertyTypes.SPACING) {
+        value = property.value;
+        title = `Spacing: ${value}`;
     }
     if (property.useToken) {
         let tokenName = getToken(property.useToken).name;

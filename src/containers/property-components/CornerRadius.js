@@ -102,7 +102,7 @@ export default function ($) {
         let oldVal;
         if (event.type === BrowserEvents.KEY_UP) {
             if (event.key === 'Enter')
-                $this.trigger('blur');
+                $('.btn-primary').trigger('focus');
             return;
         }
         if (separateType) {
@@ -133,7 +133,7 @@ export default function ($) {
                 separators.forEach(type => {
                     options[camelize(type)] = Number(value);
                 });
-                hostData.$separateRadius.text(value);
+                hostData.$radiusValue.add(hostData.$separateRadius).text(value);
             }
             else {
                 if (typeof oldVal === 'symbol') {

@@ -4,7 +4,8 @@ import CornerRadius from './CornerRadius';
 import FillColor from './FillColor';
 import StrokeWidthAlign from './StrokeWidthAlign';
 import Opacity from './Opacity';
-import Text from './Text';
+import Font from './Font';
+import Spacing from './Spacing';
 $(document).on(`${BrowserEvents.FOCUSIN} ${BrowserEvents.FOCUSOUT}`, '.val-container [contenteditable="true"], .separator-vals [contenteditable="true"]', function (event) {
     const input = $(this);
     if (event.type === BrowserEvents.FOCUSIN)
@@ -76,5 +77,6 @@ export default ($) => ({
     [PropertyTypes.STROKE_WIDTH_ALIGN]: StrokeWidthAlign($),
     [PropertyTypes.STROKE_FILL]: FillColor($),
     [PropertyTypes.OPACITY]: Opacity($),
-    [PropertyTypes.TEXT]: Text($)
+    [PropertyTypes.FONT]: Font($),
+    [PropertyTypes.SPACING]: Spacing($)
 });

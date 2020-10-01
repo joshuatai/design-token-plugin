@@ -1,8 +1,8 @@
 import { v4 } from 'uuid';
 import PropertyType from 'enums/PropertyTypes';
-class Text {
+class Font {
     constructor(options) {
-        this._type = PropertyType.TEXT;
+        this._type = PropertyType.FONT;
         this.id = v4();
         this.parent = '';
         this.useToken = '';
@@ -26,4 +26,4 @@ class Text {
         return this._type;
     }
 }
-export default Text;
+export default Font;

@@ -1,0 +1,159 @@
+@font-face {
+  font-family: "Abyssinica SIL";
+  src: url("https://joshuatai.github.io/webfont-storage/fonts/Abyssinica%20SIL/Abyssinica%20SIL.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Aksara Bali Galang";
+  src: url("https://joshuatai.github.io/webfont-storage/fonts/Aksara%20Bali%20Galang/Aksara%20Bali%20Galang.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Andada SC";
+  src: url("https://joshuatai.github.io/webfont-storage/fonts/Andada%20SC/Andada%20SC-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Antonio";
+  font-weight: normal;
+  src: url("https://joshuatai.github.io/webfont-storage/fonts/Antonio/Antonio-Regular.ttf") format("truetype");
+}
+@font-face {
+  font-family: "Antonio";
+  font-weight: 300;
+  src: url("https://joshuatai.github.io/webfont-storage/fonts/Antonio/Antonio-Light.ttf") format("truetype");
+}
+body {
+  background: #fff;
+}
+#react-page {
+  height: 100%;
+}
+.tonic-loader {
+  text-align: center;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .loader-container {
+    flex: 1;
+    display: flex;
+
+    .loader {
+      align-self: center;
+    }
+  }
+}
+.nav-tabs {
+  background-image: linear-gradient(rgb(251, 251, 251) 0%, rgb(236, 236, 236) 100%);
+  > li {
+    > a,
+    &.active > a,
+    &.active > a:hover,
+    &.active > a:focus {
+      border: 0;
+      font-size: 12px;
+      padding: 5px 8px;
+      min-width: 10px;
+    }
+  }
+  .theme-modes {
+    float: right;
+  }
+}
+.tab-content > .tab-pane {
+  height: 100%;
+}
+.plugin-panel {
+  height: 100%;
+  background: #ffffff;
+  font: normal 400 11px/16px Inter,sans-serif;
+  font-weight: 400;
+  color: #333;
+  display: none;
+
+  &.show  {
+    display: block;
+  }
+}
+.panel {
+  border: 0;
+  border-bottom: 1px solid #e5e5e5;
+}
+.panel-heading {
+  padding: 0;
+  display: flex;
+  align-items: center;
+  position: relative;
+
+  #assigned-tokens-node-list & {
+    padding: 6px 0;
+  }
+}
+.panel-title  {
+  margin: 0;
+  padding: 0 12px;
+  font-size: 13px;
+  flex: 1;
+
+  .node-name {
+    font-family: TMicon;
+  }
+  .tmicon-caret-right {
+    margin: 0;
+  }
+}
+
+[contenteditable] {
+  border: 1px solid transparent;
+  padding: 2px 4px !important;
+  line-height: 20px !important;
+  outline: none;
+  color: #333;
+}
+
+[contenteditable="true"] {
+  box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  cursor: text;
+
+  &:focus {
+    border-color:#18a0fb !important;
+    background: #fff;
+    z-index: 4;
+  }
+  &::selection {
+    background: lightblue;
+    color: #333333;
+  }
+  &[invalid="true"] {
+    border-color: #E52630 !important;
+  }
+  br {
+    display:none;
+  }
+  * {
+    color: inherit;
+    overflow: inherit;
+    font-family: inherit !important;
+    background: inherit !important;
+    color: inherit !important;
+    font-weight: inherit !important;
+    font-size: inherit !important;
+    letter-spacing: inherit !important;
+    display:inline !important;
+    white-space: nowrap !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    line-height: 20px !important;
+    word-break: inherit !important;
+    word-wrap: inherit !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+}
+
+#property-list .remove-property[disabled],
+#mode-list .remove-mode[data-disabled],
+#version-list .remove-version[disabled] {
+  opacity: 0.3;
+  cursor: not-allowed;
+}

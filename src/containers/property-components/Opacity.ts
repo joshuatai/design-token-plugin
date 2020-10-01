@@ -25,7 +25,8 @@ export default function ($) {
     this.$themeMode = commonSetting.$themeMode;
 
     useToken ? opacityValue = useToken.name : opacityValue = `${this.options.opacity}%`;
-
+    this.$element[this.$themeMode ? 'addClass' : 'removeClass']('hasThemeMode');
+    
     this.$element
       .append(
         this.$customVal
@@ -87,7 +88,8 @@ export default function ($) {
   }
 
   $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .opacity-val[contenteditable="true"]`, function (event) {
-    if (event.type === BrowserEvents.KEY_UP && event.key !== 'Enter') {
+    if (event.type === BrowserEvents.KEY_UP) {
+      if (event.key === 'Enter') $('.btn-primary').trigger('focus');
       return;
     }
     const $this = $(this);

@@ -15,7 +15,7 @@ const useTokenIcon = `
   </div>
 `;
 export const themeModeIcon =  `
-  <div class="themem-mode-list" data-toggle="dropdown">
+  <div class="themem-mode-list" data-toggle="dropdown" title="Change theme mode">
     <span class="tmicon tmicon-sun"></span>
     <span class="tmicon tmicon-moon"></span>
   </div>

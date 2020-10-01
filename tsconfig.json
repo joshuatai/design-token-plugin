@@ -4,12 +4,14 @@
     "baseUrl": ".",
     "paths": {
       "model/*": ["src/model/*"],
+      "hooks/*": ["src/hooks/*"],
       "utils/*": ["src/utils/*"],
       "enums/*": ["src/enums/*"],
       "symbols/*": ["src/symbols/*"]
     },
     "jsx": "react",
     "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
     "lib": [
       "es2017",
       "dom",

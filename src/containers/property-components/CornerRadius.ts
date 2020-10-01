@@ -120,9 +120,9 @@ export default function ($) {
     const options = hostData.options;
     let value =  $this.text();
     let oldVal;
-
+    
     if (event.type === BrowserEvents.KEY_UP) {
-      if (event.key === 'Enter') $this.trigger('blur');
+      if (event.key === 'Enter') $('.btn-primary').trigger('focus');
       return;
     }
     if (separateType) {
@@ -151,8 +151,8 @@ export default function ($) {
         options.radius = value;
         separators.forEach(type => {
           options[camelize(type)] = Number(value);
-        });
-        hostData.$separateRadius.text(value);
+        }); 
+        hostData.$radiusValue.add(hostData.$separateRadius).text(value);
       } else {
         if (typeof oldVal === 'symbol') {
           $this.text('Mixed');
