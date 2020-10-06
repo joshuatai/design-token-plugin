@@ -3,13 +3,17 @@ import { sendMessage } from 'model/DataManager';
 import MessageTypes from 'enums/MessageTypes';
 import useAPI from 'hooks/useAPI';
 import { ThemeModesContext } from '../ThemeModeProvider';
+import { groupsContext } from '../GroupProvider';
 import ThemeMode from 'model/ThemeMode';
+import Group from 'model/Group';
 
 export const JSONBIN_URL = `https://api.jsonbin.io`;
 
 const useData = () => {
   const { api } = useAPI();
   const themeModes: Array<ThemeMode> = useContext(ThemeModesContext);
+  const groups: Array<Group> = useContext(groupsContext);
+  
   const options = {
     method: 'GET',
     headers: {
@@ -158,7 +162,7 @@ const useData = () => {
   //   }
   //   return response;
   // }
-  const save = () => {
+  const saveThemeModes = (_themeModes: Array<ThemeMode>) => {
     if (!api.admin) return;
     
     options.method = 'PUT';
@@ -168,30 +172,38 @@ const useData = () => {
       "versions-id": api.versionsID,
       "last-version": api.lastVersion,
       "data": {
-        themeModes
+        themeModes: _themeModes,
+        groups
       }
     });
 
-    fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
-      .then(res => res.json())
-      .then(res => {
-        // console.log(res);
-        if (res.success) {
-        //   api.bid = res.id;
-        //   api.admin = true;
-        
-        //   return Promise.resolve({
-        //     ...api,
-        //     data: res.data.data,
-        //     success: res.success
-        //   });
-          return;
-        }
-        return Promise.reject(false);
-      })
+    return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
+      .then(res => res.json());
   }
+
+
+  const saveGroups = (_groups: Array<Group>) => {
+    if (!api.admin) return;
+    
+    options.method = 'PUT';
+    options.body = JSON.stringify({
+      // "collection-id": api.collectionID,
+      "admin-id": api.adminID,
+      "versions-id": api.versionsID,
+      "last-version": api.lastVersion,
+      "data": {
+        themeModes,
+        groups: _groups
+      }
+    });
+
+    return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
+      .then(res => res.json());
+  }
+
   return {
-    save
+    saveThemeModes,
+    saveGroups
   };
 };
 

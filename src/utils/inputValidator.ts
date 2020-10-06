@@ -1,103 +1,102 @@
 import validator from 'validator';
+import SelectText from 'utils/SelectText';
+import InputStatus from 'enums/InputStatus';
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
-
-
-
 import { getAPI, getVersion, getThemeMode, getGroup, getToken, save, saveThemeMode, saveVersion } from '../model/DataManager';
 
-const validInt = function (event) {
-  if (!validator.isInt(event.key)) {
-    event.stopPropagation();
-    event.preventDefault();
+declare var $: any;
+SelectText(jQuery);
+
+const validInt = function (e) {
+  if (!validator.isInt(e.key)) {
+    e.stopPropagation();
+    e.preventDefault();
     return false;
   }
 };
 const inputCheck = function (e) {
-  const $target = $(this);
-  const newVal = $target.text();
-  $('*', $target).removeAttr('style');
-  const isRequired = $target.attr('is-required');
-  if (isRequired && !newVal) {
-    $target.attr('invalid', "true");
+  const $target = this;
+  const newVal = $target.textContent;
+  const isRequired = $target.getAttribute('is-required');
+  $target.querySelectorAll('*').forEach(node => node.removeAttribute('style'));
+  if (e.key === 'Enter') {
+    $target.blur();
     return;
   }
-  if (newVal && $target.attr('prop-name') === "url") {
-    // if (!validator.isURL(newVal)) {
-    //   $target.attr('invalid', "true");
-    //   return;
-    // }
+  if (isRequired && !newVal) {
+    $target.setAttribute('invalid', "true");
+    return;
   }
-  if (newVal && $target.attr('prop-name') === "password") {
+  if (newVal && $target.getAttribute('prop-name') === "password") {
     if (!validator.isLength(newVal, { min: 8, max: 16 })) {
-      $target.attr('invalid', "true");
+      $target.setAttribute('invalid', "true");
       return;
     }
   }
-  $target.removeAttr('invalid');
-  if (e.key === 'Enter') {
-    $target.trigger('blur');
-    return;
-  }
+  $target.removeAttribute('invalid');
 };
 
-function valCheck (editable, data, propName) {
-  const orgVal = data[propName];
-  let newVal = editable.text().trim();
-  editable.removeAttr('invalid');
-  if (!newVal && editable.is('[is-required]')) {
+function valCheck ($editable, orgVal, resolve, reject) {
+  const propName = $editable.getAttribute('prop-name');
+  const isRequired = $editable.getAttribute('is-required');
+  let newVal = $editable.textContent.trim();
+
+  if (orgVal && newVal === orgVal) {
+    $editable.setAttribute("contenteditable", "false");
+    reject(InputStatus.NO_CHANGE);
+    return;
+  }
+  $editable.removeAttribute('invalid');
+  if (!newVal && isRequired) {
     if (orgVal) {
-      editable.text(orgVal).attr("contenteditable", "false");
-      if (!(data instanceof Version)) return;
-      newVal = orgVal;
+      $editable.innerHTML = orgVal;
+      $editable.setAttribute("contenteditable", "false");
+      // if (!(data instanceof Version)) return;
+      // newVal = orgVal;
+      reject(InputStatus.NO_CHANGE);
     } else {
-      editable
-        .attr('invalid', "true")
-        .selectText();
-      
-      return;
+      $editable.setAttribute('invalid', "true");
+      $($editable).selectText();
+      reject(InputStatus.INVALID);
     }
+    return;
   } else if (newVal) {
-    if (propName === "url") {
-      if (!validator.isURL(newVal)) {
-        // editable
-        //   .attr('invalid', "true")
-        //   .selectText();
-        // return;
-      }
-    }
     if (propName === "password") {
       if (!validator.isLength(newVal, { min: 8, max: 16 })) {
-        editable
-          .attr('invalid', "true")
-          .selectText();
+        $editable.setAttribute('invalid', "true")
+        $editable.selectText();
+        reject(InputStatus.INVALID);
         return;
       }
     }
   }
-  data[propName] = newVal;
-  editable.text(newVal).attr("contenteditable", "false");
-  editable.scrollLeft(0);
-  if (data instanceof ThemeMode) {
-    saveThemeMode();
-  } else if (data instanceof Version) {
-    saveVersion();
-  } else {
+  $editable.innerHTML = newVal;
+  $editable.setAttribute("contenteditable", "false");
+  $editable.scrollLeft = 0;
+  resolve(InputStatus.VALID);
+  // 
+  // if (data instanceof ThemeMode) {
+  //   // saveThemeMode();
+  // } else if (data instanceof Version) {
+  //   saveVersion();
+  // } else {
     
-    // save();
-  }
+  //   // save();
+  // }
 }
 
 let valCheckTimer;
-const valChange = function () {
-  const $target = $(this);
-  const id = $target.data('id');
-  const data = getVersion(id) ||  getThemeMode(id) || getGroup(id) || getToken(id) || {};
-  if (valCheckTimer) clearTimeout(valCheckTimer);
-  valCheckTimer = setTimeout(function () {
-    if (!$target.is(":visible")) return;
-    valCheck($target, data, $target.attr('prop-name'));
-  }, 250);
+const valChange = function (orgVal) {
+  const $editable = this;
+  // const id = $target.data('id');
+  // const data = getVersion(id) ||  getThemeMode(id) || getGroup(id) || getToken(id) || {};
+  return new Promise(function(resolve, reject) {
+    valCheckTimer && clearInterval(valCheckTimer);
+    valCheckTimer = setTimeout(() => {
+      valCheck($editable, orgVal, resolve, reject);
+    }, 250, 'finish'); 
+  });;
 };
 
 export {

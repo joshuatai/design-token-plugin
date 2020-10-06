@@ -89,7 +89,7 @@ const Root = () => {
             }
         }
     }, [apiChecked, tokensID]);
-    console.log('render root');
+    // console.log('render root');
     return (!apiChecked ?
         React.createElement(Loader, null) :
         apiKey && tokensID && isFetched ?

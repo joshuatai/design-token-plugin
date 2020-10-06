@@ -95,7 +95,7 @@ const Root:FC = () => {
       }
     }
   }, [apiChecked, tokensID]);
-  console.log('render root');
+  // console.log('render root');
   return (
     !apiChecked ?
       <Loader></Loader> :

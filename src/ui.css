@@ -26,7 +26,7 @@
 #mode-list,
 #version-list {
   width: 100%;
-  margin: 0;
+  margin: 4px 0;
   padding: 0;
 }
 #io .setting-row {
@@ -336,12 +336,13 @@ ul.sortable > li:hover .ui-sortable-handle {
 }
 #add-property[disabled],
 .group-create[disabled],
-.mode-create[disabled],
+.mode-create[data-disabled="true"],
 .version-create[disabled] {
   background: #F6F6F6;
   color: #b6b6b6;
   border: 1px dashed #E5E5E5;
   cursor: not-allowed;
+  pointer-events: none;
 }
 #property-setting {
   display: none;

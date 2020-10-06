@@ -6,7 +6,9 @@ import _cloneDeep from 'lodash/cloneDeep';
 
 import useAPI from 'hooks/useAPI';
 import useThemeModes from 'hooks/useThemeModes';
-import ThemeModeList from './ThemeModeList';
+import useGroups from 'hooks/useGroups';
+import TokensListContainer from './TokensListContainer';
+import ThemeModesContainer from './ThemeModesContainer';
 
 
 import TokenSetting from './TokenSetting';
@@ -51,60 +53,25 @@ $tokenActionWrapper
 
 type Props = {
   data: {
-    themeModes: Array<ThemeMode>
+    themeModes: Array<ThemeMode>,
+    groups: Array<Group>
   }
 };
 const Tokens:FC<Props> = ({
-  data = { themeModes: [] }
+  data = { themeModes: [], groups: [] }
 }: Props) => {
-  const { themeModes, setThemeModes} = useThemeModes();
+  const { setThemeModes} = useThemeModes();
+  const { setGroups } = useGroups();
   const { api: { admin }} = useAPI();
-  // console.log(admin);
-  // const { themeModes } = useThemeModes();
   let $tokenContainer, $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $groupCreator, $modeCreator, $themeModeList, $versionCreator, $versionList;
 
   const Utils = {
-    newGroupName: (): string => {
-      const lastNumber = getGroup()
-        .filter((group) => (group.name.match(/^Group \d+$/) ? true : false))
-        .map(group => (Number(group.name.replace('Group ', ''))))
-        .sort()
-        .pop();
-      return `Group ${lastNumber ? lastNumber + 1 : 1}`;
-    },
     clearSelection: () => {
       document.getSelection().removeAllRanges();
     }
   };
   
   const Renderer = {
-    themeMode: function (mode) {
-      let $mode, $name, $remove;
-  
-      $themeModeList
-        .append(
-          (
-            $mode = $(`<li id="mode-${mode.id}"></li>`)
-              .append($name = $(`<span class="theme-mode-name" prop-name="name" is-required="true" contenteditable="false">${mode.name}</span>`).data('id', mode.id))
-              .append(
-                $remove = $(`
-                  <span class="remove-mode">
-                    <svg class="svg" width="12" height="6" viewBox="0 0 12 6" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M11.5 3.5H.5v-1h11v1z" fill-rule="nonzero" fill-opacity="1" fill="#000" stroke="none"></path>
-                    </svg>
-                  </span>
-                `).attr('disabled', mode.isDefault)
-              )
-              .data({
-                data: mode,
-                $name,
-                $remove
-              })
-          )
-        );
-  
-      return $mode;
-    },
     themeModes: function () {
       const modes = getThemeMode();
       const $themeModes = $(`<div class="dropdown theme-modes"></div>`);
@@ -319,9 +286,16 @@ const Tokens:FC<Props> = ({
   }
   
   function init () {
-    const _themeModes = data.themeModes.map(({ id, name, isDefault }) => new ThemeMode({ id, name, isDefault }));
-    setThemeModes(_themeModes);
-    // themeModes.forEach((mode: ThemeMode) => Renderer.themeMode(mode));
+    if (data.themeModes) {
+      const _themeModes = data.themeModes.map(({ id, name, isDefault }) => new ThemeMode({ id, name, isDefault }));
+      setThemeModes(_themeModes);
+    } else {
+      setThemeModes(undefined);
+    }
+    if (data.groups) {
+      const _groups = data.groups.map(({ id, name }) => new Group({ id, name }));
+      setGroups(_groups);
+    }
     //groups: Array<Object>
     // let isTokenOpen = false;
     // groups.forEach((group: Group) => {
@@ -351,19 +325,19 @@ const Tokens:FC<Props> = ({
     // });
   }
   function createMode () {
-    const $mode = Renderer.themeMode(new ThemeMode({}));
-    const { data, $name } = $mode.data();
-    $name.selectText();
-    setThemeMode(data);
+    // const $mode = Renderer.themeMode(new ThemeMode({}));
+    // const { data, $name } = $mode.data();
+    // $name.seelctText();
+    // setThemeMode(data);
   }
   function createGroup () {
-    const $group = Renderer.group(new Group({
-      name: Utils.newGroupName()
-    }));
-    const { data, $name } = $group.data();
-    $name.selectText();
-    setGroup(data);
-    save();
+    // const $group = Renderer.group(new Group({
+    //   name: Utils.newGroupName()
+    // }));
+    // const { data, $name } = $group.data();
+    // $name.selectText();
+    // setGroup(data);
+    // save();
   }
   function createVersion () {
     const saveData = getSaveData();
@@ -563,7 +537,7 @@ const Tokens:FC<Props> = ({
       $(this).selectText();
       preventEvent(e);
     });
-    $(document).on(BrowserEvents.DBCLICK, '.theme-mode-name, .version-name', function (e) {
+    $(document).on(BrowserEvents.DBCLICK, '.version-name', function (e) {
       $(this).selectText();
       preventEvent(e);
     });
@@ -588,10 +562,7 @@ const Tokens:FC<Props> = ({
       // }
     });
     // done
-    $(document).on(BrowserEvents.CLICK, '.group-create', function (e) {
-      createGroup();
-      preventEvent(e);
-    });
+    
     // $(document).on(`${BrowserEvents.BLUR}`, '.group-name, .theme-mode-name, .version-name', function () {
     //   valChange.call(this);
     //   const $this = $(this);
@@ -609,17 +580,14 @@ const Tokens:FC<Props> = ({
     //     }
     //   }, 400);
     // });
-    $(document).on(`${BrowserEvents.KEY_UP}`, '.group-name, .theme-mode-name, .version-name', inputCheck);
-    $(document).on(BrowserEvents.CLICK, '#mode-creator, #version-creator', function (e) {
+    $(document).on(`${BrowserEvents.KEY_UP}`, '.group-name, .version-name', inputCheck);
+    $(document).on(BrowserEvents.CLICK, '#version-creator', function (e) {
       const $this = $(this);
       if ($this.is('[disabled]')) return;
-      if ($this.is('#mode-creator')) {
-        createMode();
-        $modeCreator.attr('disabled', true);
-      } else {
-        createVersion();
-        $versionCreator.attr('disabled', true);
-      }
+      
+      createVersion();
+      $versionCreator.attr('disabled', true);
+    
       preventEvent(e);
     });
     $(document).on(BrowserEvents.CLICK, `#token-setting .mode-item`, function (event) {
@@ -674,53 +642,39 @@ const Tokens:FC<Props> = ({
       <ul id="desigin-system-tabs" className="nav nav-tabs" role="tablist">
         <li role="presentation" className="active"><a href="#tokens" aria-controls="tokens" role="tab" data-toggle="tab" aria-expanded="true">Tokens</a></li>
         <li role="presentation"><a href="#tokens-assigned" aria-controls="selections" role="tab" data-toggle="tab">Assigned</a></li>
+        <li role="presentation"><a href="#modes" aria-controls="modes" role="tab" data-toggle="tab">Modes</a></li>
         {
-          admin && (
-          <>
-            <li role="presentation"><a href="#modes" aria-controls="modes" role="tab" data-toggle="tab">Modes</a></li>
-            <li role="presentation"><a href="#io" aria-controls="io" role="tab" data-toggle="tab">I/O</a></li>
-          </>
-          )
+          admin && <li role="presentation"><a href="#io" aria-controls="io" role="tab" data-toggle="tab">I/O</a></li>
         }
-        
         <div id="export" title="Export a JSON file" className="export"><span className="tmicon tmicon-export"></span></div>
       </ul>
       <div className="tab-content">
         <div role="tabpanel" className="tab-pane active" id="tokens">
-          <div id="design-tokens-container" className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show">
-            {
-              admin && <div id="group-creator" className="group-create">Add a new group</div>
-            }
-          </div>
+          <TokensListContainer></TokensListContainer>
           <div id="token-setting" className="plugin-panel"></div>
         </div>
         <div role="tabpanel" className="tab-pane" id="tokens-assigned">
           <div id="assigned-tokens-node-list" className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show"></div>     
         </div>
+        <div role="tabpanel" className="tab-pane" id="modes">
+          <ThemeModesContainer></ThemeModesContainer>
+        </div>
         {
           admin && (
-            <>
-              <div role="tabpanel" className="tab-pane" id="modes">
-                <div id="mode-setting" className="plugin-panel show">
-                  <ThemeModeList></ThemeModeList>
-                  <div id="mode-creator" className="mode-create">Add a new theme mode</div>
+            <div role="tabpanel" className="tab-pane" id="io">
+              <div className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show">
+                <div className="setting-row">
+                  <label>Versions:</label>
+                  <ul id="version-list"></ul>
+                  <div id="version-creator" className="version-create">Save as a new version</div>
                 </div>
-              </div>
-              <div role="tabpanel" className="tab-pane" id="io">
-                <div className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show">
-                  <div className="setting-row">
-                    <label>Versions:</label>
-                    <ul id="version-list"></ul>
-                    <div id="version-creator" className="version-create">Save as a new version</div>
-                  </div>
-                  <div className="setting-row">
-                    <label htmlFor="import-setting">Import:</label>
-                    <textarea id="import-setting"></textarea>
-                    <button id="import-btn" className="btn btn-primary btn-sm">Import</button>
-                  </div>
-                </div>    
-              </div>
-            </>
+                <div className="setting-row">
+                  <label htmlFor="import-setting">Import:</label>
+                  <textarea id="import-setting"></textarea>
+                  <button id="import-btn" className="btn btn-primary btn-sm">Import</button>
+                </div>
+              </div>    
+            </div>
           )
         }
       </div>

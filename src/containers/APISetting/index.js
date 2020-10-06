@@ -66,8 +66,9 @@ const APISetting = ({ dataRef }) => {
         document.addEventListener(BrowserEvents.BLUR, _inputBlur);
     };
     const removeInputListener = () => {
+        document.removeEventListener(BrowserEvents.CLICK, _inputEdit);
         document.removeEventListener(BrowserEvents.KEY_UP, _inputCheck);
-        document.addEventListener(BrowserEvents.BLUR, _inputBlur);
+        document.removeEventListener(BrowserEvents.BLUR, _inputBlur);
     };
     useEffect(() => {
         _apiKeyInput = apiKeyRef.current;

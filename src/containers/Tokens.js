@@ -4,11 +4,13 @@ import hash from 'hash.js';
 import _cloneDeep from 'lodash/cloneDeep';
 import useAPI from 'hooks/useAPI';
 import useThemeModes from 'hooks/useThemeModes';
-import ThemeModeList from './ThemeModeList';
+import useGroups from 'hooks/useGroups';
+import TokensListContainer from './TokensListContainer';
+import ThemeModesContainer from './ThemeModesContainer';
 import TokenSetting from './TokenSetting';
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
-import { getSaveData, removeGroup, referByToken, getCurrentThemeMode, setCurrentThemeMode, getThemeMode, setThemeMode, getGroup, setGroup, getToken, setToken, removeToken, save, sendMessage, setFonts, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
+import { getSaveData, removeGroup, referByToken, getCurrentThemeMode, setCurrentThemeMode, getThemeMode, getGroup, getToken, setToken, removeToken, save, sendMessage, setFonts, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
 import { themeModeIcon } from './property-components/CommonSettings';
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
@@ -36,45 +38,17 @@ $tokenActionWrapper
     .append($tokenActionClone)
     .append($tokenActionUnassign)
     .append($tokenActionDelete));
-const Tokens = ({ data = { themeModes: [] } }) => {
-    const { themeModes, setThemeModes } = useThemeModes();
+const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
+    const { setThemeModes } = useThemeModes();
+    const { setGroups } = useGroups();
     const { api: { admin } } = useAPI();
-    // console.log(admin);
-    // const { themeModes } = useThemeModes();
     let $tokenContainer, $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $groupCreator, $modeCreator, $themeModeList, $versionCreator, $versionList;
     const Utils = {
-        newGroupName: () => {
-            const lastNumber = getGroup()
-                .filter((group) => (group.name.match(/^Group \d+$/) ? true : false))
-                .map(group => (Number(group.name.replace('Group ', ''))))
-                .sort()
-                .pop();
-            return `Group ${lastNumber ? lastNumber + 1 : 1}`;
-        },
         clearSelection: () => {
             document.getSelection().removeAllRanges();
         }
     };
     const Renderer = {
-        themeMode: function (mode) {
-            let $mode, $name, $remove;
-            $themeModeList
-                .append(($mode = $(`<li id="mode-${mode.id}"></li>`)
-                .append($name = $(`<span class="theme-mode-name" prop-name="name" is-required="true" contenteditable="false">${mode.name}</span>`).data('id', mode.id))
-                .append($remove = $(`
-                  <span class="remove-mode">
-                    <svg class="svg" width="12" height="6" viewBox="0 0 12 6" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M11.5 3.5H.5v-1h11v1z" fill-rule="nonzero" fill-opacity="1" fill="#000" stroke="none"></path>
-                    </svg>
-                  </span>
-                `).attr('disabled', mode.isDefault))
-                .data({
-                data: mode,
-                $name,
-                $remove
-            })));
-            return $mode;
-        },
         themeModes: function () {
             const modes = getThemeMode();
             const $themeModes = $(`<div class="dropdown theme-modes"></div>`);
@@ -250,9 +224,17 @@ const Tokens = ({ data = { themeModes: [] } }) => {
         });
     }
     function init() {
-        const _themeModes = data.themeModes.map(({ id, name, isDefault }) => new ThemeMode({ id, name, isDefault }));
-        setThemeModes(_themeModes);
-        // themeModes.forEach((mode: ThemeMode) => Renderer.themeMode(mode));
+        if (data.themeModes) {
+            const _themeModes = data.themeModes.map(({ id, name, isDefault }) => new ThemeMode({ id, name, isDefault }));
+            setThemeModes(_themeModes);
+        }
+        else {
+            setThemeModes(undefined);
+        }
+        if (data.groups) {
+            const _groups = data.groups.map(({ id, name }) => new Group({ id, name }));
+            setGroups(_groups);
+        }
         //groups: Array<Object>
         // let isTokenOpen = false;
         // groups.forEach((group: Group) => {
@@ -282,19 +264,19 @@ const Tokens = ({ data = { themeModes: [] } }) => {
         // });
     }
     function createMode() {
-        const $mode = Renderer.themeMode(new ThemeMode({}));
-        const { data, $name } = $mode.data();
-        $name.selectText();
-        setThemeMode(data);
+        // const $mode = Renderer.themeMode(new ThemeMode({}));
+        // const { data, $name } = $mode.data();
+        // $name.seelctText();
+        // setThemeMode(data);
     }
     function createGroup() {
-        const $group = Renderer.group(new Group({
-            name: Utils.newGroupName()
-        }));
-        const { data, $name } = $group.data();
-        $name.selectText();
-        setGroup(data);
-        save();
+        // const $group = Renderer.group(new Group({
+        //   name: Utils.newGroupName()
+        // }));
+        // const { data, $name } = $group.data();
+        // $name.selectText();
+        // setGroup(data);
+        // save();
     }
     function createVersion() {
         const saveData = getSaveData();
@@ -498,7 +480,7 @@ const Tokens = ({ data = { themeModes: [] } }) => {
             $(this).selectText();
             preventEvent(e);
         });
-        $(document).on(BrowserEvents.DBCLICK, '.theme-mode-name, .version-name', function (e) {
+        $(document).on(BrowserEvents.DBCLICK, '.version-name', function (e) {
             $(this).selectText();
             preventEvent(e);
         });
@@ -523,10 +505,6 @@ const Tokens = ({ data = { themeModes: [] } }) => {
             // }
         });
         // done
-        $(document).on(BrowserEvents.CLICK, '.group-create', function (e) {
-            createGroup();
-            preventEvent(e);
-        });
         // $(document).on(`${BrowserEvents.BLUR}`, '.group-name, .theme-mode-name, .version-name', function () {
         //   valChange.call(this);
         //   const $this = $(this);
@@ -543,19 +521,13 @@ const Tokens = ({ data = { themeModes: [] } }) => {
         //     }
         //   }, 400);
         // });
-        $(document).on(`${BrowserEvents.KEY_UP}`, '.group-name, .theme-mode-name, .version-name', inputCheck);
-        $(document).on(BrowserEvents.CLICK, '#mode-creator, #version-creator', function (e) {
+        $(document).on(`${BrowserEvents.KEY_UP}`, '.group-name, .version-name', inputCheck);
+        $(document).on(BrowserEvents.CLICK, '#version-creator', function (e) {
             const $this = $(this);
             if ($this.is('[disabled]'))
                 return;
-            if ($this.is('#mode-creator')) {
-                createMode();
-                $modeCreator.attr('disabled', true);
-            }
-            else {
-                createVersion();
-                $versionCreator.attr('disabled', true);
-            }
+            createVersion();
+            $versionCreator.attr('disabled', true);
             preventEvent(e);
         });
         $(document).on(BrowserEvents.CLICK, `#token-setting .mode-item`, function (event) {
@@ -612,33 +584,29 @@ const Tokens = ({ data = { themeModes: [] } }) => {
                 React.createElement("a", { href: "#tokens", "aria-controls": "tokens", role: "tab", "data-toggle": "tab", "aria-expanded": "true" }, "Tokens")),
             React.createElement("li", { role: "presentation" },
                 React.createElement("a", { href: "#tokens-assigned", "aria-controls": "selections", role: "tab", "data-toggle": "tab" }, "Assigned")),
-            admin && (React.createElement(React.Fragment, null,
-                React.createElement("li", { role: "presentation" },
-                    React.createElement("a", { href: "#modes", "aria-controls": "modes", role: "tab", "data-toggle": "tab" }, "Modes")),
-                React.createElement("li", { role: "presentation" },
-                    React.createElement("a", { href: "#io", "aria-controls": "io", role: "tab", "data-toggle": "tab" }, "I/O")))),
+            React.createElement("li", { role: "presentation" },
+                React.createElement("a", { href: "#modes", "aria-controls": "modes", role: "tab", "data-toggle": "tab" }, "Modes")),
+            admin && React.createElement("li", { role: "presentation" },
+                React.createElement("a", { href: "#io", "aria-controls": "io", role: "tab", "data-toggle": "tab" }, "I/O")),
             React.createElement("div", { id: "export", title: "Export a JSON file", className: "export" },
                 React.createElement("span", { className: "tmicon tmicon-export" }))),
         React.createElement("div", { className: "tab-content" },
             React.createElement("div", { role: "tabpanel", className: "tab-pane active", id: "tokens" },
-                React.createElement("div", { id: "design-tokens-container", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show" }, admin && React.createElement("div", { id: "group-creator", className: "group-create" }, "Add a new group")),
+                React.createElement(TokensListContainer, null),
                 React.createElement("div", { id: "token-setting", className: "plugin-panel" })),
             React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "tokens-assigned" },
                 React.createElement("div", { id: "assigned-tokens-node-list", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show" })),
-            admin && (React.createElement(React.Fragment, null,
-                React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "modes" },
-                    React.createElement("div", { id: "mode-setting", className: "plugin-panel show" },
-                        React.createElement(ThemeModeList, null),
-                        React.createElement("div", { id: "mode-creator", className: "mode-create" }, "Add a new theme mode"))),
-                React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "io" },
-                    React.createElement("div", { className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show" },
-                        React.createElement("div", { className: "setting-row" },
-                            React.createElement("label", null, "Versions:"),
-                            React.createElement("ul", { id: "version-list" }),
-                            React.createElement("div", { id: "version-creator", className: "version-create" }, "Save as a new version")),
-                        React.createElement("div", { className: "setting-row" },
-                            React.createElement("label", { htmlFor: "import-setting" }, "Import:"),
-                            React.createElement("textarea", { id: "import-setting" }),
-                            React.createElement("button", { id: "import-btn", className: "btn btn-primary btn-sm" }, "Import")))))))));
+            React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "modes" },
+                React.createElement(ThemeModesContainer, null)),
+            admin && (React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "io" },
+                React.createElement("div", { className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show" },
+                    React.createElement("div", { className: "setting-row" },
+                        React.createElement("label", null, "Versions:"),
+                        React.createElement("ul", { id: "version-list" }),
+                        React.createElement("div", { id: "version-creator", className: "version-create" }, "Save as a new version")),
+                    React.createElement("div", { className: "setting-row" },
+                        React.createElement("label", { htmlFor: "import-setting" }, "Import:"),
+                        React.createElement("textarea", { id: "import-setting" }),
+                        React.createElement("button", { id: "import-btn", className: "btn btn-primary btn-sm" }, "Import"))))))));
 };
 export default Tokens;

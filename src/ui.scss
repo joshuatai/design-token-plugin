@@ -128,7 +128,7 @@ body {
     border-color: #E52630 !important;
   }
   br {
-    display:none;
+    display:none !important;
   }
   * {
     color: inherit;
@@ -152,7 +152,7 @@ body {
 }
 
 #property-list .remove-property[disabled],
-#mode-list .remove-mode[data-disabled],
+#mode-list .remove-mode[data-disabled=true],
 #version-list .remove-version[disabled] {
   opacity: 0.3;
   cursor: not-allowed;

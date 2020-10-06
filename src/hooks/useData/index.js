@@ -1,10 +1,12 @@
 import { useContext } from 'react';
 import useAPI from 'hooks/useAPI';
 import { ThemeModesContext } from '../ThemeModeProvider';
+import { groupsContext } from '../GroupProvider';
 export const JSONBIN_URL = `https://api.jsonbin.io`;
 const useData = () => {
     const { api } = useAPI();
     const themeModes = useContext(ThemeModesContext);
+    const groups = useContext(groupsContext);
     const options = {
         method: 'GET',
         headers: {
@@ -149,7 +151,7 @@ const useData = () => {
     //   }
     //   return response;
     // }
-    const save = () => {
+    const saveThemeModes = (_themeModes) => {
         if (!api.admin)
             return;
         options.method = 'PUT';
@@ -159,28 +161,33 @@ const useData = () => {
             "versions-id": api.versionsID,
             "last-version": api.lastVersion,
             "data": {
-                themeModes
+                themeModes: _themeModes,
+                groups
             }
         });
-        fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
-            .then(res => res.json())
-            .then(res => {
-            // console.log(res);
-            if (res.success) {
-                //   api.bid = res.id;
-                //   api.admin = true;
-                //   return Promise.resolve({
-                //     ...api,
-                //     data: res.data.data,
-                //     success: res.success
-                //   });
-                return;
+        return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
+            .then(res => res.json());
+    };
+    const saveGroups = (_groups) => {
+        if (!api.admin)
+            return;
+        options.method = 'PUT';
+        options.body = JSON.stringify({
+            // "collection-id": api.collectionID,
+            "admin-id": api.adminID,
+            "versions-id": api.versionsID,
+            "last-version": api.lastVersion,
+            "data": {
+                themeModes,
+                groups: _groups
             }
-            return Promise.reject(false);
         });
+        return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
+            .then(res => res.json());
     };
     return {
-        save
+        saveThemeModes,
+        saveGroups
     };
 };
 export default useData;
