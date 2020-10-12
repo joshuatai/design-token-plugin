@@ -40,7 +40,7 @@ const ThemeModeItem:FC<IThemeMode> = ({
     valChange
       .call($name, data.name)
       .then(res => {
-        if (res === InputStatus.VALID) {
+        if (res.status === InputStatus.VALID) {
           const ThemeMode: ThemeMode = getThemeMode(data.id) as ThemeMode;
           ThemeMode.name = $name.textContent;
           setThemeMode(ThemeMode);
@@ -48,7 +48,7 @@ const ThemeModeItem:FC<IThemeMode> = ({
         }
       })
       .catch(res => {
-        if (res === InputStatus.NO_CHANGE) creatable(true);
+        if (res.status === InputStatus.NO_CHANGE) creatable(true);
       });
   }
   const focusHandler = (e) => {

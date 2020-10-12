@@ -8,6 +8,7 @@ import Icon from './Icon';
 import BrowserEvents from 'enums/BrowserEvents';
 // import { getToken } from 'model/DataManager';
 // import CommonSettings from './CommonSettings';
+import ThemeModes from './ThemeModes';
 import PropertyIcon from './PropertyIcon';
 import SelectText from 'utils/SelectText';
 import { valChange } from 'utils/inputValidator';
@@ -22,14 +23,7 @@ SelectText(jQuery);
 // function t() {
 //   var Opacity = function (element, options) {
 //     const useToken = getToken(options.useToken);
-//     
 
-//     hostData = this;
-//     this.options   = new OpacityModel(options);
-
-
-//     this.$customVal = $('');
-//     this.$valContainer = $('');
 //     // this.$opacityValue = $('').attr('contenteditable', !useToken);
     
 //     const commonSetting = CommonSettings(this);
@@ -102,11 +96,12 @@ const Opacity: FC<T_Opacity> = ({
   const [ focused, setFocused ] = useState(false);
   const { opacity } = setting;
   const $opacityRef = useRef();
+  let opacityValue;
   // const useToken = getToken(options.useToken);
   const useToken = false;
   // useToken ? opacityValue = useToken.name : opacityValue = `${this.options.opacity}%`;
-  //setProperty(value || new Model())
-
+  opacityValue = `${opacity}%`;
+  
   const focusHandler = (e) => {
     setFocused(true);
   }
@@ -149,7 +144,8 @@ const Opacity: FC<T_Opacity> = ({
     <div className="custom-val">
       <div className={ focused ? 'val-container focus' : 'val-container' }>
         <PropertyIcon options={[setting]}></PropertyIcon>
-        <span ref={$opacityRef} data-type="number" className="opacity-val" is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{`${opacity}%`}</span>
+        <span ref={$opacityRef} data-type="number" className="opacity-val" title={opacityValue} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{opacityValue}</span>
+        <ThemeModes property={setting}></ThemeModes>
         <LinkToken property={setting}></LinkToken>
       </div>
     </div>

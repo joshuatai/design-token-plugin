@@ -3,12 +3,7 @@ import PropertyIcon from './PropertyIcon';
 import PropertyTypes from 'enums/PropertyTypes';
 
 
-export const themeModeIcon =  `
-  <div class="themem-mode-list" data-toggle="dropdown" title="Change theme mode">
-    <span class="tmicon tmicon-sun"></span>
-    <span class="tmicon tmicon-moon"></span>
-  </div>
-`;
+
 export default (property) => {
   const { $element, options } = property;
   const themeModes = getThemeMode();
@@ -23,34 +18,34 @@ export default (property) => {
   
   const $propertyView = $element.data('propertyView');
   const $tokenList = $('<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>').data("property", property);
-  const $themeModeIcon = $(themeModeIcon);
-  const $themeModeList = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>`).data("property", property);
-  let $themeMode;
+  // const $themeModeIcon = $(themeModeIcon);
+  // const $themeModeList = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>`).data("property", property);
+  // let $themeMode;
 
-  if (options.type === PropertyTypes.OPACITY || options.type === PropertyTypes.FILL_COLOR || options.type === PropertyTypes.STROKE_FILL) {
-    $themeMode = $(`<div class="dropdown"></div>`)
-      .append($themeModeIcon)
-      .append(
-        $themeModeList.append(
-          themeModes.map((mode, index) => {
-            const $item = $(`
-              <li class="mode-item" data-index="${index}" data-id="${mode.id}">
-                <a href="#">${mode.name}${mode.isDefault ? ' (Default)' : ''}</a>
-              </li>
-            `)
-            .data('themeMode', mode);
+  // if (options.type === PropertyTypes.OPACITY || options.type === PropertyTypes.FILL_COLOR || options.type === PropertyTypes.STROKE_FILL) {
+  //   $themeMode = $(`<div class="dropdown"></div>`)
+  //     .append($themeModeIcon)
+  //     .append(
+  //       $themeModeList.append(
+  //         themeModes.map((mode, index) => {
+  //           const $item = $(`
+  //             <li class="mode-item" data-index="${index}" data-id="${mode.id}">
+  //               <a href="#">${mode.name}${mode.isDefault ? ' (Default)' : ''}</a>
+  //             </li>
+  //           `)
+  //           .data('themeMode', mode);
 
-            if ((!options.themeMode && mode.isDefault) || options.themeMode === mode.id) {
-              options.themeMode = mode.id;
-              $item.addClass('selected');
-              $themeModeIcon.attr('title', mode.name);
-            }
-            return $item; 
-          })
-        )
-      );
-    if (themeModes.length === 1) $themeMode = null;
-  }
+  //           if ((!options.themeMode && mode.isDefault) || options.themeMode === mode.id) {
+  //             options.themeMode = mode.id;
+  //             $item.addClass('selected');
+  //             $themeModeIcon.attr('title', mode.name);
+  //           }
+  //           return $item; 
+  //         })
+  //       )
+  //     );
+  //   if (themeModes.length === 1) $themeMode = null;
+  // }
   const $icon = PropertyIcon([options]).$icon;
 
   property.options.parent = _token.id;

@@ -24,7 +24,7 @@ const ThemeModeItem = ({ data, creatable }) => {
         valChange
             .call($name, data.name)
             .then(res => {
-            if (res === InputStatus.VALID) {
+            if (res.status === InputStatus.VALID) {
                 const ThemeMode = getThemeMode(data.id);
                 ThemeMode.name = $name.textContent;
                 setThemeMode(ThemeMode);
@@ -32,7 +32,7 @@ const ThemeModeItem = ({ data, creatable }) => {
             }
         })
             .catch(res => {
-            if (res === InputStatus.NO_CHANGE)
+            if (res.status === InputStatus.NO_CHANGE)
                 creatable(true);
         });
     };

@@ -1,9 +1,11 @@
-import React, { FC, ReactElement } from "react";
+import React, { FC, ReactElement, useContext } from "react";
 import Color from 'color';
 import _cloneDeep from 'lodash/cloneDeep';
 // import { getToken, getThemeMode, getCurrentThemeMode } from 'model/DataManager';
+import usePropertyInfo from 'hooks/usePropertyInfo';
 import PropertyTypes from 'enums/PropertyTypes';
 import Icon from './Icon';
+
 
 
 
@@ -27,12 +29,11 @@ import Icon from './Icon';
 
 
 // export default (options, isCalc = false) => {
-//   const themeModes = getThemeMode();
-//   const defaultMode = themeModes.filter(mode => mode.isDefault === true)[0];
+//   
 //   // const $icon = $(icons[options[0].type]).attr('data-role', 'token-icon');
 
 //   property = options.length === 1 ? _cloneDeep(options[0]) : _cloneDeep(options);
-//   css = value = title = secondValue = thridValue = applyThemeMode = '';
+//   
 
 
 //   formTokenList = isCalc;
@@ -46,90 +47,7 @@ import Icon from './Icon';
 //       property = property.filter(prop => prop.themeMode = defaultMode.id)[0];
 //     }
 //   }
-//   if (property.type === PropertyTypes.FILL_COLOR) {
-//     const isUseToken = property.useToken;
-//     // $icon.addClass('token-icon');
-//     if (themeModes.length > 1) {
-//       applyThemeMode = property.themeMode;
-//       thridValue = getThemeMode(applyThemeMode).name;
-//     }
-//     value = property.color;
-//     secondValue = `${Math.floor(property.opacity * 100)}%`;
-//     if (isUseToken) {
-//       const useToken = getToken(property.useToken);
-//       value = useToken.name;
-//       secondValue = '';
-//       property = traversingUseToken(useToken);
-//     }
-    
-//     if (property.color === 'transparent' || property.color === 'null') {
-//       title = `Fill Color: transparent`;
-//       $icon
-//         .css('background', 'transparent')
-//         .children()
-//         .css({ opacity: 1, width: '14px' });
-//     } else {
-//       title = `Fill Color: #${property.color.toUpperCase()}; Opacity: ${Math.floor(property.opacity * 100)}%;`;
-//       const color = Color(`#${property.color}`);
-//       $icon
-//         .css({
-//           background: color,
-//           borderColor: color.isLight() ? '#dddddd' : '#FFFFFF'
-//         })
-//         .children()
-//         .css("opacity", (100 - Math.floor(property.opacity * 100)) / 100);
-//     } 
-//   }
-//   if (property.type === PropertyTypes.STROKE_FILL) {
-//     const isUseToken = property.useToken;
-//     $icon.addClass('token-icon');
-//     if (themeModes.length > 1) {
-//       applyThemeMode = property.themeMode;
-//       thridValue = getThemeMode(applyThemeMode).name;
-//     }
-//     value = property.color;
-//     secondValue = `${Math.floor(property.opacity * 100)}%`;
 
-//     if (isUseToken) {
-//       const useToken = getToken(property.useToken);
-//       value = useToken.name;
-//       secondValue = '';
-//       property = traversingUseToken(useToken);
-//     }
-
-//     title = `Stroke Color: #${property.color.toUpperCase()}`;
-//     const color = Color(`#${property.color}`).alpha(property.opacity);
-//     css = `linear-gradient(${color}, ${color}), ${opacityBg}`;
-//     $icon
-//       .addClass('token-icon')
-//       .css({
-//         background: css,
-//         borderColor: color.isLight() ? '#dddddd' : '#FFFFFF'
-//       });
-//   }
-//   if (property.type === PropertyTypes.CORNER_RADIUS) {
-//     if (typeof property.radius === 'symbol') {
-//       value = 'Mixed';
-//       title = `top-left: ${property.topLeft}; top-right: ${property.topRight}; bottom-right: ${property.bottomRight}; bottom-left: ${property.bottomLeft};`;
-//     } else {
-//       value = property.radius;
-//       title = `Corner Radius: ${value}`;
-//     }
-//   }
-//   if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
-//     value = property.width;
-//     secondValue = property.align;
-//     title = `Stroke Width: ${value} and Stroke Align: ${secondValue}`;
-//   }
-//   if (property.type === PropertyTypes.FONT) {
-//     value = property.fontName.family;
-//     secondValue = property.fontSize;
-//     title = `Font Family: ${property.fontName.family}, Font Size: ${property.fontSize}`;
-//   }
-//   if (property.type === PropertyTypes.SPACING) {
-//     value = property.value;
-//     title = `Spacing: ${value}`;
-//   }
   
 //   if (property.useToken) {
 //     let tokenName = getToken(property.useToken).name;
@@ -150,19 +68,11 @@ import Icon from './Icon';
 const PropertyIcon = ({
   options
 }) => {
-  // let property;
-  // let css;
-  // let value;
-  // let title;
-  // let secondValue;
-  // let thridValue;
-  // let formTokenList;
-  // let applyThemeMode;
   const _property = options.length === 1 ? _cloneDeep(options[0]) : _cloneDeep(options);
-  // // css = value = title = secondValue = thridValue = applyThemeMode = '';
-
+  
+  const { title } = usePropertyInfo(_property);
   // // .attr('data-role', 'token-icon');
-  return <Icon option={_property}></Icon>
+  return <Icon type={_property.type} title={title}></Icon>
 }
 
 export default PropertyIcon;

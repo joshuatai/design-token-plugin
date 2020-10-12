@@ -4,6 +4,7 @@ import Model from 'model/Opacity';
 import LinkToken from "./LinkToken";
 // import { getToken } from 'model/DataManager';
 // import CommonSettings from './CommonSettings';
+import ThemeModes from './ThemeModes';
 import PropertyIcon from './PropertyIcon';
 import SelectText from 'utils/SelectText';
 import { valChange } from 'utils/inputValidator';
@@ -15,10 +16,11 @@ const Opacity = ({ value = null }) => {
     const [focused, setFocused] = useState(false);
     const { opacity } = setting;
     const $opacityRef = useRef();
+    let opacityValue;
     // const useToken = getToken(options.useToken);
     const useToken = false;
     // useToken ? opacityValue = useToken.name : opacityValue = `${this.options.opacity}%`;
-    //setProperty(value || new Model())
+    opacityValue = `${opacity}%`;
     const focusHandler = (e) => {
         setFocused(true);
     };
@@ -62,7 +64,8 @@ const Opacity = ({ value = null }) => {
         React.createElement("div", { className: "custom-val" },
             React.createElement("div", { className: focused ? 'val-container focus' : 'val-container' },
                 React.createElement(PropertyIcon, { options: [setting] }),
-                React.createElement("span", { ref: $opacityRef, "data-type": "number", className: "opacity-val", "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, `${opacity}%`),
+                React.createElement("span", { ref: $opacityRef, "data-type": "number", className: "opacity-val", title: opacityValue, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, opacityValue),
+                React.createElement(ThemeModes, { property: setting }),
                 React.createElement(LinkToken, { property: setting }))));
 };
 export default Opacity;

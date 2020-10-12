@@ -2,32 +2,14 @@ import React, { FC, ReactElement } from "react";
 import PropertyTypes from 'enums/PropertyTypes';
 
 const _Icons = {
-  [PropertyTypes.CORNER_RADIUS]: ({
-    option
-  }) => {
-    // const isUseToken = options.useToken;
-    // if (themeModes.length > 1) {
-    //   applyThemeMode = property.themeMode;
-    //   applyThemeMode ? thridValue = getThemeMode(applyThemeMode).name : thridValue = defaultMode.name;
-    // }
-    const value = `${option.opacity}%`;
-//     if (isUseToken) {
-//       const useToken = getToken(property.useToken);
-//       value = useToken.name;
-//       secondValue = '';
-//       property = traversingUseToken(useToken);
-//     }
-    const title = `Opacity: ${option.opacity}%`; 
-
-    return <span title={title} className="corner-radius-icon"></span>;
-  },
-  [PropertyTypes.STROKE_WIDTH_ALIGN]: () => <span className="stroke-width-icon"></span>,
-  [PropertyTypes.STROKE_FILL]: () => <div className="stroke-fill-icon"></div>,
-  [PropertyTypes.FILL_COLOR]: () => <div className="fill-color-icon"><div className="color-icon-opacity"></div></div>,
-  [PropertyTypes.OPACITY]: () => <div className="opacity-icon color-icon-opacity"></div>,
-  [PropertyTypes.FONT]: () => <div className="font-icon">A</div>,
-  [PropertyTypes.SPACING]: () => 
-    <div className="spacing-icon">
+  [PropertyTypes.CORNER_RADIUS]: ({ title }) => <span className="corner-radius-icon" title={title}></span>,
+  [PropertyTypes.STROKE_WIDTH_ALIGN]: ({ title }) => <span className="stroke-width-icon" title={title}></span>,
+  [PropertyTypes.STROKE_FILL]: ({ title }) => <div className="stroke-fill-icon" title={title}></div>,
+  [PropertyTypes.FILL_COLOR]: ({ title }) => <div className="fill-color-icon" title={title}><div className="color-icon-opacity"></div></div>,
+  [PropertyTypes.OPACITY]: ({ title }) => <div className="opacity-icon color-icon-opacity" title={title}></div>,
+  [PropertyTypes.FONT]: ({ title }) => <div className="font-icon" title={title}>A</div>,
+  [PropertyTypes.SPACING]: ({ title }) => 
+    <div className="spacing-icon" title={title}>
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M1 8.38237L3.71667 5.45318L3.71667 11.3116L1 8.38237Z" fill="black"/>
       <path d="M3 8.5L13 8.5" stroke="black"/>
@@ -39,16 +21,16 @@ const _Icons = {
 };
 
 type T_Icon = {
-  option: {
-    type
-  }
+  type,
+  title
 };
 const Icon: FC<T_Icon> = ({
-  option = null
+  type,
+  title
 }: T_Icon): ReactElement => {
-  const PropertyIcon = _Icons[option.type];
+  const PropertyIcon = _Icons[type];
 
-  return <PropertyIcon option={option}></PropertyIcon>
+  return <PropertyIcon title={title}></PropertyIcon>
 };
 
 export default Icon;

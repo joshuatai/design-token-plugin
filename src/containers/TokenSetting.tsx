@@ -479,9 +479,7 @@ const TokenSetting: FC = (): ReactElement => {
         </span>
       </div>
       <div id="property-view" className="setting-row"></div>
-      {
-        properties.length > 0 && <PropertyList ></PropertyList>
-      }
+      <PropertyList ></PropertyList>
       <div className="setting-row">
         {
           token && !showPropertySetting && <button id="add-property" type="button" disabled={token.name === ''} onClick={showPropertyHandler}>Create a new property</button>

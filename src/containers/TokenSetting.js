@@ -368,7 +368,7 @@ const TokenSetting = () => {
             React.createElement("div", { className: "setting-row" },
                 React.createElement("span", { ref: $description, className: "token-description", "prop-type": "description", placeholder: "Add Description", contentEditable: "false", suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: inputHandler, onBlur: blurHandler }, token.description)),
             React.createElement("div", { id: "property-view", className: "setting-row" }),
-            properties.length > 0 && React.createElement(PropertyList, null),
+            React.createElement(PropertyList, null),
             React.createElement("div", { className: "setting-row" }, token && !showPropertySetting && React.createElement("button", { id: "add-property", type: "button", disabled: token.name === '', onClick: showPropertyHandler }, "Create a new property")),
             showPropertySetting && React.createElement(PropertySetting, { token: token, createHandler: createPropertyHandler, cancelHandler: hidePropertyHandler }));
 };
