@@ -1,4 +1,6 @@
 import { useContext } from 'react';
+import { sendMessage } from 'model/DataManager';
+import MessageTypes from 'enums/MessageTypes';
 import useAPI from 'hooks/useAPI';
 import { ThemeModesContext } from '../ThemeModeProvider';
 import { groupsContext } from '../GroupProvider';
@@ -166,7 +168,10 @@ const useData = () => {
             }
         });
         return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
-            .then(res => res.json());
+            .then(res => {
+            sendMessage(MessageTypes.SET_MODES, _themeModes);
+            return res.json();
+        });
     };
     const saveGroups = (_groups) => {
         if (!api.admin)

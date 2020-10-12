@@ -324,7 +324,6 @@ figma.ui.onmessage = async (msg) => {
     if (!currentTheme || !themeModes.find(mode => mode.id === currentTheme)) {
       figma.currentPage.setPluginData('themeMode', themeModes[0].id);
     }
-    // console.log(themeModes);
   }
 
 

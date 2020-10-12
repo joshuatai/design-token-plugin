@@ -10,6 +10,7 @@ class Opacity {
   useToken: String = '';
 
   constructor(options?: any) {
+    if (!options) return;
     if (options.id) this.id = options.id;
     if (options.parent) this.parent = options.parent;
     if (options.useToken) this.useToken = options.useToken;

@@ -36,7 +36,7 @@ const useGroups = () => {
         });
     };
     const _setGroups = (_goups) => {
-        if (_goups && _goups.length > 0) {
+        if (_goups) {
             setGroups(_goups);
         }
     };

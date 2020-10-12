@@ -28,9 +28,11 @@ const ThemeModeItem:FC<IThemeMode> = ({
   const { getThemeMode, setThemeMode, removeThemeMode } = useThemeModes();
   
   const removeHandler = (e) => {
-    if (!data.isDefault) removeThemeMode(data as ThemeMode);
+    if (!data.isDefault) {
+      removeThemeMode(data as ThemeMode);
+      creatable(true);
+    }
     // updateCurrentThemeMode();
-    // $modeCreator.attr('disabled', false);
   }
   const blurHandler = (e) => {
     const $name = modeName.current;
@@ -65,7 +67,7 @@ const ThemeModeItem:FC<IThemeMode> = ({
   }, []);
 
   return <li id={`mode-${data.id}`} data-id={data.id}>
-    <span ref={modeName} className="theme-mode-name" data-id={data.id} prop-name="name" is-required="true" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={inputHandler} onBlur={blurHandler}>{data.name}</span>
+    <span ref={modeName} className="theme-mode-name" data-id={data.id} is-required="true" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={inputHandler} onBlur={blurHandler}>{data.name}</span>
     {
       admin && <span className="remove-mode" data-disabled={data.isDefault} onClick={removeHandler} >
         <svg className="svg" width="12" height="6" viewBox="0 0 12 6" xmlns="http://www.w3.org/2000/svg">
@@ -76,13 +78,13 @@ const ThemeModeItem:FC<IThemeMode> = ({
   </li>;
 }
 
-type IThemeModeList = {
+type T_ThemeModeList = {
   creatable
 }
 
-const ThemeModeList: FC<IThemeModeList> = ({
+const ThemeModeList: FC<T_ThemeModeList> = ({
   creatable
-}: IThemeModeList) => {
+}: T_ThemeModeList) => {
   const themeModes = useContext(ThemeModesContext);
 
   return (<ul id="mode-list">

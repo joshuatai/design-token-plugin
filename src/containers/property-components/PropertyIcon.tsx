@@ -1,7 +1,15 @@
-import React from "react";
+import React, { FC, ReactElement } from "react";
+import Color from 'color';
 import _cloneDeep from 'lodash/cloneDeep';
+// import { getToken, getThemeMode, getCurrentThemeMode } from 'model/DataManager';
+import PropertyTypes from 'enums/PropertyTypes';
 import Icon from './Icon';
+
+
+
 // const opacityBg = `url("data:image/svg+xml;utf8,%3Csvg%20width%3D%226%22%20height%3D%226%22%20viewBox%3D%220%200%206%206%22%20fill%3D%22none%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M0%200H3V3H0V0Z%22%20fill%3D%22%23E1E1E1%22/%3E%3Cpath%20d%3D%22M3%200H6V3H3V0Z%22%20fill%3D%22white%22/%3E%3Cpath%20d%3D%22M3%203H6V6H3V3Z%22%20fill%3D%22%23E1E1E1%22/%3E%3Cpath%20d%3D%22M0%203H3V6H0V3Z%22%20fill%3D%22white%22/%3E%3C/svg%3E%0A")`;
+
+
 // function traversingUseToken (token) {
 //   const themeModes = getThemeMode();
 //   const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
@@ -15,13 +23,20 @@ import Icon from './Icon';
 //     return property;
 //   }
 // }
+
+
+
 // export default (options, isCalc = false) => {
 //   const themeModes = getThemeMode();
 //   const defaultMode = themeModes.filter(mode => mode.isDefault === true)[0];
 //   // const $icon = $(icons[options[0].type]).attr('data-role', 'token-icon');
+
 //   property = options.length === 1 ? _cloneDeep(options[0]) : _cloneDeep(options);
 //   css = value = title = secondValue = thridValue = applyThemeMode = '';
+
+
 //   formTokenList = isCalc;
+
 //   if (isCalc && property instanceof Array) {
 //     const currentThemeMode = getCurrentThemeMode();
 //     const currentThemeProperty = property.filter(prop => prop.themeMode === currentThemeMode);
@@ -46,6 +61,7 @@ import Icon from './Icon';
 //       secondValue = '';
 //       property = traversingUseToken(useToken);
 //     }
+    
 //     if (property.color === 'transparent' || property.color === 'null') {
 //       title = `Fill Color: transparent`;
 //       $icon
@@ -73,12 +89,14 @@ import Icon from './Icon';
 //     }
 //     value = property.color;
 //     secondValue = `${Math.floor(property.opacity * 100)}%`;
+
 //     if (isUseToken) {
 //       const useToken = getToken(property.useToken);
 //       value = useToken.name;
 //       secondValue = '';
 //       property = traversingUseToken(useToken);
 //     }
+
 //     title = `Stroke Color: #${property.color.toUpperCase()}`;
 //     const color = Color(`#${property.color}`).alpha(property.opacity);
 //     css = `linear-gradient(${color}, ${color}), ${opacityBg}`;
@@ -112,11 +130,14 @@ import Icon from './Icon';
 //     value = property.value;
 //     title = `Spacing: ${value}`;
 //   }
+  
 //   if (property.useToken) {
 //     let tokenName = getToken(property.useToken).name;
 //     value = tokenName;
 //   }
+
 //   $icon.attr('title', title);
+
 //   return {
 //     value,
 //     title,
@@ -125,18 +146,23 @@ import Icon from './Icon';
 //     $icon
 //   };
 // };
-const PropertyIcon = ({ options }) => {
-    // let property;
-    // let css;
-    // let value;
-    // let title;
-    // let secondValue;
-    // let thridValue;
-    // let formTokenList;
-    // let applyThemeMode;
-    const _property = options.length === 1 ? _cloneDeep(options[0]) : _cloneDeep(options);
-    // // css = value = title = secondValue = thridValue = applyThemeMode = '';
-    // // .attr('data-role', 'token-icon');
-    return React.createElement(Icon, { option: _property });
-};
+
+const PropertyIcon = ({
+  options
+}) => {
+  // let property;
+  // let css;
+  // let value;
+  // let title;
+  // let secondValue;
+  // let thridValue;
+  // let formTokenList;
+  // let applyThemeMode;
+  const _property = options.length === 1 ? _cloneDeep(options[0]) : _cloneDeep(options);
+  // // css = value = title = secondValue = thridValue = applyThemeMode = '';
+
+  // // .attr('data-role', 'token-icon');
+  return <Icon option={_property}></Icon>
+}
+
 export default PropertyIcon;

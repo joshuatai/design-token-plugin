@@ -1,27 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { v4 } from 'uuid';
 import hash from 'hash.js';
 import _cloneDeep from 'lodash/cloneDeep';
 import useAPI from 'hooks/useAPI';
 import useThemeModes from 'hooks/useThemeModes';
 import useGroups from 'hooks/useGroups';
-import TokensListContainer from './TokensListContainer';
+import GroupsListContainer from './GroupsListContainer';
 import ThemeModesContainer from './ThemeModesContainer';
+import { tokenSettingContext } from 'hooks/TokenSettingProvider';
 import TokenSetting from './TokenSetting';
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
 import { getSaveData, removeGroup, referByToken, getCurrentThemeMode, setCurrentThemeMode, getThemeMode, getGroup, getToken, setToken, removeToken, save, sendMessage, setFonts, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
-import { themeModeIcon } from './property-components/CommonSettings';
+// import { themeModeIcon } from './property-components/CommonSettings.tss';
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
 import Group from 'model/Group';
 import { Mixed } from 'symbols/index';
 import MessageTypes from 'enums/MessageTypes';
-import PropertyIcon from './property-components/PropertyIcon';
+// import PropertyIcon from './property-components/PropertyIcon';
 import BrowserEvents from 'enums/BrowserEvents';
 import preventEvent from 'utils/preventEvent';
 import { inputCheck } from 'utils/inputValidator';
-TokenSetting(jQuery);
+// TokenSetting(jQuery);
 SelectText(jQuery);
 PluginDestroy(jQuery);
 const $groupActionDelete = $(`<li class="delete-group"><a href="#">Delete Group</a></li>`);
@@ -39,10 +40,11 @@ $tokenActionWrapper
     .append($tokenActionUnassign)
     .append($tokenActionDelete));
 const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
+    const tokenSetting = useContext(tokenSettingContext);
     const { setThemeModes } = useThemeModes();
     const { setGroups } = useGroups();
     const { api: { admin } } = useAPI();
-    let $tokenContainer, $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $groupCreator, $modeCreator, $themeModeList, $versionCreator, $versionList;
+    let $tokenContainer, $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $groupCreator, $themeModeList, $versionCreator, $versionList;
     const Utils = {
         clearSelection: () => {
             document.getSelection().removeAllRanges();
@@ -52,12 +54,12 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
         themeModes: function () {
             const modes = getThemeMode();
             const $themeModes = $(`<div class="dropdown theme-modes"></div>`);
-            const $themeModeIcon = $(themeModeIcon);
+            // const $themeModeIcon = $(themeModeIcon);
             const $themeModeList = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>`);
             $desiginSystemTabs.find('.theme-modes').remove();
             if (modes.length > 1) {
                 $desiginSystemTabs.append($themeModes
-                    .append($themeModeIcon)
+                    // .append($themeModeIcon)
                     .append($themeModeList.append(modes.map((mode, index) => {
                     return `
                     <li class="theme-mode" data-index="${index}" data-id="${mode.id}">
@@ -127,7 +129,7 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
             let $token = $(`#${token.id}`);
             let $icon;
             if (token.propertyType !== Mixed) {
-                $icon = PropertyIcon(token.properties, true).$icon;
+                // $icon = PropertyIcon(token.properties, true).$icon;
             }
             if ($token.length === 0) {
                 $token = $(`<li id="${token.id}" class="token-item"></li>`)
@@ -173,7 +175,7 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
                         const token = getToken(_token);
                         let $icon;
                         if (token.propertyType !== Mixed) {
-                            $icon = PropertyIcon(token.properties, true).$icon;
+                            // $icon = PropertyIcon(token.properties, true).$icon;
                         }
                         return $(`<li class="token-item"></li>`)
                             .data({
@@ -337,7 +339,6 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
         $desiginSystemTabs = $('#desigin-system-tabs');
         $tokenSetting = $('#token-setting');
         $groupCreator = $('#group-creator');
-        $modeCreator = $('#mode-creator');
         $themeModeList = $('#mode-list');
         // $tabTokensAssigned = $('[aria-controls="selections"]').parent();
         $assignedTokensNodeList = $('#assigned-tokens-node-list');
@@ -385,13 +386,13 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
             }
         }));
         // This event listener is to prevent collapse event.
-        $(document).on(BrowserEvents.CLICK, '.group-name:focus, .add-token', preventEvent);
+        // $(document).on(BrowserEvents.CLICK, '.group-name, .add-token', preventEvent);
         // token setting
         $(document).on(BrowserEvents.CLICK, '.token-edit-btn, .add-token', function () {
-            let { group, token } = $(this).closest('.token-item, .panel-heading').data();
-            Utils.clearSelection();
-            $tokenSetting.TokenSetting({ group, token });
-            $tokenSetting.prev().removeClass('show');
+            // let { group, token } = $(this).closest('.token-item, .panel-heading').data();
+            // Utils.clearSelection();
+            // $tokenSetting.TokenSetting({ group, token });
+            // $tokenSetting.prev().removeClass('show');
         });
         $(document).on(BrowserEvents.CONTEXTMENU, '.token-edit-btn, #design-tokens-container .panel-heading .panel-title', function (e) {
             const $this = $(this);
@@ -476,10 +477,6 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
             preventEvent(e);
         });
         // done
-        $(document).on(BrowserEvents.DBCLICK, '.group-name', function (e) {
-            $(this).selectText();
-            preventEvent(e);
-        });
         $(document).on(BrowserEvents.DBCLICK, '.version-name', function (e) {
             $(this).selectText();
             preventEvent(e);
@@ -510,7 +507,7 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
         //   const $this = $(this);
         //   setTimeout(() => {
         //     if ($this.is('.theme-mode-name') && $this.text()) {
-        //       $modeCreator.removeAttr('disabled');
+        //       
         //       // setTimeout(function() {
         //         Renderer.themeModes();
         //         updateCurrentThemeMode();
@@ -521,7 +518,7 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
         //     }
         //   }, 400);
         // });
-        $(document).on(`${BrowserEvents.KEY_UP}`, '.group-name, .version-name', inputCheck);
+        $(document).on(`${BrowserEvents.KEY_UP}`, '.version-name', inputCheck);
         $(document).on(BrowserEvents.CLICK, '#version-creator', function (e) {
             const $this = $(this);
             if ($this.is('[disabled]'))
@@ -577,7 +574,7 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
             }
         });
     }, []);
-    console.log('Token', admin);
+    // console.log('Token', admin);
     return (React.createElement(React.Fragment, null,
         React.createElement("ul", { id: "desigin-system-tabs", className: "nav nav-tabs", role: "tablist" },
             React.createElement("li", { role: "presentation", className: "active" },
@@ -591,15 +588,15 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
             React.createElement("div", { id: "export", title: "Export a JSON file", className: "export" },
                 React.createElement("span", { className: "tmicon tmicon-export" }))),
         React.createElement("div", { className: "tab-content" },
-            React.createElement("div", { role: "tabpanel", className: "tab-pane active", id: "tokens" },
-                React.createElement(TokensListContainer, null),
-                React.createElement("div", { id: "token-setting", className: "plugin-panel" })),
+            React.createElement("div", { role: "tabpanel", className: "tab-pane active", id: "tokens" }, tokenSetting.groupId ?
+                React.createElement(TokenSetting, null) :
+                React.createElement(GroupsListContainer, null)),
             React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "tokens-assigned" },
-                React.createElement("div", { id: "assigned-tokens-node-list", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show" })),
+                React.createElement("div", { id: "assigned-tokens-node-list", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic" })),
             React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "modes" },
                 React.createElement(ThemeModesContainer, null)),
             admin && (React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "io" },
-                React.createElement("div", { className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show" },
+                React.createElement("div", { className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic" },
                     React.createElement("div", { className: "setting-row" },
                         React.createElement("label", null, "Versions:"),
                         React.createElement("ul", { id: "version-list" }),

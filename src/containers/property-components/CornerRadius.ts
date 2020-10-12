@@ -4,7 +4,7 @@ import camelize from 'utils/camelize';
 import BrowserEvents from 'enums/BrowserEvents';
 import { Mixed } from 'symbols/index';
 import { getToken } from 'model/DataManager';
-import CommonSettings from './CommonSettings';
+// import CommonSettings from './CommonSettings.tss';
 
 let hostData;
 const NAME = 'radius';
@@ -25,7 +25,9 @@ export default function ($) {
     this.$separateSetting =  $('<div class="separator-vals"></div>');
     this.$separateIcon = $('<i class="separator-mode-sign" separate-type="top-left"></i>');
     this.$separatorGroup = $('<div class="btn-group"></div>');
-    this.$token = CommonSettings(this).$token;
+    // this.$token = CommonSettings(this).$token;
+    const commonSetting = { $token: null } //CommonSettings(this);
+    this.$token = commonSetting.$token;
 
     useToken ?
       radiusValue = useToken.name :

@@ -2,7 +2,7 @@ import validator from 'validator';
 import SpacingModel from 'model/Spacing';
 import BrowserEvents from 'enums/BrowserEvents';
 import { getToken } from 'model/DataManager';
-import CommonSettings from './CommonSettings';
+// import CommonSettings from './CommonSettings.tss';
 let hostData;
 const NAME = 'spacing';
 export default function ($) {
@@ -15,7 +15,7 @@ export default function ($) {
         this.$customVal = $('<div class="custom-val"></div>');
         this.$valContainer = $('<div class="val-container"></div>');
         this.$spacingValue = $('<span class="spacing-val"></span>').attr('contenteditable', !useToken);
-        const commonSetting = CommonSettings(this);
+        const commonSetting = { $token: null }; //CommonSettings(this);
         this.$token = commonSetting.$token;
         useToken ? spacingValue = useToken.name : spacingValue = this.options.value;
         this.$element

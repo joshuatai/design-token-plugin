@@ -4,7 +4,7 @@ import BrowserEvents from 'enums/BrowserEvents';
 import { getToken, getPureToken } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
 import StrokeAligns from 'enums/StrokeAligns';
-import CommonSettings from './CommonSettings';
+// import CommonSettings from './CommonSettings.tss';
 
 let hostData;
 const NAME = 'stroke';
@@ -29,7 +29,9 @@ export default function ($) {
     this.$alignDropdownBtnVal = $(`<span>${this.options.align}</span>`);
     this.$alignDropdowns = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right" />`);
     this.$alignOptions = Object.keys(StrokeAligns).reduce((calc, key) => calc.add($(`<li><a href="#">${key}</a></li>`)), $());
-    this.$token = CommonSettings(this).$token;
+    
+    const commonSetting = { $token: null } //CommonSettings(this);
+    this.$token = commonSetting.$token;
 
     useToken ? strokeValue = useToken.name : strokeValue = this.options.width;
 

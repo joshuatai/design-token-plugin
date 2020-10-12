@@ -321,7 +321,6 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
         if (!currentTheme || !themeModes.find(mode => mode.id === currentTheme)) {
             figma.currentPage.setPluginData('themeMode', themeModes[0].id);
         }
-        // console.log(themeModes);
     }
     if (type === MessageTypes.GET_FONTS) {
         let fontList = yield figma.clientStorage.getAsync('font-list');

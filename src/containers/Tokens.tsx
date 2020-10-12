@@ -1,4 +1,4 @@
-import React, { useEffect, FC } from 'react';
+import React, { useEffect, FC, useContext } from 'react';
 import { v4 } from 'uuid';
 import hash from 'hash.js';
 import _cloneDeep from 'lodash/cloneDeep';
@@ -7,15 +7,15 @@ import _cloneDeep from 'lodash/cloneDeep';
 import useAPI from 'hooks/useAPI';
 import useThemeModes from 'hooks/useThemeModes';
 import useGroups from 'hooks/useGroups';
-import TokensListContainer from './TokensListContainer';
+import GroupsListContainer from './GroupsListContainer';
 import ThemeModesContainer from './ThemeModesContainer';
-
-
+import { tokenSettingContext, T_TokenSetting } from 'hooks/TokenSettingProvider';
 import TokenSetting from './TokenSetting';
+
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
 import { getSaveData, getVersion, fetchInitial, removeGroup, referByToken, getCurrentThemeMode, setCurrentThemeMode, getThemeMode, setThemeMode, removeThemeMode, getGroup, setGroup, getToken, setToken, removeToken, setPureToken, setProperty, save, sendMessage, setFonts, saveThemeMode, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
-import { themeModeIcon } from './property-components/CommonSettings';
+// import { themeModeIcon } from './property-components/CommonSettings.tss';
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
 import Group from 'model/Group';
@@ -23,7 +23,7 @@ import Token from 'model/Token';
 import Properties from 'model/Properties';
 import { Mixed } from 'symbols/index';
 import MessageTypes from 'enums/MessageTypes';
-import PropertyIcon from './property-components/PropertyIcon';
+// import PropertyIcon from './property-components/PropertyIcon';
 import BrowserEvents from 'enums/BrowserEvents';
 import preventEvent from  'utils/preventEvent';
 
@@ -31,7 +31,7 @@ import { inputCheck, valChange } from 'utils/inputValidator';
 
 
 declare var $: any;
-TokenSetting(jQuery);
+// TokenSetting(jQuery);
 SelectText(jQuery);
 PluginDestroy(jQuery);
 
@@ -60,29 +60,29 @@ type Props = {
 const Tokens:FC<Props> = ({
   data = { themeModes: [], groups: [] }
 }: Props) => {
+  const tokenSetting: T_TokenSetting = useContext(tokenSettingContext);
   const { setThemeModes} = useThemeModes();
   const { setGroups } = useGroups();
   const { api: { admin }} = useAPI();
-  let $tokenContainer, $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $groupCreator, $modeCreator, $themeModeList, $versionCreator, $versionList;
+  let $tokenContainer, $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $groupCreator, $themeModeList, $versionCreator, $versionList;
 
   const Utils = {
     clearSelection: () => {
       document.getSelection().removeAllRanges();
     }
   };
-  
   const Renderer = {
     themeModes: function () {
       const modes = getThemeMode();
       const $themeModes = $(`<div class="dropdown theme-modes"></div>`);
-      const $themeModeIcon = $(themeModeIcon);
+      // const $themeModeIcon = $(themeModeIcon);
       const $themeModeList = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>`);
   
       $desiginSystemTabs.find('.theme-modes').remove();
       if (modes.length > 1) {
         $desiginSystemTabs.append(
           $themeModes
-            .append($themeModeIcon)
+            // .append($themeModeIcon)
             .append(
               $themeModeList.append(
                 modes.map((mode, index) => {
@@ -135,6 +135,7 @@ const Tokens:FC<Props> = ({
       const $expend = $('<span class="tmicon tmicon-caret-right tmicon-hoverable"></span>').hide();
       const $name = $('<span class="group-name" prop-name="name" is-required="true"></span>').text(name).data('id', id);
       const $addTokenBtn = $('<button type="button" class="add-token" title="Create a token"><svg class="svg" width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 5.5v-5h1v5h5v1h-5v5h-1v-5h-5v-1h5z" fill-rule="nonzero" fill-opacity="1" fill="#000" stroke="none"></path></svg></button>');
+      
       const $tokenListPanel = $('<div class="panel-collapse collapse" aria-expanded="false"></div>').attr('id', `group-${id}`);
       const $tokenList = $('<ul class="token-list"></ul>');
     
@@ -179,7 +180,7 @@ const Tokens:FC<Props> = ({
       let $icon;
   
       if (token.propertyType !== Mixed) {
-        $icon = PropertyIcon(token.properties, true).$icon;
+        // $icon = PropertyIcon(token.properties, true).$icon;
       }
       if ($token.length === 0) {
         $token = $(`<li id="${token.id}" class="token-item"></li>`)
@@ -230,7 +231,7 @@ const Tokens:FC<Props> = ({
                         const token = getToken(_token);
                         let $icon;
                         if (token.propertyType !== Mixed) {
-                          $icon = PropertyIcon(token.properties, true).$icon;
+                          // $icon = PropertyIcon(token.properties, true).$icon;
                         }
                         return $(`<li class="token-item"></li>`)
                           .data({
@@ -402,7 +403,7 @@ const Tokens:FC<Props> = ({
     $desiginSystemTabs = $('#desigin-system-tabs');
     $tokenSetting = $('#token-setting');
     $groupCreator = $('#group-creator');
-    $modeCreator = $('#mode-creator');
+    
     $themeModeList = $('#mode-list');
     // $tabTokensAssigned = $('[aria-controls="selections"]').parent();
     $assignedTokensNodeList = $('#assigned-tokens-node-list');
@@ -449,13 +450,13 @@ const Tokens:FC<Props> = ({
       })
     );
     // This event listener is to prevent collapse event.
-    $(document).on(BrowserEvents.CLICK, '.group-name:focus, .add-token', preventEvent);
+    // $(document).on(BrowserEvents.CLICK, '.group-name, .add-token', preventEvent);
     // token setting
     $(document).on(BrowserEvents.CLICK, '.token-edit-btn, .add-token', function () {
-      let { group, token } = $(this).closest('.token-item, .panel-heading').data();
-      Utils.clearSelection();
-      $tokenSetting.TokenSetting({ group, token });
-      $tokenSetting.prev().removeClass('show');
+      // let { group, token } = $(this).closest('.token-item, .panel-heading').data();
+      // Utils.clearSelection();
+      // $tokenSetting.TokenSetting({ group, token });
+      // $tokenSetting.prev().removeClass('show');
     });
     $(document).on(BrowserEvents.CONTEXTMENU, '.token-edit-btn, #design-tokens-container .panel-heading .panel-title', function (e) {
       const $this = $(this);
@@ -533,10 +534,6 @@ const Tokens:FC<Props> = ({
       preventEvent(e);
     });
     // done
-    $(document).on(BrowserEvents.DBCLICK, '.group-name', function (e) {
-      $(this).selectText();
-      preventEvent(e);
-    });
     $(document).on(BrowserEvents.DBCLICK, '.version-name', function (e) {
       $(this).selectText();
       preventEvent(e);
@@ -568,7 +565,7 @@ const Tokens:FC<Props> = ({
     //   const $this = $(this);
     //   setTimeout(() => {
     //     if ($this.is('.theme-mode-name') && $this.text()) {
-    //       $modeCreator.removeAttr('disabled');
+    //       
     //       // setTimeout(function() {
     //         Renderer.themeModes();
     //         updateCurrentThemeMode();
@@ -580,7 +577,7 @@ const Tokens:FC<Props> = ({
     //     }
     //   }, 400);
     // });
-    $(document).on(`${BrowserEvents.KEY_UP}`, '.group-name, .version-name', inputCheck);
+    $(document).on(`${BrowserEvents.KEY_UP}`, '.version-name', inputCheck);
     $(document).on(BrowserEvents.CLICK, '#version-creator', function (e) {
       const $this = $(this);
       if ($this.is('[disabled]')) return;
@@ -602,7 +599,6 @@ const Tokens:FC<Props> = ({
           .filter((index, item) => $(item).data('id') === useMode.id)
           .addClass('selected');
     });
-    
     $(document).on(BrowserEvents.CLICK, '.version-restore', function (e) {
       restore($(this).closest('li').data('data'));
     });
@@ -636,7 +632,7 @@ const Tokens:FC<Props> = ({
       }
     });
   }, []);
-  console.log('Token', admin);
+  // console.log('Token', admin);
   return (
     <>
       <ul id="desigin-system-tabs" className="nav nav-tabs" role="tablist">
@@ -650,11 +646,14 @@ const Tokens:FC<Props> = ({
       </ul>
       <div className="tab-content">
         <div role="tabpanel" className="tab-pane active" id="tokens">
-          <TokensListContainer></TokensListContainer>
-          <div id="token-setting" className="plugin-panel"></div>
+          {
+            tokenSetting.groupId ?
+            <TokenSetting></TokenSetting> :
+            <GroupsListContainer></GroupsListContainer>
+          }
         </div>
         <div role="tabpanel" className="tab-pane" id="tokens-assigned">
-          <div id="assigned-tokens-node-list" className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show"></div>     
+          <div id="assigned-tokens-node-list" className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic"></div>     
         </div>
         <div role="tabpanel" className="tab-pane" id="modes">
           <ThemeModesContainer></ThemeModesContainer>
@@ -662,7 +661,7 @@ const Tokens:FC<Props> = ({
         {
           admin && (
             <div role="tabpanel" className="tab-pane" id="io">
-              <div className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic show">
+              <div className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic">
                 <div className="setting-row">
                   <label>Versions:</label>
                   <ul id="version-list"></ul>

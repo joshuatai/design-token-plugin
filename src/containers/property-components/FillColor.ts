@@ -7,8 +7,8 @@ import PropertyTypes from 'enums/PropertyTypes';
 import FillColor from 'model/FillColor';
 import StrokeFill from 'model/StrokeFill';
 import colorPicker from 'utils/colorPicker';
-import PropertyIcon from './PropertyIcon';
-import CommonSettings from './CommonSettings';
+// import PropertyIcon from './PropertyIcon';
+// import CommonSettings from './CommonSettings.tss';
 
 colorPicker(jQuery);
 
@@ -43,8 +43,11 @@ export default function ($) {
     this.$colorValue = $('<span class="color-val"></span>').attr('contenteditable', !useToken);
     this.$colorOpacity = $('<span class="opacity-val"></span>').attr('contenteditable', !useToken);
     
-    const commonSetting = CommonSettings(this);
+    const commonSetting = { $token: null, $themeMode: null } //CommonSettings(this);
     this.$token = commonSetting.$token;
+
+    // const commonSetting = CommonSettings(this);
+    // this.$token = commonSetting.$token;
     this.$themeMode = commonSetting.$themeMode;
     
     useToken ? colorValue = useToken.name : colorValue = this.options.color;
@@ -70,16 +73,16 @@ export default function ($) {
     $(document).trigger('property-preview', [this.options]);
   }
   Fill.prototype.setIcon = function () {
-    const newIcon = PropertyIcon([this.options]).$icon;
-    hostData.$icon.replaceWith(newIcon);
-    hostData.$icon = newIcon;
-    if (this.options.useToken || this.options.color === 'transparent' || this.options.color === 'null') {
-      this.$colorOpacity.hide();
-      this.$icon.attr('disabled', true);
-    } else {
-      this.$colorOpacity.show();
-      this.$icon.attr('disabled', false);
-    }
+    // const newIcon = PropertyIcon([this.options]).$icon;
+    // hostData.$icon.replaceWith(newIcon);
+    // hostData.$icon = newIcon;
+    // if (this.options.useToken || this.options.color === 'transparent' || this.options.color === 'null') {
+    //   this.$colorOpacity.hide();
+    //   this.$icon.attr('disabled', true);
+    // } else {
+    //   this.$colorOpacity.show();
+    //   this.$icon.attr('disabled', false);
+    // }
   }
   Fill.prototype.useToken = function (token) {
     const themeModes = getThemeMode();

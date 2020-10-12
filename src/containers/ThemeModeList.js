@@ -12,10 +12,11 @@ const ThemeModeItem = ({ data, creatable }) => {
     const { api: { admin } } = useAPI();
     const { getThemeMode, setThemeMode, removeThemeMode } = useThemeModes();
     const removeHandler = (e) => {
-        if (!data.isDefault)
+        if (!data.isDefault) {
             removeThemeMode(data);
+            creatable(true);
+        }
         // updateCurrentThemeMode();
-        // $modeCreator.attr('disabled', false);
     };
     const blurHandler = (e) => {
         const $name = modeName.current;
@@ -51,7 +52,7 @@ const ThemeModeItem = ({ data, creatable }) => {
             $name.click();
     }, []);
     return React.createElement("li", { id: `mode-${data.id}`, "data-id": data.id },
-        React.createElement("span", { ref: modeName, className: "theme-mode-name", "data-id": data.id, "prop-name": "name", "is-required": "true", contentEditable: "false", suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: inputHandler, onBlur: blurHandler }, data.name),
+        React.createElement("span", { ref: modeName, className: "theme-mode-name", "data-id": data.id, "is-required": "true", contentEditable: "false", suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: inputHandler, onBlur: blurHandler }, data.name),
         admin && React.createElement("span", { className: "remove-mode", "data-disabled": data.isDefault, onClick: removeHandler },
             React.createElement("svg", { className: "svg", width: "12", height: "6", viewBox: "0 0 12 6", xmlns: "http://www.w3.org/2000/svg" },
                 React.createElement("path", { d: "M11.5 3.5H.5v-1h11v1z", fillRule: "nonzero", fillOpacity: "1", fill: "#000", stroke: "none" }))));

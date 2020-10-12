@@ -2,7 +2,7 @@ import validator from 'validator';
 import FontModel from 'model/Font';
 import BrowserEvents from 'enums/BrowserEvents';
 import { getToken, getFonts } from 'model/DataManager';
-import CommonSettings from './CommonSettings';
+// import CommonSettings from './CommonSettings.tss';
 import FontStyls from 'enums/FontStyles';
 let hostData;
 const NAME = 'font';
@@ -92,7 +92,9 @@ export default function ($) {
         this.$styleName = $('<span></span>');
         this.$styleDropdowns = $('<ul class="dropdown-menu dropdown-menu-multi-select style-dropdown" />');
         this.$fontSize = $(`<span class="font-size-val" contenteditable="true" />`);
-        this.$token = CommonSettings(this).$token;
+        // this.$token = CommonSettings(this).$token;
+        const commonSetting = { $token: null, $themeMode: null }; //CommonSettings(this);
+        this.$token = commonSetting.$token;
         const { fontName: { family, style } } = this.options;
         useToken ? familyVal = useToken.name : familyVal = family;
         this.$element

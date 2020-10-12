@@ -6,12 +6,11 @@ import StrokeWidthAlign from './StrokeWidthAlign';
 import Opacity from './Opacity';
 import Font from './Font';
 import Spacing from './Spacing';
-$(document).on(`${BrowserEvents.FOCUSIN} ${BrowserEvents.FOCUSOUT}`, '.val-container [contenteditable="true"], .separator-vals [contenteditable="true"]', function (event) {
-    const input = $(this);
-    if (event.type === BrowserEvents.FOCUSIN)
-        input['selectText']();
-    input.closest('.val-container')[event.type === BrowserEvents.FOCUSIN ? 'addClass' : 'removeClass']('focus');
-});
+// $(document).on(`${BrowserEvents.FOCUSIN} ${BrowserEvents.FOCUSOUT}`, '.val-container [contenteditable="true"], .separator-vals [contenteditable="true"]', function (event) {
+//   const input = $(this);
+//   if (event.type === BrowserEvents.FOCUSIN) input['selectText']();
+//   input.closest('.val-container')[event.type === BrowserEvents.FOCUSIN ? 'addClass' : 'removeClass']('focus');
+// });
 $(document).on("shown.bs.dropdown hidden.bs.dropdown", ".input-group-btn, .dropdown", function (event) {
     const $this = $(this);
     const container = $this.closest(".val-container");
@@ -71,12 +70,12 @@ $(document).on(BrowserEvents.CLICK, `#token-setting .detach-token`, function (ev
     property.$tokenList.children().removeClass('selected');
     property.detachToken(token);
 });
-export default ($) => ({
-    [PropertyTypes.CORNER_RADIUS]: CornerRadius($),
-    [PropertyTypes.FILL_COLOR]: FillColor($),
-    [PropertyTypes.STROKE_WIDTH_ALIGN]: StrokeWidthAlign($),
-    [PropertyTypes.STROKE_FILL]: FillColor($),
-    [PropertyTypes.OPACITY]: Opacity($),
-    [PropertyTypes.FONT]: Font($),
-    [PropertyTypes.SPACING]: Spacing($)
-});
+export default {
+    [PropertyTypes.CORNER_RADIUS]: CornerRadius,
+    [PropertyTypes.FILL_COLOR]: FillColor,
+    [PropertyTypes.STROKE_WIDTH_ALIGN]: StrokeWidthAlign,
+    [PropertyTypes.STROKE_FILL]: FillColor,
+    [PropertyTypes.OPACITY]: Opacity,
+    [PropertyTypes.FONT]: Font,
+    [PropertyTypes.SPACING]: Spacing
+};

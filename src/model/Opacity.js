@@ -8,6 +8,8 @@ class Opacity {
         this.opacity = 100;
         this.themeMode = "";
         this.useToken = '';
+        if (!options)
+            return;
         if (options.id)
             this.id = options.id;
         if (options.parent)

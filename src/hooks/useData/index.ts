@@ -178,7 +178,13 @@ const useData = () => {
     });
 
     return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
-      .then(res => res.json());
+      .then(res => {
+        sendMessage(
+          MessageTypes.SET_MODES,
+          _themeModes
+        );
+        return res.json();
+      });
   }
 
 

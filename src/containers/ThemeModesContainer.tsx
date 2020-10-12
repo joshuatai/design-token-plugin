@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useState } from "react";
 import useAPI from 'hooks/useAPI';
 import useThemeModes from 'hooks/useThemeModes';
 import ThemeModeList from './ThemeModeList';
@@ -16,10 +16,10 @@ const ThemeModesContainer: FC = () => {
     setCreateEnable(false);
     setThemeMode(newMode);
   };
-  return <div id="mode-setting" className="plugin-panel show">
+  return <div id="mode-setting" className="plugin-panel">
     <ThemeModeList creatable={setCreateEnable}></ThemeModeList>
     {
-      admin && <div id="mode-creator" className="mode-create" onClick={createModeHandler} data-disabled={!createEnable}>Add a new theme mode</div>
+      admin && <button id="mode-creator" onClick={createModeHandler} disabled={!createEnable}>Add a new theme mode</button>
     }
   </div>
 };
