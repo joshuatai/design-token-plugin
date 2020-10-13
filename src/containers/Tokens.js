@@ -5,10 +5,11 @@ import _cloneDeep from 'lodash/cloneDeep';
 import useAPI from 'hooks/useAPI';
 import useThemeModes from 'hooks/useThemeModes';
 import useGroups from 'hooks/useGroups';
-import GroupsListContainer from './GroupsListContainer';
-import ThemeModesContainer from './ThemeModesContainer';
+import useTokens from 'hooks/useTokens';
 import { tokenSettingContext } from 'hooks/TokenSettingProvider';
+import GroupsListContainer from './GroupsListContainer';
 import TokenSetting from './TokenSetting';
+import ThemeModesContainer from './ThemeModesContainer';
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
 import { getSaveData, removeGroup, referByToken, getCurrentThemeMode, setCurrentThemeMode, getThemeMode, getGroup, getToken, setToken, removeToken, save, sendMessage, setFonts, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
@@ -16,6 +17,7 @@ import { getSaveData, removeGroup, referByToken, getCurrentThemeMode, setCurrent
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
 import Group from 'model/Group';
+import Token from 'model/Token';
 import { Mixed } from 'symbols/index';
 import MessageTypes from 'enums/MessageTypes';
 // import PropertyIcon from './property-components/PropertyIcon';
@@ -39,11 +41,17 @@ $tokenActionWrapper
     .append($tokenActionClone)
     .append($tokenActionUnassign)
     .append($tokenActionDelete));
-const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
-    const tokenSetting = useContext(tokenSettingContext);
-    const { setThemeModes } = useThemeModes();
-    const { setGroups } = useGroups();
+const Tokens = ({ data = {
+    themeModes: [],
+    groups: [],
+    tokens: [],
+    properties: []
+} }) => {
     const { api: { admin } } = useAPI();
+    const { setAllGroups } = useGroups();
+    const { setThemeModes } = useThemeModes();
+    const { setAllTokens } = useTokens();
+    const tokenSetting = useContext(tokenSettingContext);
     let $tokenContainer, $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $groupCreator, $themeModeList, $versionCreator, $versionList;
     const Utils = {
         clearSelection: () => {
@@ -90,21 +98,9 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
             return $version;
         },
         group: function (group) {
-            const { id, name } = group;
-            const $group = $(`<div id="${id}" class="panel panel-default panel-collapse-shown"></div>`);
-            const $heading = $('<div class="panel-heading group-item" data-toggle="collapse" aria-expanded="false"></div>').attr('data-target', `#group-${id}`).data('group', id);
-            const $title = $('<h6 class="panel-title"></h6>');
-            const $expend = $('<span class="tmicon tmicon-caret-right tmicon-hoverable"></span>').hide();
-            const $name = $('<span class="group-name" prop-name="name" is-required="true"></span>').text(name).data('id', id);
-            const $addTokenBtn = $('<button type="button" class="add-token" title="Create a token"><svg class="svg" width="12" height="12" viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg"><path d="M5.5 5.5v-5h1v5h5v1h-5v5h-1v-5h-5v-1h5z" fill-rule="nonzero" fill-opacity="1" fill="#000" stroke="none"></path></svg></button>');
-            const $tokenListPanel = $('<div class="panel-collapse collapse" aria-expanded="false"></div>').attr('id', `group-${id}`);
+            const $tokenListPanel = $('<div class="panel-collapse collapse" aria-expanded="false"></div>');
             const $tokenList = $('<ul class="token-list"></ul>');
-            $group
-                .append($heading
-                .append($title
-                .append($expend)
-                .append($name))
-                .append($addTokenBtn))
+            const $group = $()
                 .append($tokenListPanel
                 .append($tokenList
                 .addClass('sortable')
@@ -113,15 +109,7 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
                 placeholder: 'ui-sortable-placeholder',
                 handle: '.ui-sortable-handle',
                 axis: "y"
-            })))
-                .data({
-                data: group,
-                $heading,
-                $name: $name,
-                $tokenList,
-                $expend
-            })
-                .insertBefore($groupCreator);
+            })));
             return $group;
         },
         token: function (token) {
@@ -234,8 +222,12 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
             setThemeModes(undefined);
         }
         if (data.groups) {
-            const _groups = data.groups.map(({ id, name }) => new Group({ id, name }));
-            setGroups(_groups);
+            const _groups = data.groups.map(group => new Group(group));
+            setAllGroups(_groups);
+        }
+        if (data.tokens) {
+            const _tokens = data.tokens.map(token => new Token(token));
+            setAllTokens(_tokens);
         }
         //groups: Array<Object>
         // let isTokenOpen = false;
@@ -245,7 +237,6 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
         //     name: group.name
         //   }));
         //   const { $expend, data } = $group.data();
-        //   setGroup(data);
         //   if (group.tokens.length > 0) {
         //     group.tokens.forEach(token => {
         //       token.properties = token.properties.map((property: any) => {
@@ -588,7 +579,7 @@ const Tokens = ({ data = { themeModes: [], groups: [] } }) => {
             React.createElement("div", { id: "export", title: "Export a JSON file", className: "export" },
                 React.createElement("span", { className: "tmicon tmicon-export" }))),
         React.createElement("div", { className: "tab-content" },
-            React.createElement("div", { role: "tabpanel", className: "tab-pane active", id: "tokens" }, tokenSetting.groupId ?
+            React.createElement("div", { role: "tabpanel", className: "tab-pane active", id: "tokens" }, tokenSetting.group ?
                 React.createElement(TokenSetting, null) :
                 React.createElement(GroupsListContainer, null)),
             React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "tokens-assigned" },

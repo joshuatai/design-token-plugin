@@ -1,6 +1,19 @@
 import { useContext } from 'react';
 import { ThemeModesContext } from 'hooks/ThemeModeProvider';
 import PropertyTypes from 'enums/PropertyTypes';
+// function traversingUseToken (token) {
+//   const themeModes = getThemeMode();
+//   const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
+//   const useThemeMode = formTokenList ? getCurrentThemeMode() : applyThemeMode;
+//   const existCurrentMode = token.properties.find(prop => prop.themeMode === useThemeMode);
+//   const defaultMode = token.properties.find(prop => prop.themeMode === defaultThemeMode);
+//   const property = existCurrentMode ? existCurrentMode : defaultMode;
+//   if (property.useToken) {
+//     return traversingUseToken(getToken(property.useToken));
+//   } else {
+//     return property;
+//   }
+// }
 const usePropertyInfo = (property, isCalc = false) => {
     const themeModes = useContext(ThemeModesContext);
     const defaultMode = themeModes.find((mode) => mode.isDefault);

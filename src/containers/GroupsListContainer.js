@@ -7,7 +7,7 @@ import BrowserEvents from 'enums/BrowserEvents';
 import preventEvent from 'utils/preventEvent';
 const GroupsContainer = () => {
     const { api: { admin } } = useAPI();
-    const { setGroup } = useGroups();
+    const { addGroup } = useGroups();
     const [createEnable, setCreateEnable] = useState(true);
     const createGroupHandler = (e) => {
         if (!admin)
@@ -16,7 +16,7 @@ const GroupsContainer = () => {
             name: ''
         });
         setCreateEnable(false);
-        setGroup(newGroup);
+        addGroup(newGroup);
         preventEvent(e);
     };
     useEffect(() => {

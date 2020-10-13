@@ -9,7 +9,7 @@ const useThemeModes = () => {
   const { saveThemeModes } = useData();
   const themeModes: Array<ThemeMode> = useContext(ThemeModesContext);
   const { setThemeModes } = useContext(ThemeModesSetterContext);
-  const _getThemeMode = (id: String): ThemeMode | Array<ThemeMode> => (themeModes.slice().find(mode => mode.id === id) || themeModes.slice());
+  const _getThemeMode = (id: string): ThemeMode | Array<ThemeMode> => (themeModes.slice().find(mode => mode.id === id) || themeModes.slice());
   const _removeThemeMode = (mode: ThemeMode) => {
     const nextThemeModes = themeModes.slice().filter(_mode => _mode.id != mode.id);
     saveThemeModes(nextThemeModes)

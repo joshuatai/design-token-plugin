@@ -14,8 +14,6 @@ export const ThemeModeIcon: FC<T_ThemeModeIcon> = ({
   </div>
 };
 
-
-
 type T_ThemeModeItem = {
   mode,
   selected: boolean

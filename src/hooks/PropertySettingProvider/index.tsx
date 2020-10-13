@@ -1,15 +1,12 @@
 import PropTypes from "prop-types";
 import React, { useRef, useState } from "react";
+import Property from 'model/Property';
 
-export type T_PropertySetting = {
-  id,
-  parent
-}
-const initialProperty: T_PropertySetting = null;
+const initialProperty: Property = null;
 const initialPropertySetter = {
   setProperty: null
 };
-const initialProperties: Array<T_PropertySetting> = [];
+const initialProperties: Array<Property> = [];
 const initialPropertiesSetter = {
   setProperties: null
 };

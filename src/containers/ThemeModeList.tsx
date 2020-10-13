@@ -12,8 +12,8 @@ declare var $: any;
 SelectText(jQuery);
 type IThemeMode = {
   data: {
-    id: String,
-    name: String,
+    id: string,
+    name: string,
     isDefault: Boolean
   },
   creatable

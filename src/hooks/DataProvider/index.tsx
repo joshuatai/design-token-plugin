@@ -1,9 +1,9 @@
-import PropTypes from "prop-types";
-import React, { useEffect, useRef, useState } from "react";
-
+import React from "react";
+import APIProvider from '../APIProvider';
 import ThemeModesProvider from '../ThemeModeProvider';
 import GroupProvider from '../GroupProvider';
-import APIProvider from '../APIProvider';
+import TokenProvider from '../TokenProvider';
+import PropertyProvider from '../PropertyProvider';
 import TokenSettingProvider from '../TokenSettingProvider';
 import PropertySettingProvider from '../PropertySettingProvider';
 
@@ -12,11 +12,15 @@ const DataProvider = ({ children }) => {
     <APIProvider>
       <ThemeModesProvider>
         <GroupProvider>
-          <TokenSettingProvider>
-            <PropertySettingProvider>
-            {children}
-            </PropertySettingProvider>
-          </TokenSettingProvider>
+          <TokenProvider>
+            <PropertyProvider>
+              <TokenSettingProvider>
+                <PropertySettingProvider>
+                  {children}
+                </PropertySettingProvider>
+              </TokenSettingProvider>
+            </PropertyProvider>
+          </TokenProvider>
         </GroupProvider>
       </ThemeModesProvider>
     </APIProvider>

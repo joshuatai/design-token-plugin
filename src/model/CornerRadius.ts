@@ -4,14 +4,14 @@ import { Mixed } from 'symbols/index';
 
 class CornerRadius {
   private _type: string = PropertyType.CORNER_RADIUS;
-  id: String = v4();
-  parent: String = '';
+  id: string = v4();
+  parent: string = '';
   radius: number | symbol = 0;
   topLeft: number = 0;
   topRight: number = 0;
   bottomRight: number = 0;
   bottomLeft: number = 0;
-  useToken: String = '';
+  useToken: string = '';
 
   constructor(options?: any) {
     if (options.id) this.id = options.id;
@@ -23,7 +23,7 @@ class CornerRadius {
     if (options.bottomRight != null) this.bottomRight = options.bottomRight;
     if (options.bottomLeft != null) this.bottomLeft = options.bottomLeft;
   }
-  get type (): String {
+  get type (): string {
     return this._type;
   }
 }

@@ -5,9 +5,10 @@ class Group {
         this.id = '';
         this.name = '';
         this.tokens = [];
-        const { id, name } = param;
+        const { id, name, tokens = [] } = param;
         this.id = id || v4();
         this.name = name;
+        this.tokens = tokens;
     }
 }
 export default Group;

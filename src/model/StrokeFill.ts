@@ -3,13 +3,13 @@ import FillColor from 'model/FillColor';
 
 class StrokeFill extends FillColor {
   _type: string = PropertyType.STROKE_FILL;
-  color: String = '000000';
+  color: string = '000000';
 
   constructor(options?: any) {
     super(options);
     if (options.color != null) this.color = options.color;
   }
-  get type (): String {
+  get type (): string {
     return this._type;
   }
 }

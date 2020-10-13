@@ -296,7 +296,7 @@ const removeGroup = (group: Group) => {
   if (getGroup(group.id)) {
     const index = groups.findIndex((_group: Group) => _group.id === group.id);
     group.tokens.forEach(token => {
-      removeToken(token);
+      removeToken(getToken(token));
     });
     delete groupMap[group.id];
     groups.splice(index, 1);
@@ -354,7 +354,7 @@ const group2saveData = () => {
       setPureToken(token);
       if (token.propertyType === Mixed) token.propertyType = String(Mixed);
       token.properties.forEach((property: any, propIndex) => {
-        setProperty(groups[groupIndex].tokens[tokenIndex].properties[propIndex]);
+        setProperty(getToken(groups[groupIndex].tokens[tokenIndex]).properties[propIndex]);
         if (property.type === PropertyTypes.CORNER_RADIUS && property.radius === Mixed) {
           property.radius = String(Mixed);
         }
@@ -429,7 +429,7 @@ const syncNode = (token: Token) => {
     token
   );
 };
-const sendMessage = (type: MessageTypes | String, message: String | object = "") => parent.postMessage(
+const sendMessage = (type: MessageTypes | string, message: string | object = "") => parent.postMessage(
   {
     pluginMessage: {
       type,

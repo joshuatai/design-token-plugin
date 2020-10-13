@@ -18,11 +18,15 @@ const usePropertySetting = () => {
         }
         setProperties(_properties);
     };
+    const _setProperties = (_properties = []) => {
+        setProperties(_properties);
+    };
     return {
-        property,
-        properties,
-        setProperty,
-        createProperty: _createProperty
+        propertySetting: property,
+        propertiesSetting: properties,
+        setPropertySetting: setProperty,
+        setPropertiesSetting: _setProperties,
+        createPropertySetting: _createProperty
     };
 };
 export default usePropertySetting;

@@ -64,10 +64,10 @@ const PropertyItem = ({ property }) => {
             React.createElement(RemoveIcon, null)));
 };
 const PropertyList = () => {
-    const { properties } = usePropertySetting();
+    const { propertiesSetting } = usePropertySetting();
     const $itemContainerRef = useRef(null);
     useEffect(() => {
-        if (properties.length > 1) {
+        if (propertiesSetting.length > 1) {
             $($itemContainerRef.current).sortable({
                 placeholder: 'ui-sortable-placeholder',
                 handle: '.sortable-handler',
@@ -75,10 +75,10 @@ const PropertyList = () => {
             });
         }
     });
-    return properties.length > 0 ?
-        React.createElement("div", { id: "property-list", className: properties.length > 1 ? 'setting-row ui-sortable' : 'setting-row' },
+    return propertiesSetting.length > 0 ?
+        React.createElement("div", { id: "property-list", className: propertiesSetting.length > 1 ? 'setting-row ui-sortable' : 'setting-row' },
             React.createElement("h6", null, "Properties"),
-            React.createElement("ul", { ref: $itemContainerRef, className: "property-item-container" }, properties.map(property => React.createElement(PropertyItem, { key: property.id, property: property })))) :
+            React.createElement("ul", { ref: $itemContainerRef, className: "property-item-container" }, propertiesSetting.map(property => React.createElement(PropertyItem, { key: property.id, property: property })))) :
         null;
 };
 export default PropertyList;

@@ -18,35 +18,31 @@ const useGroups = () => {
     };
     const _removeGroup = (group) => {
         const nextGroups = groups.slice().filter(_group => _group.id != group.id);
-        saveGroups(nextGroups)
-            .then(res => {
-            if (res.success)
-                _setGroups(nextGroups);
-        });
+        _setAllGroups(nextGroups);
+        return nextGroups;
     };
-    const _setGroup = (group) => {
+    const _addGroup = (group) => {
         const nextGroups = groups.slice();
-        const existGroup = nextGroups.find(_group => _group.id === group.id);
-        if (!existGroup)
+        const existIndex = nextGroups.findIndex(_group => _group.id === group.id);
+        if (existIndex === -1) {
             nextGroups.push(group);
-        saveGroups(nextGroups)
-            .then(res => {
-            if (res.success)
-                _setGroups(nextGroups);
-        });
-    };
-    const _setGroups = (_goups) => {
-        if (_goups) {
-            setGroups(_goups);
         }
+        else {
+            nextGroups.splice(existIndex, 1, group);
+        }
+        _setAllGroups(nextGroups);
+        return nextGroups;
+    };
+    const _setAllGroups = (_groups = []) => {
+        setGroups(_groups);
     };
     return {
         groups,
         getGroupName: _getGroupName,
         getGroup: _getGroup,
         removeGroup: _removeGroup,
-        setGroup: _setGroup,
-        setGroups: _setGroups
+        addGroup: _addGroup,
+        setAllGroups: _setAllGroups
     };
 };
 export default useGroups;

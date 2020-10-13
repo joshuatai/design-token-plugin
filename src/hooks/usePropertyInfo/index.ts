@@ -3,6 +3,20 @@ import { ThemeModesContext } from 'hooks/ThemeModeProvider';
 import ThemeMode from 'model/ThemeMode';
 import PropertyTypes from 'enums/PropertyTypes';
 
+// function traversingUseToken (token) {
+//   const themeModes = getThemeMode();
+//   const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
+//   const useThemeMode = formTokenList ? getCurrentThemeMode() : applyThemeMode;
+//   const existCurrentMode = token.properties.find(prop => prop.themeMode === useThemeMode);
+//   const defaultMode = token.properties.find(prop => prop.themeMode === defaultThemeMode);
+//   const property = existCurrentMode ? existCurrentMode : defaultMode;
+//   if (property.useToken) {
+//     return traversingUseToken(getToken(property.useToken));
+//   } else {
+//     return property;
+//   }
+// }
+
 const usePropertyInfo = (property, isCalc = false) => {
   const themeModes: Array<ThemeMode> = useContext(ThemeModesContext);
   const defaultMode: ThemeMode = themeModes.find((mode) => mode.isDefault);
@@ -19,7 +33,7 @@ const usePropertyInfo = (property, isCalc = false) => {
     // }
   }
 
-    if (property.type === PropertyTypes.FILL_COLOR) {
+  if (property.type === PropertyTypes.FILL_COLOR) {
 //     const isUseToken = property.useToken;
 //     // $icon.addClass('token-icon');
 //     if (themeModes.length > 1) {
@@ -111,6 +125,7 @@ const usePropertyInfo = (property, isCalc = false) => {
     //   let tokenName = getToken(property.useToken).name;
     //   value = tokenName;
     // }
+
     return {
       value,
       title,

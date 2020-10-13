@@ -1,10 +1,10 @@
-import CornerRadius from './CornerRadius';
-import StrokeWidthAlign from './StrokeWidthAlign';
-import FillColor from './FillColor';
-import StrokeFill from 'model/StrokeFill';
-import Opacity from 'model/Opacity';
-import Font from 'model/Font';
-import Spacing from 'model/Spacing';
+import CornerRadius from "./CornerRadius";
+import StrokeWidthAlign from "./StrokeWidthAlign";
+import FillColor from "./FillColor";
+import StrokeFill from "./StrokeFill";
+import Opacity from "./Opacity";
+import Font from "./Font";
+import Spacing from "./Spacing";
 export default {
     CornerRadius,
     FillColor,
@@ -12,5 +12,5 @@ export default {
     StrokeFill,
     StrokeWidthAlign,
     Font,
-    Spacing
+    Spacing,
 };

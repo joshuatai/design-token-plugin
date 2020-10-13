@@ -33,7 +33,7 @@ let allProperties = [];
 //   }
 //   throw 'unknown'
 // }
-function postMessage (type: String, message: String | Object): void {
+function postMessage (type: string, message: string | Object): void {
   figma.ui.postMessage({ type, message });
 }
 function propertyMaps (properties) {

@@ -1,13 +1,9 @@
 import React, { useEffect, FC, useRef, useContext, useState } from "react";
-import validator from 'validator';
 import usePropertySetting from 'hooks/usePropertySetting';
 import Model from 'model/Opacity';
 import LinkToken from "./LinkToken";
-import PropertyTypes from 'enums/PropertyTypes';
-import Icon from './Icon';
-import BrowserEvents from 'enums/BrowserEvents';
-// import { getToken } from 'model/DataManager';
 // import CommonSettings from './CommonSettings';
+import { ThemeModesContext } from 'hooks/ThemeModeProvider';
 import ThemeModes from './ThemeModes';
 import PropertyIcon from './PropertyIcon';
 import SelectText from 'utils/SelectText';
@@ -17,8 +13,6 @@ import InputStatus from "enums/InputStatus";
 declare var $: any;
 SelectText(jQuery);
 
-// let hostData;
-// const NAME = 'opacity';
 
 // function t() {
 //   var Opacity = function (element, options) {
@@ -28,10 +22,6 @@ SelectText(jQuery);
     
 //     const commonSetting = CommonSettings(this);
 //     this.$token = commonSetting.$token;
-//     this.$themeMode = commonSetting.$themeMode;
-
-//     
-//     this.$element[this.$themeMode ? 'addClass' : 'removeClass']('hasThemeMode');
     
 //     this.$element
 //       .append(
@@ -42,7 +32,6 @@ SelectText(jQuery);
 //               .append(
 //                 this.$opacityValue.text(opacityValue).attr('title', opacityValue).addClass(this.tokenList.length ? 'hasReferenceToken' : '')
 //               )
-//               .append(this.$themeMode)
 //               .append(this.$token)
 //           )
 //       );
@@ -72,15 +61,6 @@ SelectText(jQuery);
 
 
 //   $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .opacity-val[contenteditable="true"]`, function (event) {
-//     
-//     const $this = $(this);
-//     const options = hostData.options;
-//     let value =  $this.text();
-//     value = value.replace('%', '');
-//     if (!validator.isInt(value)) value = options.opacity;
-//     value = Math.min(Math.max(0, value), 100);
-//     options.opacity = value;
-//     $this.text(`${value}%`);
 //     $(document).trigger('property-preview', [options]);
 //   });
 // }
@@ -91,8 +71,9 @@ type T_Opacity = {
 const Opacity: FC<T_Opacity> = ({
   value = null
 }: T_Opacity) => {
+  const themeModes = useContext(ThemeModesContext);
   const [ setting, setSetting ] = useState(value || new Model());
-  const { setProperty } = usePropertySetting();
+  const { setPropertySetting } = usePropertySetting();
   const [ focused, setFocused ] = useState(false);
   const { opacity } = setting;
   const $opacityRef = useRef();
@@ -137,10 +118,10 @@ const Opacity: FC<T_Opacity> = ({
   }, [focused]);
 
   useEffect(() => {
-    setProperty(setting);
+    setPropertySetting(setting);
   }, [setting]);
   
-  return setting && <div className="property-setting-section" property-componen="opacity">
+  return setting ? <div className={themeModes.length > 1 ? 'property-setting-section hasThemeMode' : 'property-setting-section'} property-componen="opacity">
     <div className="custom-val">
       <div className={ focused ? 'val-container focus' : 'val-container' }>
         <PropertyIcon options={[setting]}></PropertyIcon>
@@ -149,6 +130,6 @@ const Opacity: FC<T_Opacity> = ({
         <LinkToken property={setting}></LinkToken>
       </div>
     </div>
-  </div>
+  </div> : <></>
 }
 export default Opacity;

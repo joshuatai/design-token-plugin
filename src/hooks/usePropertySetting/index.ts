@@ -1,14 +1,12 @@
 import { useContext, useRef } from 'react';
-import { propertyContext, propertySetterContext, propertiesContext, propertiesSetterContext, T_PropertySetting } from '../PropertySettingProvider';
+import { propertyContext, propertySetterContext, propertiesContext, propertiesSetterContext } from '../PropertySettingProvider';
 import useAPI from 'hooks/useAPI';
-import useData from 'hooks/useData';
-import Token from 'model/Token';
-import Group from 'model/Group';
+import Property from 'model/Property';
 
 const usePropertySetting = () => {
   const { api } = useAPI();
-  const property: T_PropertySetting = useContext(propertyContext);
-  const properties: Array<T_PropertySetting> = useContext(propertiesContext);
+  const property: Property = useContext(propertyContext);
+  const properties: Array<Property> = useContext(propertiesContext);
   const { setProperty } = useContext(propertySetterContext);
   const { setProperties } = useContext(propertiesSetterContext);
   
@@ -22,11 +20,16 @@ const usePropertySetting = () => {
     }
     setProperties(_properties);
   }
+  const _setProperties = (_properties = []) => {
+    setProperties(_properties);
+  }
+
   return {
-    property,
-    properties,
-    setProperty,
-    createProperty: _createProperty
+    propertySetting: property,
+    propertiesSetting: properties,
+    setPropertySetting: setProperty,
+    setPropertiesSetting: _setProperties,
+    createPropertySetting: _createProperty
   };
 };
 

@@ -266,7 +266,7 @@ const removeGroup = (group) => {
     if (getGroup(group.id)) {
         const index = groups.findIndex((_group) => _group.id === group.id);
         group.tokens.forEach(token => {
-            removeToken(token);
+            removeToken(getToken(token));
         });
         delete groupMap[group.id];
         groups.splice(index, 1);
@@ -323,7 +323,7 @@ const group2saveData = () => {
             if (token.propertyType === Mixed)
                 token.propertyType = String(Mixed);
             token.properties.forEach((property, propIndex) => {
-                setProperty(groups[groupIndex].tokens[tokenIndex].properties[propIndex]);
+                setProperty(getToken(groups[groupIndex].tokens[tokenIndex]).properties[propIndex]);
                 if (property.type === PropertyTypes.CORNER_RADIUS && property.radius === Mixed) {
                     property.radius = String(Mixed);
                 }

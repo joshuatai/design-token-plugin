@@ -13,20 +13,18 @@ declare var $: any;
 SelectText(jQuery);
 
 type T_Group = {
-  data: {
-    id: String,
-    name: String
-  },
+  data: Group,
   creatable
 }
 
 const GroupItem:FC<T_Group> = ({
-  data: { id, name },
+  data,
   creatable
 }: T_Group) => {
-  const groupName = useRef(null);
+  const { id, name } = data;
+  const groupNameRef = useRef(null);
   const { api: { admin } } = useAPI();
-  const { getGroup, getGroupName, setGroup } = useGroups();
+  const { getGroup, getGroupName, addGroup } = useGroups();
   const { setGroup: _setGroup } = useTokenSetting();
   
   const removeHandler = (e) => {
@@ -37,17 +35,17 @@ const GroupItem:FC<T_Group> = ({
   }
   const focusHandler = (e) => {
     if (!admin) return;
-    $(groupName.current).selectText();
+    $(groupNameRef.current).selectText();
     preventEvent(e);
   }
   const inputHandler = (e) => {
     if (!admin) return;
-    const $name = groupName.current;
+    const $name = groupNameRef.current;
     inputCheck.call($name, e);
   }
   const blurHandler = (e) => {
     if (!admin) return;
-    const $name = groupName.current;
+    const $name = groupNameRef.current;
     creatable(false);
     valChange
       .call($name, name)
@@ -55,7 +53,7 @@ const GroupItem:FC<T_Group> = ({
         if (res.status === InputStatus.VALID) {
           const group: Group = getGroup(id) as Group;
           group.name = $name.textContent;
-          setGroup(group);
+          addGroup(group);
           creatable(true);
         }
       })
@@ -64,11 +62,11 @@ const GroupItem:FC<T_Group> = ({
       });
   }
   const addTokenHandler = (e) => {
-    _setGroup({ id, name } as Group);
+    _setGroup(data);
   }
 
   useEffect(() => {
-    const $name = groupName.current;
+    const $name = groupNameRef.current;
     if (admin && $name && !$name.innerHTML) {
       $name.click();
       $name.innerHTML = getGroupName();
@@ -80,7 +78,7 @@ const GroupItem:FC<T_Group> = ({
       <div className="panel-heading group-item" data-target={`#group-${id}`} data-toggle="collapse" aria-expanded="false">
         <h6 className="panel-title">
           <span className="tmicon tmicon-caret-right tmicon-hoverable"></span>
-          <span data-id={id} ref={groupName} className="group-name" is-required="true" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={inputHandler} onBlur={blurHandler}>{name}</span>
+          <span data-id={id} ref={groupNameRef} className="group-name" is-required="true" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={inputHandler} onBlur={blurHandler}>{name}</span>
         </h6>
         {
           admin &&
@@ -92,7 +90,14 @@ const GroupItem:FC<T_Group> = ({
         }
       </div>
       <div id={`group-${id}`} className="panel-collapse collapse" aria-expanded="false">
-        test
+        {
+          console.log(data.name, data.tokens)
+}{
+          data.tokens.map(token => {
+            
+            return token;
+          })
+        }
       </div>
     </div>
   );

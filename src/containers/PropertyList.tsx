@@ -81,10 +81,10 @@ const PropertyItem = ({
   </li>;
 }
 const PropertyList = () => {
-  const { properties } = usePropertySetting();
+  const { propertiesSetting } = usePropertySetting();
   const $itemContainerRef = useRef(null);
   useEffect(() => {
-    if (properties.length > 1) {
+    if (propertiesSetting.length > 1) {
       $($itemContainerRef.current).sortable({
         placeholder: 'ui-sortable-placeholder',
         handle: '.sortable-handler',
@@ -92,12 +92,12 @@ const PropertyList = () => {
       });
     } 
   });
-  return properties.length > 0 ?
-    <div id="property-list" className={properties.length > 1 ? 'setting-row ui-sortable' : 'setting-row'}>
+  return propertiesSetting.length > 0 ?
+    <div id="property-list" className={propertiesSetting.length > 1 ? 'setting-row ui-sortable' : 'setting-row'}>
       <h6>Properties</h6>
       <ul ref={$itemContainerRef} className="property-item-container">
         {
-          properties.map(property => <PropertyItem key={property.id} property={property}></PropertyItem>)
+          propertiesSetting.map(property => <PropertyItem key={property.id} property={property}></PropertyItem>)
         }
       </ul>
     </div> :

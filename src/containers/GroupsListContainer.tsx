@@ -8,7 +8,7 @@ import preventEvent from 'utils/preventEvent';
 
 const GroupsContainer: FC = () => {
   const { api: { admin }} = useAPI();
-  const { setGroup } = useGroups();
+  const { addGroup } = useGroups();
   const [ createEnable, setCreateEnable ] = useState(true);
 
   const createGroupHandler = (e) => {
@@ -17,7 +17,7 @@ const GroupsContainer: FC = () => {
       name: ''
     });
     setCreateEnable(false);
-    setGroup(newGroup);
+    addGroup(newGroup);
     preventEvent(e);
   };
 

@@ -6,7 +6,7 @@ class Token {
   name: string = '';
   description: string = '';
   parent: string = '';
-  properties: object[] = [];
+  properties: string[] = [];
   propertyType: string | symbol = '';
 
   constructor(param) {

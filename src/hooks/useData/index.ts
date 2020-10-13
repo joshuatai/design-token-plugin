@@ -4,8 +4,12 @@ import MessageTypes from 'enums/MessageTypes';
 import useAPI from 'hooks/useAPI';
 import { ThemeModesContext } from '../ThemeModeProvider';
 import { groupsContext } from '../GroupProvider';
+import { tokensContext } from '../TokenProvider';
+import { propertiesContext } from '../PropertyProvider';
 import ThemeMode from 'model/ThemeMode';
 import Group from 'model/Group';
+import Token from 'model/Token';
+import Property from 'model/Property';
 
 export const JSONBIN_URL = `https://api.jsonbin.io`;
 
@@ -13,6 +17,8 @@ const useData = () => {
   const { api } = useAPI();
   const themeModes: Array<ThemeMode> = useContext(ThemeModesContext);
   const groups: Array<Group> = useContext(groupsContext);
+  const tokens: Array<Token> = useContext(tokensContext);
+  const properties: Array<Property> = useContext(propertiesContext);
   
   const options = {
     method: 'GET',
@@ -173,7 +179,9 @@ const useData = () => {
       "last-version": api.lastVersion,
       "data": {
         themeModes: _themeModes,
-        groups
+        groups,
+        tokens,
+        properties
       }
     });
 
@@ -199,7 +207,9 @@ const useData = () => {
       "last-version": api.lastVersion,
       "data": {
         themeModes,
-        groups: _groups
+        groups: _groups,
+        tokens,
+        properties
       }
     });
 
@@ -207,9 +217,73 @@ const useData = () => {
       .then(res => res.json());
   }
 
+  const saveTokens = (_tokens: Array<Token>) => {
+    if (!api.admin) return;
+    options.method = 'PUT';
+    options.body = JSON.stringify({
+      // "collection-id": api.collectionID,
+      "admin-id": api.adminID,
+      "versions-id": api.versionsID,
+      "last-version": api.lastVersion,
+      "data": {
+        themeModes,
+        groups,
+        tokens: _tokens,
+        properties
+      }
+    });
+
+    return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
+      .then(res => res.json());
+  }
+
+  const saveProperties = (_properties: Array<Property>) => {
+    if (!api.admin) return;
+    
+    options.method = 'PUT';
+    options.body = JSON.stringify({
+      // "collection-id": api.collectionID,
+      "admin-id": api.adminID,
+      "versions-id": api.versionsID,
+      "last-version": api.lastVersion,
+      "data": {
+        themeModes,
+        groups,
+        tokens,
+        properties: _properties
+      }
+    });
+    return Promise.resolve({ success: true });
+    // return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
+    //   .then(res => res.json());
+  }
+
+  const saveTokensProperties = (_groups: Array<Group>, _tokens: Array<Token>, _properties: Array<Property>) => {
+    if (!api.admin) return;
+
+    options.method = 'PUT';
+    options.body = JSON.stringify({
+      // "collection-id": api.collectionID,
+      "admin-id": api.adminID,
+      "versions-id": api.versionsID,
+      "last-version": api.lastVersion,
+      "data": {
+        themeModes,
+        groups: _groups,
+        tokens: _tokens,
+        properties: _properties
+      }
+    });
+    return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
+      .then(res => res.json());
+  }
+
   return {
     saveThemeModes,
-    saveGroups
+    saveGroups,
+    saveTokensProperties,
+    saveTokens,
+    saveProperties
   };
 };
 

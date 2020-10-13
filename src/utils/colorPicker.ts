@@ -17,7 +17,7 @@ class Picker {
   mode: PickerMode = PickerMode.SOLID;
   color: number = 0xC4C4C4;
   opacity: number = 1;
-  format: String = ColorFormat.HEX;
+  format: string = ColorFormat.HEX;
   constructor(options?: any) {
     if (options.mode) this.mode = options.mode;
     if (options.color != null) this.color = options.color;

@@ -5,11 +5,12 @@ class Group {
   type: string = 'Group';
   id: string = '';
   name: string = '';
-  tokens: Array<Token> = [];
+  tokens: string[] = [];
   constructor(param) {
-    const  { id, name } = param;
+    const  { id, name, tokens = [] } = param;
     this.id = id || v4();
     this.name = name;
+    this.tokens = tokens;
   }
 }
 

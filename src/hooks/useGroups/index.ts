@@ -11,7 +11,7 @@ const useGroups = () => {
   const groups: Array<Group> = useContext(groupsContext);
   const { setGroups } = useContext(groupsSetterContext);
   
-  const _getGroup = (id?: String): Group | Array<Group> => (groups.slice().find(group => group.id === id) || groups.slice());
+  const _getGroup = (id?: string): Group | Array<Group> => (groups.slice().find(group => group.id === id) || groups.slice());
   const _getGroupName = () => {
     const lastNumber = (_getGroup() as Array<Group>)
       .filter(group => (group.name.match(/^Group \d+$/) ? true : false))
@@ -22,32 +22,30 @@ const useGroups = () => {
   }
   const _removeGroup = (group: Group) => {
     const nextGroups = groups.slice().filter(_group => _group.id != group.id);
-    saveGroups(nextGroups)
-      .then(res => {
-        if (res.success) _setGroups(nextGroups);
-      });
+    _setAllGroups(nextGroups);
+    return nextGroups;
   }
-  const _setGroup = (group: Group) => {
+  const _addGroup = (group: Group) => {
     const nextGroups = groups.slice();
-    const existGroup = nextGroups.find(_group => _group.id === group.id);
-    if (!existGroup) nextGroups.push(group);
-    saveGroups(nextGroups)
-      .then(res => {
-        if (res.success) _setGroups(nextGroups);
-      });
-  }
-  const _setGroups = (_goups: Array<Group> | undefined) => {
-    if (_goups) {
-      setGroups(_goups);
+    const existIndex = nextGroups.findIndex(_group => _group.id === group.id);
+    if (existIndex === -1) {
+      nextGroups.push(group);
+    } else {
+      nextGroups.splice(existIndex, 1, group);
     }
+    _setAllGroups(nextGroups);
+    return nextGroups;
+  }
+  const _setAllGroups = (_groups: Array<Group> = []) => {
+    setGroups(_groups);
   }
   return {
     groups,
     getGroupName: _getGroupName,
     getGroup: _getGroup,
     removeGroup: _removeGroup,
-    setGroup: _setGroup,
-    setGroups: _setGroups
+    addGroup: _addGroup,
+    setAllGroups: _setAllGroups
   };
 };
 

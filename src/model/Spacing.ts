@@ -3,10 +3,10 @@ import PropertyType from 'enums/PropertyTypes';
 
 class Spacing {
   private _type: string = PropertyType.SPACING;
-  id: String = v4();
-  parent: String = '';
+  id: string = v4();
+  parent: string = '';
   value: number = 4;
-  useToken: String = '';
+  useToken: string = '';
 
   constructor(options?: any) {
     if (options.id) this.id = options.id;
@@ -14,7 +14,7 @@ class Spacing {
     if (options.useToken) this.useToken = options.useToken;
     if (options.value != null) this.value = options.value;
   }
-  get type (): String {
+  get type (): string {
     return this._type;
   }
 }

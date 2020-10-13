@@ -17,7 +17,7 @@ class ThemeMode {
       this.name = 'Default';
     }
   }
-  get type (): String {
+  get type (): string {
     return this._type;
   }
 }

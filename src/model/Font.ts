@@ -3,9 +3,9 @@ import PropertyType from 'enums/PropertyTypes';
 
 class Font {
   _type: string = PropertyType.FONT;
-  id: String = v4();
-  parent: String = '';
-  useToken: String = '';
+  id: string = v4();
+  parent: string = '';
+  useToken: string = '';
   fontName = {
     family: "Segoe UI",
     style: "Regular"
@@ -19,7 +19,7 @@ class Font {
     if (options.fontName) this.fontName = options.fontName;
     if (options.fontSize) this.fontSize = options.fontSize;
   }
-  get type (): String {
+  get type (): string {
     return this._type;
   }
 }

@@ -1,15 +1,14 @@
 import PropTypes from "prop-types";
 import React, { useRef, useState } from "react";
-const initialTokenSetting = {
-    groupId: '',
-    groupName: '',
+export const initialTokenSetting = {
+    group: null,
     token: null
 };
 const initialTokenSettingSetter = {
     setTokenSetting: null
 };
-const tokenSettingContext = React.createContext(initialTokenSetting);
-const tokenSettingSetterContext = React.createContext(initialTokenSettingSetter);
+export const tokenSettingContext = React.createContext(initialTokenSetting);
+export const tokenSettingSetterContext = React.createContext(initialTokenSettingSetter);
 const TokenSettingProvider = ({ value = initialTokenSetting, children }) => {
     const [tokenSetting, setTokenSetting] = useState(value);
     const tokenSettingSetterRef = useRef({
@@ -23,4 +22,3 @@ TokenSettingProvider.propTypes = {
 };
 TokenSettingProvider.displayName = "TokenSettingProvider";
 export default TokenSettingProvider;
-export { tokenSettingContext, tokenSettingSetterContext };

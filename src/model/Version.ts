@@ -16,7 +16,7 @@ class Version {
     this.hash = hash;
     this.data = data;
   }
-  get type (): String {
+  get type (): string {
     return this._type;
   }
 }
