@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import usePropertySetting from 'hooks/usePropertySetting';
+import usePropertyInfo from 'hooks/usePropertyInfo';
 import PropertyIcon from './property-components/PropertyIcon';
 const RemoveIcon = () => React.createElement("svg", { className: "svg", width: "12", height: "6", viewBox: "0 0 12 6", xmlns: "http://www.w3.org/2000/svg" },
     React.createElement("path", { d: "M11.5 3.5H.5v-1h11v1z", fillRule: "nonzero", fillOpacity: "1", fill: "#000", stroke: "none" }));
@@ -53,13 +54,14 @@ $(document).on("sortupdate", '.property-item-container', function (event, ui) {
     $host.trigger('property-sort', [data]);
 });
 const PropertyItem = ({ property }) => {
+    const { title, value, secondValue, thridValue } = usePropertyInfo(property);
     return React.createElement("li", { className: "property-item" },
         React.createElement("span", { className: "sortable-handler" }),
         React.createElement("span", { className: "property-name" }, property.type),
         React.createElement(PropertyIcon, { options: property }),
-        React.createElement("span", { className: "property-value", title: "title" }, property.opacity),
-        React.createElement("span", { className: "property-second-value" }),
-        React.createElement("span", { className: "property-third-value" }),
+        React.createElement("span", { className: "property-value", title: title }, value),
+        secondValue && React.createElement("span", { className: "property-second-value" }, secondValue),
+        thridValue && React.createElement("span", { className: "property-third-value" }, thridValue),
         React.createElement("span", { className: "remove-property" },
             React.createElement(RemoveIcon, null)));
 };

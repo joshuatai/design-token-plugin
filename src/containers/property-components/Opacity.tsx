@@ -3,7 +3,7 @@ import usePropertySetting from 'hooks/usePropertySetting';
 import Model from 'model/Opacity';
 import LinkToken from "./LinkToken";
 // import CommonSettings from './CommonSettings';
-import { ThemeModesContext } from 'hooks/ThemeModeProvider';
+import useThemeModes from 'hooks/useThemeModes';
 import ThemeModes from './ThemeModes';
 import PropertyIcon from './PropertyIcon';
 import SelectText from 'utils/SelectText';
@@ -71,8 +71,8 @@ type T_Opacity = {
 const Opacity: FC<T_Opacity> = ({
   value = null
 }: T_Opacity) => {
-  const themeModes = useContext(ThemeModesContext);
-  const [ setting, setSetting ] = useState(value || new Model());
+  const { defaultMode, themeModes } = useThemeModes();
+  const [ setting, setSetting ] = useState(value || new Model({ themeMode: defaultMode.id }));
   const { setPropertySetting } = usePropertySetting();
   const [ focused, setFocused ] = useState(false);
   const { opacity } = setting;
@@ -113,6 +113,10 @@ const Opacity: FC<T_Opacity> = ({
         }
       });
   }
+  const themeModeChangeHandler = (mode) => {
+    setting.themeMode = mode.id;
+    setSetting(new Model(setting));
+  }
   useEffect(() => {
     if (focused) $($opacityRef.current).selectText();
   }, [focused]);
@@ -126,7 +130,7 @@ const Opacity: FC<T_Opacity> = ({
       <div className={ focused ? 'val-container focus' : 'val-container' }>
         <PropertyIcon options={[setting]}></PropertyIcon>
         <span ref={$opacityRef} data-type="number" className="opacity-val" title={opacityValue} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{opacityValue}</span>
-        <ThemeModes property={setting}></ThemeModes>
+        <ThemeModes property={setting} changeHandler={themeModeChangeHandler}></ThemeModes>
         <LinkToken property={setting}></LinkToken>
       </div>
     </div>

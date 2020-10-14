@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useContext } from "react";
+import useData from 'hooks/useData';
 import useAPI from 'hooks/useAPI';
 import { ThemeModesContext } from 'hooks/ThemeModeProvider';
 import useThemeModes from 'hooks/useThemeModes';
@@ -8,9 +9,10 @@ import { inputCheck, valChange } from 'utils/inputValidator';
 import InputStatus from 'enums/InputStatus';
 SelectText(jQuery);
 const ThemeModeItem = ({ data, creatable }) => {
-    const modeName = useRef(null);
     const { api: { admin } } = useAPI();
-    const { getThemeMode, setThemeMode, removeThemeMode } = useThemeModes();
+    const { saveThemeModes } = useData();
+    const { getThemeMode, addThemeMode, removeThemeMode } = useThemeModes();
+    const $modeName = useRef();
     const removeHandler = (e) => {
         if (!data.isDefault) {
             removeThemeMode(data);
@@ -19,7 +21,7 @@ const ThemeModeItem = ({ data, creatable }) => {
         // updateCurrentThemeMode();
     };
     const blurHandler = (e) => {
-        const $name = modeName.current;
+        const $name = $modeName.current;
         creatable(false);
         valChange
             .call($name, data.name)
@@ -27,8 +29,11 @@ const ThemeModeItem = ({ data, creatable }) => {
             if (res.status === InputStatus.VALID) {
                 const ThemeMode = getThemeMode(data.id);
                 ThemeMode.name = $name.textContent;
-                setThemeMode(ThemeMode);
-                creatable(true);
+                const themeModes = addThemeMode(ThemeMode);
+                saveThemeModes(themeModes)
+                    .then(res => {
+                    creatable(true);
+                });
             }
         })
             .catch(res => {
@@ -39,20 +44,20 @@ const ThemeModeItem = ({ data, creatable }) => {
     const focusHandler = (e) => {
         if (!admin)
             return;
-        $(modeName.current).selectText();
+        $($modeName.current).selectText();
         preventEvent(e);
     };
     const inputHandler = (e) => {
-        const $name = modeName.current;
+        const $name = $modeName.current;
         inputCheck.call($name, e);
     };
     useEffect(() => {
-        const $name = modeName.current;
+        const $name = $modeName.current;
         if (admin && $name && !$name.innerHTML)
             $name.click();
     }, []);
     return React.createElement("li", { id: `mode-${data.id}`, "data-id": data.id },
-        React.createElement("span", { ref: modeName, className: "theme-mode-name", "data-id": data.id, "is-required": "true", contentEditable: "false", suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: inputHandler, onBlur: blurHandler }, data.name),
+        React.createElement("span", { ref: $modeName, className: "theme-mode-name", "data-id": data.id, "is-required": "true", contentEditable: "false", suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: inputHandler, onBlur: blurHandler }, data.name),
         admin && React.createElement("span", { className: "remove-mode", "data-disabled": data.isDefault, onClick: removeHandler },
             React.createElement("svg", { className: "svg", width: "12", height: "6", viewBox: "0 0 12 6", xmlns: "http://www.w3.org/2000/svg" },
                 React.createElement("path", { d: "M11.5 3.5H.5v-1h11v1z", fillRule: "nonzero", fillOpacity: "1", fill: "#000", stroke: "none" }))));

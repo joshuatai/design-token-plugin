@@ -40,12 +40,8 @@ SelectText(jQuery);
 //   }
 
 //   var TokenSetting = function (element, { group, token }) {
-//     this.group = getGroup(group);
-//     this.token = getToken(token) || setToken(new Token({ parent: group }));
 
-
-//     const $propertyView = $('');
-//     const $propertyList = $('');    
+  
 //     this.$element = $(element)
 //       .append($propertyView)
 //       .append(
@@ -131,31 +127,7 @@ SelectText(jQuery);
 //   TokenSetting.prototype.destroy = function () {
 //       return this.$element.empty().removeData().hide();
 //   };
-//   function Plugin(option) {
-//     return this.each(function () {
-//       var $this   = $(this)
-//       var data    = $this.data('TokenSetting');
-//       var options = typeof option == 'object' && option;
-//       if (typeof option === 'string') {
-//         data && data[option]();
-//       } else if (data) {
-//         data.destroy();
-//       } else {
-//         $this.data('TokenSetting', (data = new TokenSetting(this, options)));
-//       }
-//     })
-//   }
 
-//   var old = $.fn.TokenSetting;
-
-//   $.fn.TokenSetting             = Plugin
-//   $.fn.TokenSetting.Constructor = TokenSetting
-
-//   $.fn.TokenSetting.noConflict = function () {
-//     $.fn.TokenSetting = old
-//     return this
-//   }
-  
 //   function canAddProperty (callback) {
 //     return function (e) {
 //       callback.call(this, e);
@@ -294,6 +266,7 @@ const PropertySetting: FC<T_PropertySetting> = ({
   </div>
 }
 const TokenSetting: FC = (): ReactElement => {
+  const { api: { admin }} = useAPI();
   const { initialSetting, setting, setToken, setTokenSetting } = useTokenSetting();
   const { group, token } = setting;
   const { propertiesSetting, setPropertiesSetting } = usePropertySetting();
@@ -303,10 +276,9 @@ const TokenSetting: FC = (): ReactElement => {
   const { addProperties } = useProperties();
   const [ showPropertySetting, setShowPropertySetting ] = useState(false);
   const [ creatable, setCreatable ] = useState(token && token.name ? true : false);
-  const { api: { admin }} = useAPI();
-  
   const $name = useRef();
   const $description = useRef();
+  const $backButton = useRef();
   
   const focusHandler = (e) => {
     if (!admin) return;
@@ -327,8 +299,8 @@ const TokenSetting: FC = (): ReactElement => {
       })
       .then(res => {
         if (res.status === InputStatus.VALID) {
-          setting.token[type] = $target.textContent;
-          setToken(setting.token);
+          token[type] = $target.textContent;
+          setToken(token);
           setCreatable(true);
         }
       })
@@ -347,22 +319,23 @@ const TokenSetting: FC = (): ReactElement => {
   }
   const cancelTokenHandler = () => {
     setPropertiesSetting([]);
-    setTokenSetting(initialSetting);
+    setTokenSetting(Object.assign({}, initialSetting));
   }
-  const saveTokenHandler = () => {
+  const saveTokenHandler = (e) => {
     // this.$propertyList.propertyList(this.token.properties);
+    const exist = group.tokens.find((_token: string) => _token === token.id);
+    if (!exist) group.tokens.push(token.id);
     saveTokensProperties(addGroup(group), addToken(token), addProperties(propertiesSetting))
       .then(res => {
-        console.log(res)
+        if (res.success) {
+          ($backButton.current as HTMLElement).click();
+        }
       });
   }
-  // $(document).on(BrowserEvents.CLICK, '#add-property, #property-setting-cancel', function () {
-  //   hostData.$propertyView.propertyView(hostData.token.properties);
-  // });
+
   useEffect(() => {
     if (!token) {
       const newToken = new Token({ parent: group.id });
-      group.tokens.push(newToken.id);
       setTokenSetting({
         group,
         token: newToken
@@ -373,7 +346,7 @@ const TokenSetting: FC = (): ReactElement => {
   }, [token]);
 
   useEffect(() => {
-    if (setting.token) {
+    if (token) {
       const properties = [];
       if (propertiesSetting.length > 0) {
         const propertyTypes = Object.keys(propertiesSetting.reduce((calc, property: Property) => {
@@ -381,19 +354,19 @@ const TokenSetting: FC = (): ReactElement => {
           calc[property.type] = property.type;
           return calc;
         }, {}));
-        setting.token.propertyType = propertyTypes.length === 1 ? propertyTypes[0] : Mixed;
+        token.propertyType = propertyTypes.length === 1 ? propertyTypes[0] : Mixed;
       } else {
-        setting.token.propertyType = '';
+        token.propertyType = '';
       }
-      setting.token.properties = properties;
-      setToken(setting.token);
+      token.properties = properties;
+      setToken(token);
     }
   }, [propertiesSetting]);
 
   return token &&
     <div id="token-setting" className="plugin-panel" >
       <div className="setting-row">
-        <BackButton onClick={cancelTokenHandler} />
+        <BackButton _ref={$backButton} onClick={cancelTokenHandler} />
         <h6 id="panel-group-name">{group.name}</h6>
       </div>
       <div className="setting-row">

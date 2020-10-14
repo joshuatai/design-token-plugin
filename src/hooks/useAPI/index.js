@@ -9,6 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { useContext } from 'react';
 import { APIContext, APISetterContext } from '../APIProvider';
+import ThemeMode from 'model/ThemeMode';
 import { sendMessage } from 'model/DataManager';
 import MessageTypes from 'enums/MessageTypes';
 export const JSONBIN_URL = `https://api.jsonbin.io`;
@@ -134,7 +135,12 @@ const useAPI = () => {
                             'admin-id': api.aid,
                             'versions-id': api.vid,
                             'last-version': api.lastV,
-                            'data': {}
+                            'data': {
+                                'groups': [],
+                                'tokens': [],
+                                'properties': [],
+                                'themeModes': [new ThemeMode()]
+                            }
                         });
                         return fetch(`${JSONBIN_URL}/b`, options)
                             .then(res => res.json())

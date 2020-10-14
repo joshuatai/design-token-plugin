@@ -38,9 +38,7 @@ const APISetting = ({
     _inputCheck = function (e) {
       const input = e.target;
       if (inputs.indexOf(input) > -1) {
-        input.dataset.id = input.textContent;
-        inputCheck.call(input, [e]);
-
+        inputCheck.call(input, e);
         if (_apiKeyInput.getAttribute('invalid') || _binIDInput.getAttribute('invalid') || _adminPWDInput.getAttribute('invalid')) {
           setSavable(false);
         } else {
@@ -55,8 +53,11 @@ const APISetting = ({
     _inputBlur = (e) => {
       const input = e.target;
       if (inputs.indexOf(input) > -1) {
-        valChange.call(input);
-        input.scrollLeft = 0;
+        valChange.call(input)
+          .then(res => {})
+          .catch(res => {
+            
+          });
       }
     }
     document.addEventListener(BrowserEvents.CLICK, _inputEdit);
@@ -75,6 +76,7 @@ const APISetting = ({
     _adminPWDInput = adminPWDRef.current;
 
     errorTarget = {
+      'Invalid secret key provided': _apiKeyInput,
       'Invalid secret key provided.': _apiKeyInput,
       'Invalid secret-key provided': _apiKeyInput,
       'Invalid Record ID': _binIDInput,
@@ -110,9 +112,10 @@ const APISetting = ({
       })
       .catch(e => {
         setProcessing(false);
-        if (errorTarget[e.message]) {
-          errorTarget[e.message].setAttribute('invalid', true);
-          errorTarget[e.message].click();
+        const $target = errorTarget[e.message];
+        if ($target) {
+          $($target).selectText();
+          $target.setAttribute('invalid', true);
         }
       });
   }

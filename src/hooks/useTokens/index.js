@@ -1,12 +1,13 @@
 import { useContext } from 'react';
-import { tokensContext, tokensSetterContext } from '../TokenProvider';
+import { tokensContext, tokensSetterContext, purePropertyTokensContext, purePropertyTokensSetterContext } from '../TokenProvider';
 import useAPI from 'hooks/useAPI';
-import useData from 'hooks/useData';
+import { Mixed } from 'symbols/index';
 const useTokens = () => {
     const { api } = useAPI();
-    const { saveTokens } = useData();
     const tokens = useContext(tokensContext);
     const { setTokens } = useContext(tokensSetterContext);
+    const pureTokens = useContext(purePropertyTokensContext);
+    const { setPureTokens } = useContext(purePropertyTokensSetterContext);
     const _getToken = (id) => {
         if (id) {
             return tokens.slice().find(_token => _token.id === id);
@@ -32,9 +33,19 @@ const useTokens = () => {
     };
     const _setAllTokens = (_tokens = []) => {
         setTokens(_tokens);
+        const _pureTokens = {};
+        _tokens.forEach(token => {
+            if (token.propertyType !== Mixed) {
+                if (!_pureTokens[token.propertyType])
+                    _pureTokens[token.propertyType] = [];
+                _pureTokens[token.propertyType].push(token);
+            }
+        });
+        setPureTokens(_pureTokens);
     };
     return {
         tokens,
+        pureTokens,
         getToken: _getToken,
         removeToken: _removeToken,
         addToken: _addToken,

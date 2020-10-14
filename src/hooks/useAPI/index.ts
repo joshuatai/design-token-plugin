@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import { APIContext, APISetterContext } from '../APIProvider';
+import ThemeMode from 'model/ThemeMode';
 import { sendMessage } from 'model/DataManager';
 import MessageTypes from 'enums/MessageTypes';
 
@@ -141,7 +142,12 @@ const useAPI = () => {
                 'admin-id': api.aid, //remove it once the collection api is back!!
                 'versions-id': api.vid,
                 'last-version': api.lastV,
-                'data': {}
+                'data': {
+                  'groups': [],
+                  'tokens': [],
+                  'properties': [],
+                  'themeModes': [new ThemeMode()]
+                }
               });
               return fetch(`${JSONBIN_URL}/b`, options)
                 .then(res => res.json())

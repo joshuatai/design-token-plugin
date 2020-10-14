@@ -22,6 +22,7 @@ const useProperties = () => {
     return nextProperties;
   }
   const _addProperties = (_properties: Array<Property>) => {
+    console.log(properties, _properties);
     const nextProperties = properties.slice();
     const existIndex = _properties.map(_prop => nextProperties.findIndex(_property => _property.id === _prop.id));
     existIndex.forEach((existIndex, index) => {

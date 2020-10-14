@@ -6,7 +6,7 @@ import ThemeMode from 'model/ThemeMode';
 
 const ThemeModesContainer: FC = () => {
   const { api: { admin } } = useAPI();
-  const { setThemeMode } = useThemeModes();
+  const { addThemeMode } = useThemeModes();
   const [ createEnable, setCreateEnable ] = useState(true);
   const createModeHandler = () => {
     const newMode = new ThemeMode({
@@ -14,7 +14,7 @@ const ThemeModesContainer: FC = () => {
       isDefault: false
     });
     setCreateEnable(false);
-    setThemeMode(newMode);
+    addThemeMode(newMode);
   };
   return <div id="mode-setting" className="plugin-panel">
     <ThemeModeList creatable={setCreateEnable}></ThemeModeList>

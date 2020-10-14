@@ -1,4 +1,5 @@
-import React, { useEffect, FC, useRef, useContext } from "react";
+import React, { useEffect, FC, useRef, useContext, ReactElement } from "react";
+import useData from 'hooks/useData';
 import useAPI from 'hooks/useAPI';
 import { ThemeModesContext } from  'hooks/ThemeModeProvider';
 import useThemeModes from 'hooks/useThemeModes';
@@ -10,7 +11,7 @@ import InputStatus from 'enums/InputStatus';
 
 declare var $: any;
 SelectText(jQuery);
-type IThemeMode = {
+type T_ThemeModeItem = {
   data: {
     id: string,
     name: string,
@@ -19,14 +20,15 @@ type IThemeMode = {
   creatable
 }
 
-const ThemeModeItem:FC<IThemeMode> = ({
+const ThemeModeItem:FC<T_ThemeModeItem> = ({
   data,
   creatable
-}: IThemeMode) => {
-  const modeName = useRef(null);
+}: T_ThemeModeItem) => {
   const { api: { admin } } = useAPI();
-  const { getThemeMode, setThemeMode, removeThemeMode } = useThemeModes();
-  
+  const { saveThemeModes } = useData();
+  const { getThemeMode, addThemeMode, removeThemeMode } = useThemeModes();
+  const $modeName = useRef();
+
   const removeHandler = (e) => {
     if (!data.isDefault) {
       removeThemeMode(data as ThemeMode);
@@ -35,7 +37,7 @@ const ThemeModeItem:FC<IThemeMode> = ({
     // updateCurrentThemeMode();
   }
   const blurHandler = (e) => {
-    const $name = modeName.current;
+    const $name = $modeName.current as HTMLElement;
     creatable(false);
     valChange
       .call($name, data.name)
@@ -43,8 +45,11 @@ const ThemeModeItem:FC<IThemeMode> = ({
         if (res.status === InputStatus.VALID) {
           const ThemeMode: ThemeMode = getThemeMode(data.id) as ThemeMode;
           ThemeMode.name = $name.textContent;
-          setThemeMode(ThemeMode);
-          creatable(true);
+          const themeModes = addThemeMode(ThemeMode);
+          saveThemeModes(themeModes)
+            .then(res => {
+              creatable(true);
+            });
         }
       })
       .catch(res => {
@@ -53,21 +58,21 @@ const ThemeModeItem:FC<IThemeMode> = ({
   }
   const focusHandler = (e) => {
     if (!admin) return;
-    $(modeName.current).selectText();
+    $($modeName.current).selectText();
     preventEvent(e);
   }
   const inputHandler = (e) => {
-    const $name = modeName.current;
+    const $name = $modeName.current;
     inputCheck.call($name, e);
   }
 
   useEffect(() => {
-    const $name = modeName.current;
+    const $name = $modeName.current as HTMLElement;
     if (admin && $name && !$name.innerHTML) $name.click();
   }, []);
 
   return <li id={`mode-${data.id}`} data-id={data.id}>
-    <span ref={modeName} className="theme-mode-name" data-id={data.id} is-required="true" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={inputHandler} onBlur={blurHandler}>{data.name}</span>
+    <span ref={$modeName} className="theme-mode-name" data-id={data.id} is-required="true" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={inputHandler} onBlur={blurHandler}>{data.name}</span>
     {
       admin && <span className="remove-mode" data-disabled={data.isDefault} onClick={removeHandler} >
         <svg className="svg" width="12" height="6" viewBox="0 0 12 6" xmlns="http://www.w3.org/2000/svg">

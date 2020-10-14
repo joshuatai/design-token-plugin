@@ -5,7 +5,7 @@ import ThemeModeList from './ThemeModeList';
 import ThemeMode from 'model/ThemeMode';
 const ThemeModesContainer = () => {
     const { api: { admin } } = useAPI();
-    const { setThemeMode } = useThemeModes();
+    const { addThemeMode } = useThemeModes();
     const [createEnable, setCreateEnable] = useState(true);
     const createModeHandler = () => {
         const newMode = new ThemeMode({
@@ -13,7 +13,7 @@ const ThemeModesContainer = () => {
             isDefault: false
         });
         setCreateEnable(false);
-        setThemeMode(newMode);
+        addThemeMode(newMode);
     };
     return React.createElement("div", { id: "mode-setting", className: "plugin-panel" },
         React.createElement(ThemeModeList, { creatable: setCreateEnable }),

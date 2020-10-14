@@ -1,47 +1,41 @@
 import { useContext } from 'react';
-import { ThemeModesContext, ThemeModesSetterContext } from '../ThemeModeProvider';
+import { ThemeModesContext, ThemeModesSetterContext, defaultModeContext, defaultModeContextSetterContext } from '../ThemeModeProvider';
 import useAPI from 'hooks/useAPI';
-import useData from 'hooks/useData';
-import ThemeMode from 'model/ThemeMode';
 const useThemeModes = () => {
     const { api } = useAPI();
-    const { saveThemeModes } = useData();
+    const defaultMode = useContext(defaultModeContext);
+    const { setDefaultMode } = useContext(defaultModeContextSetterContext);
     const themeModes = useContext(ThemeModesContext);
     const { setThemeModes } = useContext(ThemeModesSetterContext);
     const _getThemeMode = (id) => (themeModes.slice().find(mode => mode.id === id) || themeModes.slice());
     const _removeThemeMode = (mode) => {
         const nextThemeModes = themeModes.slice().filter(_mode => _mode.id != mode.id);
-        saveThemeModes(nextThemeModes)
-            .then(res => {
-            if (res.success)
-                _setThemeModes(nextThemeModes);
-        });
+        _setAllThemeModes(nextThemeModes);
+        return nextThemeModes;
     };
-    const _setThemeMode = (mode) => {
+    const _addThemeMode = (mode) => {
         const nextThemeModes = themeModes.slice();
-        const existMode = nextThemeModes.find(_mode => _mode.id === mode.id);
-        if (!existMode)
+        const existIndex = nextThemeModes.findIndex(_mode => _mode.id === mode.id);
+        if (existIndex === -1) {
             nextThemeModes.push(mode);
-        saveThemeModes(nextThemeModes)
-            .then(res => {
-            if (res.success)
-                _setThemeModes(nextThemeModes);
-        });
+        }
+        else {
+            nextThemeModes.splice(existIndex, 1, mode);
+        }
+        _setAllThemeModes(nextThemeModes);
+        return nextThemeModes;
     };
-    const _setThemeModes = (modes) => {
-        if (modes && modes.length > 0) {
-            setThemeModes(modes);
-        }
-        else if (themeModes.length === 0 && api.admin) {
-            _setThemeMode(new ThemeMode());
-        }
+    const _setAllThemeModes = (modes = []) => {
+        setDefaultMode(modes.find(mode => mode.isDefault));
+        setThemeModes(modes);
     };
     return {
+        defaultMode,
         themeModes,
         getThemeMode: _getThemeMode,
         removeThemeMode: _removeThemeMode,
-        setThemeMode: _setThemeMode,
-        setThemeModes: _setThemeModes
+        addThemeMode: _addThemeMode,
+        setAllThemeModes: _setAllThemeModes
     };
 };
 export default useThemeModes;

@@ -1,5 +1,6 @@
 import React, { useEffect, FC, useRef, useContext } from "react";
 import usePropertySetting from 'hooks/usePropertySetting';
+import usePropertyInfo from 'hooks/usePropertyInfo';
 import preventEvent from 'utils/preventEvent';
 import BrowserEvents from 'enums/BrowserEvents';
 import { getToken, referByToken } from 'model/DataManager';
@@ -70,13 +71,14 @@ type T_PropertyItem = {
 const PropertyItem = ({
   property
 }) => {
+  const { title, value, secondValue, thridValue } = usePropertyInfo(property);
   return <li className="property-item">
     <span className="sortable-handler"></span>
     <span className="property-name">{property.type}</span>
     <PropertyIcon options={property}></PropertyIcon>
-    <span className="property-value" title="title">{property.opacity}</span>
-    <span className="property-second-value"></span>
-    <span className="property-third-value"></span>
+    <span className="property-value" title={title}>{value}</span>
+    { secondValue && <span className="property-second-value">{secondValue}</span> }
+    { thridValue && <span className="property-third-value">{thridValue}</span> }
     <span className="remove-property"><RemoveIcon></RemoveIcon></span>
   </li>;
 }

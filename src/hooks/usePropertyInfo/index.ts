@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { ThemeModesContext } from 'hooks/ThemeModeProvider';
+import useThemeModes from 'hooks/useThemeModes';
 import ThemeMode from 'model/ThemeMode';
 import PropertyTypes from 'enums/PropertyTypes';
 
@@ -18,8 +18,7 @@ import PropertyTypes from 'enums/PropertyTypes';
 // }
 
 const usePropertyInfo = (property, isCalc = false) => {
-  const themeModes: Array<ThemeMode> = useContext(ThemeModesContext);
-  const defaultMode: ThemeMode = themeModes.find((mode) => mode.isDefault);
+  const { themeModes, defaultMode, getThemeMode } = useThemeModes();
   let css, value, title, secondValue, thridValue, applyThemeMode;
   css = value = title = secondValue = thridValue = applyThemeMode = '';
 
@@ -109,8 +108,19 @@ const usePropertyInfo = (property, isCalc = false) => {
 //     title = `Stroke Width: ${value} and Stroke Align: ${secondValue}`;
 //   }
     if (property.type === PropertyTypes.OPACITY) {
+      // const isUseToken = property.useToken;
+      if (themeModes.length > 1) {
+        applyThemeMode = property.themeMode;
+        applyThemeMode ? thridValue = (getThemeMode(applyThemeMode) as ThemeMode).name : thridValue = defaultMode.name;
+      }
       value = `${property.opacity}%`;
-      title = `Opacity: ${value}`;
+      // if (isUseToken) {
+      //   const useToken = getToken(property.useToken);
+      //   value = useToken.name;
+      //   secondValue = '';
+      //   property = traversingUseToken(useToken);
+      // }
+      title = `Opacity: ${property.opacity}%`;
     }
 //   if (property.type === PropertyTypes.FONT) {
 //     value = property.fontName.family;

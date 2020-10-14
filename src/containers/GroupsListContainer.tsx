@@ -1,5 +1,6 @@
 import React, { FC, useState, useEffect } from "react";
 import useAPI from 'hooks/useAPI';
+import useData from 'hooks/useData';
 import useGroups from 'hooks/useGroups';
 import GroupsList from './GroupsList';
 import Group from 'model/Group';
@@ -8,6 +9,7 @@ import preventEvent from 'utils/preventEvent';
 
 const GroupsContainer: FC = () => {
   const { api: { admin }} = useAPI();
+  const { saveGroups } = useData();
   const { addGroup } = useGroups();
   const [ createEnable, setCreateEnable ] = useState(true);
 

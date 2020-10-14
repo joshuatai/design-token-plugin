@@ -36,9 +36,10 @@ const inputCheck = function (e) {
 function valCheck($editable, orgVal, customValidator, resolve, reject) {
     const dataType = $editable.getAttribute('data-type');
     const isRequired = $editable.getAttribute('is-required');
+    const _orgVal = orgVal ? String(orgVal) : undefined;
     let newVal = $editable.textContent.trim();
     $editable.removeAttribute('invalid');
-    if (orgVal && newVal === orgVal) {
+    if (_orgVal && newVal === _orgVal) {
         $editable.setAttribute("contenteditable", "false");
         reject({
             status: InputStatus.NO_CHANGE
@@ -48,7 +49,7 @@ function valCheck($editable, orgVal, customValidator, resolve, reject) {
     if (newVal) {
         if (dataType) {
             if (!Validator[dataType](newVal)) {
-                $editable.innerHTML = orgVal || '';
+                $editable.innerHTML = _orgVal || '';
                 $editable.setAttribute("contenteditable", "false");
                 reject({
                     status: InputStatus.NO_CHANGE
@@ -59,7 +60,7 @@ function valCheck($editable, orgVal, customValidator, resolve, reject) {
         if (customValidator) {
             const { status, value } = customValidator(newVal);
             if (status === InputStatus.NO_CHANGE) {
-                $editable.innerHTML = orgVal || '';
+                $editable.innerHTML = _orgVal || '';
                 $editable.setAttribute("contenteditable", "false");
                 reject({
                     status: InputStatus.NO_CHANGE
@@ -86,8 +87,8 @@ function valCheck($editable, orgVal, customValidator, resolve, reject) {
         // }
     }
     else if (!newVal && isRequired) {
-        if (orgVal) {
-            $editable.innerHTML = orgVal;
+        if (_orgVal) {
+            $editable.innerHTML = _orgVal;
             $editable.setAttribute("contenteditable", "false");
             // if (!(data instanceof Version)) return;
             // newVal = orgVal;
@@ -127,7 +128,7 @@ const valChange = function (orgVal, customValidator = null) {
     return new Promise(function (resolve, reject) {
         // valCheckTimer && clearInterval(valCheckTimer);
         // valCheckTimer = setTimeout(() => {
-        valCheck($editable, String(orgVal), customValidator, resolve, reject);
+        valCheck($editable, orgVal, customValidator, resolve, reject);
         // }, 50, 'finish'); 
     });
     ;

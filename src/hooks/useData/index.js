@@ -196,7 +196,7 @@ const useData = () => {
             }
         });
         return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
-            .then(res => res.json());
+            .then(res => Promise.resolve(res.json()));
     };
     const saveTokens = (_tokens) => {
         if (!api.admin)
@@ -215,7 +215,7 @@ const useData = () => {
             }
         });
         return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
-            .then(res => res.json());
+            .then(res => Promise.resolve(res.json()));
     };
     const saveProperties = (_properties) => {
         if (!api.admin)
@@ -233,9 +233,8 @@ const useData = () => {
                 properties: _properties
             }
         });
-        return Promise.resolve({ success: true });
-        // return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
-        //   .then(res => res.json());
+        return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
+            .then(res => Promise.resolve(res.json()));
     };
     const saveTokensProperties = (_groups, _tokens, _properties) => {
         if (!api.admin)
@@ -254,7 +253,7 @@ const useData = () => {
             }
         });
         return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
-            .then(res => res.json());
+            .then(res => Promise.resolve(res.json()));
     };
     return {
         saveThemeModes,

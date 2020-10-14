@@ -73,6 +73,7 @@ const PropertySetting = ({ token = null, property = null, cancelHandler = null, 
                     property && React.createElement("button", { id: "property-setting-update", type: "button", className: "btn btn-sm btn-primary" }, "Update"))));
 };
 const TokenSetting = () => {
+    const { api: { admin } } = useAPI();
     const { initialSetting, setting, setToken, setTokenSetting } = useTokenSetting();
     const { group, token } = setting;
     const { propertiesSetting, setPropertiesSetting } = usePropertySetting();
@@ -82,9 +83,9 @@ const TokenSetting = () => {
     const { addProperties } = useProperties();
     const [showPropertySetting, setShowPropertySetting] = useState(false);
     const [creatable, setCreatable] = useState(token && token.name ? true : false);
-    const { api: { admin } } = useAPI();
     const $name = useRef();
     const $description = useRef();
+    const $backButton = useRef();
     const focusHandler = (e) => {
         if (!admin)
             return;
@@ -107,8 +108,8 @@ const TokenSetting = () => {
         })
             .then(res => {
             if (res.status === InputStatus.VALID) {
-                setting.token[type] = $target.textContent;
-                setToken(setting.token);
+                token[type] = $target.textContent;
+                setToken(token);
                 setCreatable(true);
             }
         })
@@ -128,22 +129,23 @@ const TokenSetting = () => {
     };
     const cancelTokenHandler = () => {
         setPropertiesSetting([]);
-        setTokenSetting(initialSetting);
+        setTokenSetting(Object.assign({}, initialSetting));
     };
-    const saveTokenHandler = () => {
+    const saveTokenHandler = (e) => {
         // this.$propertyList.propertyList(this.token.properties);
+        const exist = group.tokens.find((_token) => _token === token.id);
+        if (!exist)
+            group.tokens.push(token.id);
         saveTokensProperties(addGroup(group), addToken(token), addProperties(propertiesSetting))
             .then(res => {
-            console.log(res);
+            if (res.success) {
+                $backButton.current.click();
+            }
         });
     };
-    // $(document).on(BrowserEvents.CLICK, '#add-property, #property-setting-cancel', function () {
-    //   hostData.$propertyView.propertyView(hostData.token.properties);
-    // });
     useEffect(() => {
         if (!token) {
             const newToken = new Token({ parent: group.id });
-            group.tokens.push(newToken.id);
             setTokenSetting({
                 group,
                 token: newToken
@@ -154,7 +156,7 @@ const TokenSetting = () => {
         }
     }, [token]);
     useEffect(() => {
-        if (setting.token) {
+        if (token) {
             const properties = [];
             if (propertiesSetting.length > 0) {
                 const propertyTypes = Object.keys(propertiesSetting.reduce((calc, property) => {
@@ -162,19 +164,19 @@ const TokenSetting = () => {
                     calc[property.type] = property.type;
                     return calc;
                 }, {}));
-                setting.token.propertyType = propertyTypes.length === 1 ? propertyTypes[0] : Mixed;
+                token.propertyType = propertyTypes.length === 1 ? propertyTypes[0] : Mixed;
             }
             else {
-                setting.token.propertyType = '';
+                token.propertyType = '';
             }
-            setting.token.properties = properties;
-            setToken(setting.token);
+            token.properties = properties;
+            setToken(token);
         }
     }, [propertiesSetting]);
     return token &&
         React.createElement("div", { id: "token-setting", className: "plugin-panel" },
             React.createElement("div", { className: "setting-row" },
-                React.createElement(BackButton, { onClick: cancelTokenHandler }),
+                React.createElement(BackButton, { _ref: $backButton, onClick: cancelTokenHandler }),
                 React.createElement("h6", { id: "panel-group-name" }, group.name)),
             React.createElement("div", { className: "setting-row" },
                 React.createElement("span", { ref: $name, className: "token-name", "prop-type": "name", placeholder: "Token Name", "is-required": "true", contentEditable: "false", suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: inputHandler, onBlur: blurHandler }, token.name)),

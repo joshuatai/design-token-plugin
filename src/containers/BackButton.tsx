@@ -1,11 +1,12 @@
 import React, { FC, MouseEventHandler } from "react";
 
 type T_BackIcon = {
+  _ref,
   onClick: MouseEventHandler,
 };
-const BackIcon: FC<T_BackIcon> = ({ onClick }) => 
+const BackIcon: FC<T_BackIcon> = ({ _ref, onClick }) => 
 (
-  <div id="turn-back-btn" className="turn-back-btn" onClick={onClick}>
+  <div ref={_ref} id="turn-back-btn" className="turn-back-btn" onClick={onClick}>
     <svg
       className="svg"
       width="8"

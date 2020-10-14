@@ -1,34 +1,4 @@
-#design-tokens-container .panel-heading .add-token {
-  margin-right: 0;
-}
-#design-tokens-container .panel-heading .add-token:hover {
-  opacity: 1;
-  background: #dddddd;
-}
-.token-list {
-  margin: 0;
-  padding: 0;
-}
-.token-list .token-item,
-#mode-list li,
-#version-list li {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 0 12px;
-  height: 32px;
-  box-sizing: border-box;
-  cursor: default;
-}
-#version-list li {
-  padding: 0;
-}
-#mode-list,
-#version-list {
-  width: 100%;
-  margin: 4px 0;
-  padding: 0;
-}
+
 #io .setting-row {
   flex-wrap: wrap;
 }
@@ -54,52 +24,7 @@
 #version-list li:hover .tmicon-backup {
   display: inline-block;
 }
-.token-item-selected {
-  background: #daebf7;
-}
-.token-item .token-icon {
-  display: flex;
-  -webkit-filter: none;
-  filter: none;
-  width: 16px;
-  height: 16px;
-  border-radius: 100%;
-  border: 1px solid #ffffff;
-  justify-content: flex-end;
-  align-items: center;
-  box-sizing: border-box;
-  margin: 8px;
-  overflow: hidden;
-  cursor: default;
-}
-.token-key {
-  flex: 1;
-  color: #333;
-}
-#token-action-wrapper {
-  margin-right: -12px;
-  float: right;
-}
 
-.token-item-selected .token-edit-btn {
-  background: #18a0fb;
-  opacity: 1;
-}
-.token-item-selected .token-edit-btn svg path {
-  fill: #ffffff;
-}
-
-.token-item-selected .token-edit-btn:focus {
-  border: 1px solid #426990;
-  border-radius: 0;
-  outline: 1px solid #afafaf;
-  width: 31px;
-  height: 31px;
-  margin-right: 1px;
-}
-.token-item-selected .token-edit-btn svg {
-  color: #ffffff;
-}
 
 
 

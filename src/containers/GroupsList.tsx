@@ -1,9 +1,11 @@
 import React, { useEffect, FC, useRef, useContext } from "react";
 import useAPI from 'hooks/useAPI';
 import { groupsContext } from  'hooks/GroupProvider';
+import useData from 'hooks/useData';
 import useGroups from 'hooks/useGroups';
 import useTokenSetting from 'hooks/useTokenSetting';
 import Group from 'model/Group';
+import TokenList from './TokenList';
 import { inputCheck, valChange } from 'utils/inputValidator';
 import SelectText from 'utils/SelectText';
 import preventEvent from 'utils/preventEvent';
@@ -21,11 +23,12 @@ const GroupItem:FC<T_Group> = ({
   data,
   creatable
 }: T_Group) => {
-  const { id, name } = data;
+  const { id, name, tokens } = data;
   const groupNameRef = useRef(null);
   const { api: { admin } } = useAPI();
+  const { saveGroups } = useData();
   const { getGroup, getGroupName, addGroup } = useGroups();
-  const { setGroup: _setGroup } = useTokenSetting();
+  const { setGroup } = useTokenSetting();
   
   const removeHandler = (e) => {
     if (!admin) return;
@@ -53,8 +56,11 @@ const GroupItem:FC<T_Group> = ({
         if (res.status === InputStatus.VALID) {
           const group: Group = getGroup(id) as Group;
           group.name = $name.textContent;
-          addGroup(group);
-          creatable(true);
+          const _groups = addGroup(group);
+          saveGroups(_groups)
+            .then(res => {
+              creatable(true);
+            });
         }
       })
       .catch(res => {
@@ -62,7 +68,7 @@ const GroupItem:FC<T_Group> = ({
       });
   }
   const addTokenHandler = (e) => {
-    _setGroup(data);
+    setGroup(data);
   }
 
   useEffect(() => {
@@ -77,7 +83,7 @@ const GroupItem:FC<T_Group> = ({
     <div data-id={id} className="panel panel-default panel-collapse-shown">
       <div className="panel-heading group-item" data-target={`#group-${id}`} data-toggle="collapse" aria-expanded="false">
         <h6 className="panel-title">
-          <span className="tmicon tmicon-caret-right tmicon-hoverable"></span>
+          { tokens.length > 0 && <span className="tmicon tmicon-caret-right tmicon-hoverable"></span> }
           <span data-id={id} ref={groupNameRef} className="group-name" is-required="true" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={inputHandler} onBlur={blurHandler}>{name}</span>
         </h6>
         {
@@ -90,14 +96,7 @@ const GroupItem:FC<T_Group> = ({
         }
       </div>
       <div id={`group-${id}`} className="panel-collapse collapse" aria-expanded="false">
-        {
-          console.log(data.name, data.tokens)
-}{
-          data.tokens.map(token => {
-            
-            return token;
-          })
-        }
+        <TokenList group={data}></TokenList>
       </div>
     </div>
   );
@@ -114,7 +113,7 @@ const GroupsList: FC<T_GroupsList> = ({
   return (
     <>
       {
-        groups.map(group => <GroupItem key={group.id} data={group} creatable={creatable}></GroupItem>)
+        groups.map((group: Group) => <GroupItem key={group.id} data={group} creatable={creatable}></GroupItem>)
       }
     </>
   );

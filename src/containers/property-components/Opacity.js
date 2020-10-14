@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useContext, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import usePropertySetting from 'hooks/usePropertySetting';
 import Model from 'model/Opacity';
 import LinkToken from "./LinkToken";
 // import CommonSettings from './CommonSettings';
-import { ThemeModesContext } from 'hooks/ThemeModeProvider';
+import useThemeModes from 'hooks/useThemeModes';
 import ThemeModes from './ThemeModes';
 import PropertyIcon from './PropertyIcon';
 import SelectText from 'utils/SelectText';
@@ -11,8 +11,8 @@ import { valChange } from 'utils/inputValidator';
 import InputStatus from "enums/InputStatus";
 SelectText(jQuery);
 const Opacity = ({ value = null }) => {
-    const themeModes = useContext(ThemeModesContext);
-    const [setting, setSetting] = useState(value || new Model());
+    const { defaultMode, themeModes } = useThemeModes();
+    const [setting, setSetting] = useState(value || new Model({ themeMode: defaultMode.id }));
     const { setPropertySetting } = usePropertySetting();
     const [focused, setFocused] = useState(false);
     const { opacity } = setting;
@@ -54,6 +54,10 @@ const Opacity = ({ value = null }) => {
             }
         });
     };
+    const themeModeChangeHandler = (mode) => {
+        setting.themeMode = mode.id;
+        setSetting(new Model(setting));
+    };
     useEffect(() => {
         if (focused)
             $($opacityRef.current).selectText();
@@ -66,7 +70,7 @@ const Opacity = ({ value = null }) => {
             React.createElement("div", { className: focused ? 'val-container focus' : 'val-container' },
                 React.createElement(PropertyIcon, { options: [setting] }),
                 React.createElement("span", { ref: $opacityRef, "data-type": "number", className: "opacity-val", title: opacityValue, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, opacityValue),
-                React.createElement(ThemeModes, { property: setting }),
+                React.createElement(ThemeModes, { property: setting, changeHandler: themeModeChangeHandler }),
                 React.createElement(LinkToken, { property: setting })))) : React.createElement(React.Fragment, null);
 };
 export default Opacity;

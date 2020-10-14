@@ -6,6 +6,7 @@ import useAPI from 'hooks/useAPI';
 import useThemeModes from 'hooks/useThemeModes';
 import useGroups from 'hooks/useGroups';
 import useTokens from 'hooks/useTokens';
+import useProperties from 'hooks/useProperties';
 import { tokenSettingContext } from 'hooks/TokenSettingProvider';
 import GroupsListContainer from './GroupsListContainer';
 import TokenSetting from './TokenSetting';
@@ -18,6 +19,7 @@ import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
 import Group from 'model/Group';
 import Token from 'model/Token';
+import Properties from 'model/Properties';
 import { Mixed } from 'symbols/index';
 import MessageTypes from 'enums/MessageTypes';
 // import PropertyIcon from './property-components/PropertyIcon';
@@ -29,12 +31,12 @@ SelectText(jQuery);
 PluginDestroy(jQuery);
 const $groupActionDelete = $(`<li class="delete-group"><a href="#">Delete Group</a></li>`);
 const $groupActionDropdown = $(`<ul class="dropdown-menu pull-right "></ul>`).append($groupActionDelete);
-const $tokenActionWrapper = $(`<div id="token-action-wrapper" class="dropdown"></div>`);
-const $tokenEditBtn = $('<button type="button" class="token-edit-btn"><svg class="svg" width="12" height="14" viewBox="0 0 12 14" xmlns="http://www.w3.org/2000/svg"><path d="M2 7.05V0h1v7.05c1.141.232 2 1.24 2 2.45 0 1.21-.859 2.218-2 2.45V14H2v-2.05c-1.141-.232-2-1.24-2-2.45 0-1.21.859-2.218 2-2.45zM4 9.5c0 .828-.672 1.5-1.5 1.5-.828 0-1.5-.672-1.5-1.5C1 8.672 1.672 8 2.5 8 3.328 8 4 8.672 4 9.5zM9 14h1V6.95c1.141-.232 2-1.24 2-2.45 0-1.21-.859-2.218-2-2.45V0H9v2.05c-1.141.232-2 1.24-2 2.45 0 1.21.859 2.218 2 2.45V14zm2-9.5c0-.828-.672-1.5-1.5-1.5C8.672 3 8 3.672 8 4.5 8 5.328 8.672 6 9.5 6c.828 0 1.5-.672 1.5-1.5z" fill-rule="evenodd" fill-opacity="1" fill="#000" stroke="none"></path></svg></button>');
-const $tokenActionDropdown = $(`<ul class="dropdown-menu pull-right "></ul>`);
-const $tokenActionClone = $(`<li class="clone-token"><a href="#">Clone token</a></li>`);
-const $tokenActionDelete = $(`<li class="delete-token"><a href="#">Delete Token</a></li>`);
-const $tokenActionUnassign = $(`<li class="unassign-token"><a href="#">Unassign token</a></li>`);
+const $tokenActionWrapper = $(``);
+const $tokenEditBtn = $('');
+const $tokenActionDropdown = $(``);
+const $tokenActionClone = $(``);
+const $tokenActionDelete = $(``);
+const $tokenActionUnassign = $(``);
 $tokenActionWrapper
     .append($tokenEditBtn)
     .append($tokenActionDropdown
@@ -49,8 +51,9 @@ const Tokens = ({ data = {
 } }) => {
     const { api: { admin } } = useAPI();
     const { setAllGroups } = useGroups();
-    const { setThemeModes } = useThemeModes();
     const { setAllTokens } = useTokens();
+    const { setAllProperties } = useProperties();
+    const { setAllThemeModes } = useThemeModes();
     const tokenSetting = useContext(tokenSettingContext);
     let $tokenContainer, $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $groupCreator, $themeModeList, $versionCreator, $versionList;
     const Utils = {
@@ -97,21 +100,6 @@ const Tokens = ({ data = {
             })));
             return $version;
         },
-        group: function (group) {
-            const $tokenListPanel = $('<div class="panel-collapse collapse" aria-expanded="false"></div>');
-            const $tokenList = $('<ul class="token-list"></ul>');
-            const $group = $()
-                .append($tokenListPanel
-                .append($tokenList
-                .addClass('sortable')
-                .sortable({
-                containment: "parent",
-                placeholder: 'ui-sortable-placeholder',
-                handle: '.ui-sortable-handle',
-                axis: "y"
-            })));
-            return $group;
-        },
         token: function (token) {
             const { $tokenList, $expend } = $(`#${token.parent}`).data();
             let $token = $(`#${token.id}`);
@@ -119,21 +107,6 @@ const Tokens = ({ data = {
             if (token.propertyType !== Mixed) {
                 // $icon = PropertyIcon(token.properties, true).$icon;
             }
-            if ($token.length === 0) {
-                $token = $(`<li id="${token.id}" class="token-item"></li>`)
-                    .data({
-                    'group': token.parent,
-                    'token': token.id
-                })
-                    .append($(`<span class="ui-sortable-handle"></span>`))
-                    .append($('<span class="token-key"></span>'));
-                $tokenList.append($token);
-            }
-            const $tokenKey = $('.token-key', $token).text(token.name);
-            $token.find('[data-role="token-icon"]').remove();
-            $icon && $icon.insertBefore($tokenKey);
-            $token.data = token;
-            $expend.show();
             return $token;
         },
         tokensAssigned: function (nodes) {
@@ -216,10 +189,7 @@ const Tokens = ({ data = {
     function init() {
         if (data.themeModes) {
             const _themeModes = data.themeModes.map(({ id, name, isDefault }) => new ThemeMode({ id, name, isDefault }));
-            setThemeModes(_themeModes);
-        }
-        else {
-            setThemeModes(undefined);
+            setAllThemeModes(_themeModes);
         }
         if (data.groups) {
             const _groups = data.groups.map(group => new Group(group));
@@ -228,6 +198,10 @@ const Tokens = ({ data = {
         if (data.tokens) {
             const _tokens = data.tokens.map(token => new Token(token));
             setAllTokens(_tokens);
+        }
+        if (data.properties) {
+            const _properties = data.properties.map(property => new Properties[property._type](property));
+            setAllProperties(_properties);
         }
         //groups: Array<Object>
         // let isTokenOpen = false;
@@ -360,11 +334,9 @@ const Tokens = ({ data = {
                     sendMessage(MessageTypes.ASSIGN_TOKEN, getToken($item.data('token')));
                 }
                 if (type === BrowserEvents.MOUSE_OVER) {
-                    if (!$item.is($tokenActionWrapper.data('hoveredItem'))) {
-                        $tokenActionWrapper.data('hoveredItem', $item);
-                        $item.append($tokenActionWrapper);
-                        $('.open').removeClass('open');
-                    }
+                    // if (!$item.is($tokenActionWrapper.data('hoveredItem'))) {
+                    //   $('.open').removeClass('open');
+                    // }
                 }
             }
             else {
@@ -519,15 +491,15 @@ const Tokens = ({ data = {
             preventEvent(e);
         });
         $(document).on(BrowserEvents.CLICK, `#token-setting .mode-item`, function (event) {
-            const $this = $(this);
-            const useMode = $this.data('themeMode');
-            const property = $this.parent().data('property');
-            property.options.themeMode = useMode.id;
-            property.$themeModeList
-                .children()
-                .removeClass('selected')
-                .filter((index, item) => $(item).data('id') === useMode.id)
-                .addClass('selected');
+            // const $this = $(this);
+            // const useMode = $this.data('themeMode');
+            // const property = $this.parent().data('property');
+            // property.options.themeMode = useMode.id;
+            // property.$themeModeList
+            //     .children()
+            //     .removeClass('selected')
+            //     .filter((index, item) => $(item).data('id') === useMode.id)
+            //     .addClass('selected');
         });
         $(document).on(BrowserEvents.CLICK, '.version-restore', function (e) {
             restore($(this).closest('li').data('data'));
@@ -565,7 +537,6 @@ const Tokens = ({ data = {
             }
         });
     }, []);
-    // console.log('Token', admin);
     return (React.createElement(React.Fragment, null,
         React.createElement("ul", { id: "desigin-system-tabs", className: "nav nav-tabs", role: "tablist" },
             React.createElement("li", { role: "presentation", className: "active" },

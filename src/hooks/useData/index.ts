@@ -214,7 +214,7 @@ const useData = () => {
     });
 
     return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
-      .then(res => res.json());
+      .then(res => Promise.resolve(res.json()));
   }
 
   const saveTokens = (_tokens: Array<Token>) => {
@@ -234,7 +234,7 @@ const useData = () => {
     });
 
     return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
-      .then(res => res.json());
+      .then(res => Promise.resolve(res.json()));
   }
 
   const saveProperties = (_properties: Array<Property>) => {
@@ -253,9 +253,8 @@ const useData = () => {
         properties: _properties
       }
     });
-    return Promise.resolve({ success: true });
-    // return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
-    //   .then(res => res.json());
+    return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
+      .then(res => Promise.resolve(res.json()));
   }
 
   const saveTokensProperties = (_groups: Array<Group>, _tokens: Array<Token>, _properties: Array<Property>) => {
@@ -275,7 +274,7 @@ const useData = () => {
       }
     });
     return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
-      .then(res => res.json());
+      .then(res => Promise.resolve(res.json()));
   }
 
   return {
