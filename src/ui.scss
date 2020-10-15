@@ -408,7 +408,7 @@ body {
     flex-wrap: wrap;
     align-items: center;
   }
-  [property-component="radius"] .custom-val {
+  [property-component=corner-radius] .custom-val {
     flex-direction: row-reverse;
   }
   .val-container {

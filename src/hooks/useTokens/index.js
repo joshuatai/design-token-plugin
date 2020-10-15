@@ -8,6 +8,12 @@ const useTokens = () => {
     const { setTokens } = useContext(tokensSetterContext);
     const pureTokens = useContext(purePropertyTokensContext);
     const { setPureTokens } = useContext(purePropertyTokensSetterContext);
+    const _getPureTokensByType = (types) => {
+        const _types = [];
+        typeof (types) === 'string' ? _types.push(types) : _types.concat(types);
+        const _pureTokens = _types.map(type => pureTokens[type]);
+        return _pureTokens;
+    };
     const _getToken = (id) => {
         if (id) {
             return tokens.slice().find(_token => _token.id === id);
@@ -46,6 +52,7 @@ const useTokens = () => {
     return {
         tokens,
         pureTokens,
+        getPureTokensByType: _getPureTokensByType,
         getToken: _getToken,
         removeToken: _removeToken,
         addToken: _addToken,

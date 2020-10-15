@@ -4,6 +4,8 @@ import useAPI from 'hooks/useAPI';
 import useData from 'hooks/useData';
 import Token from 'model/Token';
 import { Mixed } from 'symbols/index';
+import PropertyTypes from 'enums/PropertyTypes';
+import Property from 'model/Property';
 
 const useTokens = () => {
   const { api } = useAPI();
@@ -11,11 +13,18 @@ const useTokens = () => {
   const { setTokens } = useContext(tokensSetterContext);
   const pureTokens = useContext(purePropertyTokensContext);
   const { setPureTokens } = useContext(purePropertyTokensSetterContext);
-  const _getToken = (id?: string): Token | Array<Token> => {
-    if (id) {
-      return tokens.slice().find(_token => _token.id === id);
-    }
-    return tokens.slice();
+  
+  const _getPureTokensByProperty = (property: Property) => {
+    const types = property.type === PropertyTypes.STROKE_FILL ? [PropertyTypes.FILL_COLOR, PropertyTypes.STROKE_FILL] : [property.type];
+
+    return types
+      .map(type => pureTokens[type])
+      .filter(tokens => tokens)
+      .flat()
+      .filter(token => !property.parent || token.id !== property.parent);
+  }
+  const _getToken = function (id?: string): Token | Array<Token> {
+    return arguments.length ? tokens.slice().find(_token => _token.id === id) : tokens.slice();
   };
   const _removeToken = (token: Token) => {
     const nextTokens = tokens.slice().filter(_token => _token.id != token.id);
@@ -44,9 +53,11 @@ const useTokens = () => {
     });
     setPureTokens(_pureTokens);
   }
+
   return {
     tokens,
     pureTokens,
+    getPureTokensByProperty: _getPureTokensByProperty,
     getToken: _getToken,
     removeToken: _removeToken,
     addToken: _addToken,

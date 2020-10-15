@@ -10,11 +10,8 @@ const useProperties = () => {
   const properties: Array<Property> = useContext(propertiesContext);
   const { setProperties } = useContext(propertiesSetterContext);
   
-  const _getProperty = (id?: string): Property | Array<Property> => {
-    if (id) {
-      return properties.slice().find(_property => _property.id === id);
-    }
-    return properties.slice();
+  const _getProperty = function (id?: string): Property | Array<Property> {
+    return arguments.length ? properties.slice().find(_property => _property.id === id) : properties.slice();
   };
   const _removeProperty = (property: Property) => {
     const nextProperties = properties.slice().filter(_property => _property.id != property.id);

@@ -1,65 +1,20 @@
-import React, { useEffect, FC, useRef, useContext, useState } from "react";
-import usePropertySetting from 'hooks/usePropertySetting';
-import Model from 'model/Opacity';
-import LinkToken from "./LinkToken";
-// import CommonSettings from './CommonSettings';
-import useThemeModes from 'hooks/useThemeModes';
-import ThemeModes from './ThemeModes';
+import React, { FC, useEffect, useRef, useState } from "react";
 import PropertyIcon from './PropertyIcon';
+import ThemeModes from './ThemeModes';
+import PureTokens from "./PureTokens";
+import usePropertySetting from 'hooks/usePropertySetting';
+import useThemeModes from 'hooks/useThemeModes';
+import useTokens from "hooks/useTokens";
+import useProperties from 'hooks/useProperties';
+import InputStatus from "enums/InputStatus";
+import Model from 'model/Opacity';
+import Token from 'model/Token';
 import SelectText from 'utils/SelectText';
 import { valChange } from 'utils/inputValidator';
-import InputStatus from "enums/InputStatus";
 
 declare var $: any;
 SelectText(jQuery);
-
-
 // function t() {
-//   var Opacity = function (element, options) {
-//     const useToken = getToken(options.useToken);
-
-//     // this.$opacityValue = $('').attr('contenteditable', !useToken);
-    
-//     const commonSetting = CommonSettings(this);
-//     this.$token = commonSetting.$token;
-    
-//     this.$element
-//       .append(
-//         this.$customVal
-//           .append(
-//             this.$valContainer
-//               .append(this.$icon)
-//               .append(
-//                 this.$opacityValue.text(opacityValue).attr('title', opacityValue).addClass(this.tokenList.length ? 'hasReferenceToken' : '')
-//               )
-//               .append(this.$token)
-//           )
-//       );
-//     $(document).trigger('property-preview', [this.options]);
-//   }
-//   Opacity.prototype.setIcon = function () {
-//     const newIcon = PropertyIcon([this.options]).$icon;
-//     this.$icon.replaceWith(newIcon);
-//     this.$icon = newIcon;
-//     if (this.options.useToken) {
-//       this.$icon.attr('disabled', true);
-//     } else {
-//       this.$icon.attr('disabled', false);
-//     }
-//   }
-//   Opacity.prototype.useToken = function (token) {
-//     this.options.opacity = token.properties[0].opacity;
-//     this.$opacityValue.text(token.name).attr('contenteditable', false).attr('title', token.name);
-//   }
-//   Opacity.prototype.detachToken = function (token) {
-//     const usedProperty = token.properties[0];
-//     this.$opacityValue
-//       .text(`${usedProperty.opacity}%`)
-//       .attr('contenteditable', true)
-//       .removeAttr('title');
-//   }
-
-
 //   $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .opacity-val[contenteditable="true"]`, function (event) {
 //     $(document).trigger('property-preview', [options]);
 //   });
@@ -72,18 +27,19 @@ const Opacity: FC<T_Opacity> = ({
   value = null
 }: T_Opacity) => {
   const { defaultMode, themeModes } = useThemeModes();
+  const { getToken, getPureTokensByProperty } = useTokens();
+  const { getProperty } = useProperties();
   const [ setting, setSetting ] = useState(value || new Model({ themeMode: defaultMode.id }));
   const { setPropertySetting } = usePropertySetting();
   const [ focused, setFocused ] = useState(false);
-  const { opacity } = setting;
+  const { opacity, useToken } = setting;
+  const pureTokens: Array<Token> = getPureTokensByProperty(setting);
   const $opacityRef = useRef();
-  let opacityValue;
-  // const useToken = getToken(options.useToken);
-  const useToken = false;
-  // useToken ? opacityValue = useToken.name : opacityValue = `${this.options.opacity}%`;
-  opacityValue = `${opacity}%`;
-  
+  const _useToken = getToken(useToken) as Token;
+  const opacityValue = _useToken ? _useToken.name : `${opacity}%`;
+
   const focusHandler = (e) => {
+    if (_useToken) return;
     setFocused(true);
   }
   const keyUpHandler = (e) => {
@@ -113,10 +69,23 @@ const Opacity: FC<T_Opacity> = ({
         }
       });
   }
-  const themeModeChangeHandler = (mode) => {
+  const useThemeHandler = (mode) => {
     setting.themeMode = mode.id;
     setSetting(new Model(setting));
   }
+  const useTokenHandler = (token) => {
+    const usedToken: Token = getToken(token.id) as Token;
+    const usedProperty: Model = getProperty(usedToken.properties[0]) as Model;
+    setting.useToken = token.id;
+    setting.opacity = usedProperty.opacity;
+    setSetting(new Model(setting));
+  }
+  const detachTokenHandler = () => {
+    const detachedToken = getToken(setting.useToken);
+    setting.useToken = '';
+    setSetting(new Model(setting));
+  }
+
   useEffect(() => {
     if (focused) $($opacityRef.current).selectText();
   }, [focused]);
@@ -124,14 +93,14 @@ const Opacity: FC<T_Opacity> = ({
   useEffect(() => {
     setPropertySetting(setting);
   }, [setting]);
-  
-  return setting ? <div className={themeModes.length > 1 ? 'property-setting-section hasThemeMode' : 'property-setting-section'} property-componen="opacity">
+
+  return setting ? <div className={themeModes.length > 1 ? 'property-setting-section hasThemeMode' : 'property-setting-section'}>
     <div className="custom-val">
       <div className={ focused ? 'val-container focus' : 'val-container' }>
         <PropertyIcon options={[setting]}></PropertyIcon>
-        <span ref={$opacityRef} data-type="number" className="opacity-val" title={opacityValue} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{opacityValue}</span>
-        <ThemeModes property={setting} changeHandler={themeModeChangeHandler}></ThemeModes>
-        <LinkToken property={setting}></LinkToken>
+        <span ref={$opacityRef} data-type="number" className={pureTokens.length ? 'opacity-val hasReferenceToken' : 'opacity-val' } title={opacityValue} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{opacityValue}</span>
+        <ThemeModes property={setting} useThemeHandler={useThemeHandler}></ThemeModes>
+        <PureTokens property={setting} pureTokens={pureTokens} useTokenHandler={useTokenHandler} detachTokenHandler={detachTokenHandler}></PureTokens>
       </div>
     </div>
   </div> : <></>

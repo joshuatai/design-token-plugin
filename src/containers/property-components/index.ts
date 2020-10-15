@@ -17,63 +17,31 @@ $(document).on(
   "shown.bs.dropdown hidden.bs.dropdown",
   ".input-group-btn, .dropdown",
   function (event) {
-    const $this = $(this);
-    const container = $this.closest(".val-container");
-    const dropdownMenu = container.find(".dropdown-menu");
-    const input = container.find('[contenteditable]:visible');
-    let value = $(".dropdown-toggle span", container).text();
-    if (!value) value = input.text();
-    if (event.type === "shown") {
-      container.addClass("focus");
-      dropdownMenu.scrollTop(0);
-      const matchedOptions = dropdownMenu.find(`a:contains(${value})`);
-      const exactlyMatched = matchedOptions.filter((index, option) => option.innerText === value);
-      const targetOption = exactlyMatched.length > 0 ? exactlyMatched[0] : matchedOptions[0];
-      if (targetOption) dropdownMenu.scrollTop($(targetOption).parent().data("index") * 28);
-    } else {
-      if (input && input.is(":focus")) {
-        return;
-      } else {
-        container.removeClass("focus");
-      }
-    }
+    // const $this = $(this);
+    // const container = $this.closest(".val-container");
+    // const dropdownMenu = container.find(".dropdown-menu");
+    // const input = container.find('[contenteditable]:visible');
+    // let value = $(".dropdown-toggle span", container).text();
+    // if (!value) value = input.text();
+    // if (event.type === "shown") {
+    //   container.addClass("focus");
+    //   dropdownMenu.scrollTop(0);
+    //   const matchedOptions = dropdownMenu.find(`a:contains(${value})`);
+    //   const exactlyMatched = matchedOptions.filter((index, option) => option.innerText === value);
+    //   const targetOption = exactlyMatched.length > 0 ? exactlyMatched[0] : matchedOptions[0];
+    //   if (targetOption) dropdownMenu.scrollTop($(targetOption).parent().data("index") * 28);
+    // } else {
+    //   if (input && input.is(":focus")) {
+    //     return;
+    //   } else {
+    //     container.removeClass("focus");
+    //   }
+    // }
   }
 );
 // $(document).on(BrowserEvents.CLICK, '#token-setting .mode-item', function (event) {
-//   const $this = $(this);
-//   const useThemeMode = $this.data('id');
-//   const $propertySetting = $(this).closest('[property-component]');
-//   const propertyComponent = $propertySetting.data('color') || $propertySetting.data('opacity');
-//   const value = $propertySetting.data('value');
-//   value.themeMode = useThemeMode;
 //   if (propertyComponent) propertyComponent.setIcon();
 // });
-$(document).on(BrowserEvents.CLICK, `#token-setting .token-item`, function (event) {
-  const $this = $(this);
-  const useToken = $this.data('token');
-  const property = $this.parent().data('property');
-
-  property.options.useToken = useToken.id;
-  property.$detachToken.data('token', useToken).show();
-  property.$tokenList
-      .children()
-      .removeClass('selected')
-      .children()
-      .filter((index, item) => item.innerText === useToken.name)
-      .parent()
-      .addClass('selected');
-  property.useToken(useToken);
-  $(document).trigger('property-preview', [property.options]);
-});
-
-$(document).on(BrowserEvents.CLICK, `#token-setting .detach-token`, function (event) {
-  const { token, property } = $(this).data();
-
-  property.options.useToken = '';
-  property.$detachToken.removeData('token').hide();
-  property.$tokenList.children().removeClass('selected');
-  property.detachToken(token);
-});
 
 export default {
   [PropertyTypes.CORNER_RADIUS]: CornerRadius,

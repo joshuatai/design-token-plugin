@@ -2,6 +2,7 @@ import { useContext } from 'react';
 import useThemeModes from 'hooks/useThemeModes';
 import ThemeMode from 'model/ThemeMode';
 import PropertyTypes from 'enums/PropertyTypes';
+import { Mixed } from 'symbols/index';
 
 // function traversingUseToken (token) {
 //   const themeModes = getThemeMode();
@@ -93,15 +94,15 @@ const usePropertyInfo = (property, isCalc = false) => {
 //         borderColor: color.isLight() ? '#dddddd' : '#FFFFFF'
 //       });
 //   }
-//   if (property.type === PropertyTypes.CORNER_RADIUS) {
-//     if (typeof property.radius === 'symbol') {
-//       value = 'Mixed';
-//       title = `top-left: ${property.topLeft}; top-right: ${property.topRight}; bottom-right: ${property.bottomRight}; bottom-left: ${property.bottomLeft};`;
-//     } else {
-//       value = property.radius;
-//       title = `Corner Radius: ${value}`;
-//     }
-//   }
+    if (property.type === PropertyTypes.CORNER_RADIUS) {
+      if (property.radius === Mixed) {
+        value = 'Mixed';
+        title = `top-left: ${property.topLeft}; top-right: ${property.topRight}; bottom-right: ${property.bottomRight}; bottom-left: ${property.bottomLeft};`;
+      } else {
+        value = property.radius;
+        title = `Corner Radius: ${value}`;
+      }
+    }
 //   if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
 //     value = property.width;
 //     secondValue = property.align;

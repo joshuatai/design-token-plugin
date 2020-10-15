@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import usePropertySetting from 'hooks/usePropertySetting';
 import Model from 'model/Opacity';
-import LinkToken from "./LinkToken";
+import PureTokens from "./PureTokens";
 // import CommonSettings from './CommonSettings';
 import useThemeModes from 'hooks/useThemeModes';
 import ThemeModes from './ThemeModes';
@@ -71,6 +71,6 @@ const Opacity = ({ value = null }) => {
                 React.createElement(PropertyIcon, { options: [setting] }),
                 React.createElement("span", { ref: $opacityRef, "data-type": "number", className: "opacity-val", title: opacityValue, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, opacityValue),
                 React.createElement(ThemeModes, { property: setting, changeHandler: themeModeChangeHandler }),
-                React.createElement(LinkToken, { property: setting })))) : React.createElement(React.Fragment, null);
+                React.createElement(PureTokens, { property: setting })))) : React.createElement(React.Fragment, null);
 };
 export default Opacity;

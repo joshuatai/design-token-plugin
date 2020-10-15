@@ -12,14 +12,11 @@ let $host;
 // export default function ($) {
   const NAME = 'property-list';
   // var PropertyList = function (element, options) {
-  //   const $title = $('');
-  //   this.$propertyContainer = $('');
+
   //   this.options = options;
 
   //   if (options && options.length > 0) {
   //     $host = this.$element  = $(element)
-  //       .addClass('show')
-  //       .append($title)
   //       .append(
   //         this.$propertyContainer
   //           .append(options.map((property, index) => {
