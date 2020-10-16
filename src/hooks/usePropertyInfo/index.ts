@@ -128,10 +128,10 @@ const usePropertyInfo = (property, isCalc = false) => {
 //     secondValue = property.fontSize;
 //     title = `Font Family: ${property.fontName.family}, Font Size: ${property.fontSize}`;
 //   }
-//   if (property.type === PropertyTypes.SPACING) {
-//     value = property.value;
-//     title = `Spacing: ${value}`;
-//   }
+    if (property.type === PropertyTypes.SPACING) {
+      value = property.value;
+      title = `Spacing: ${value}`;
+    }
     // if (property.useToken) {
     //   let tokenName = getToken(property.useToken).name;
     //   value = tokenName;

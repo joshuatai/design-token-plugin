@@ -1,41 +1,67 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import PropertyIcon from './PropertyIcon';
-import ThemeModes from './ThemeModes';
 import PureTokens from "./PureTokens";
 import usePropertySetting from 'hooks/usePropertySetting';
-import useThemeModes from 'hooks/useThemeModes';
 import useTokens from "hooks/useTokens";
 import useProperties from 'hooks/useProperties';
 import InputStatus from "enums/InputStatus";
-import Model from 'model/Opacity';
+import validator from 'validator';
+import Model from 'model/Spacing';
 import Token from 'model/Token';
 import SelectText from 'utils/SelectText';
 import { inputCheck, valChange } from 'utils/inputValidator';
 
 declare var $: any;
 SelectText(jQuery);
-// function t() {
-//   $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .opacity-val[contenteditable="true"]`, function (event) {
+
+
+//     $(document).trigger('property-preview', [this.options]);
+//   }
+//   Spacing.prototype.useToken = function (token) {
+//     this.options.value = token.properties[0].value;
+//     this.$spacingValue.text(token.name).attr('contenteditable', false).attr('title', token.name);
+//   }
+//   Spacing.prototype.detachToken = function (token) {
+//     const usedProperty = token.properties[0];
+//     this.$spacingValue
+//       .text(usedProperty.value)
+//       .attr('contenteditable', true)
+//       .removeAttr('title');
+//   }
+
+//   $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .spacing-val[contenteditable="true"]`, function (event) {
+//     const $this = $(this);
+//     if (event.type === BrowserEvents.KEY_UP) {
+//       if (event.key === 'Enter') $('.btn-primary').trigger('focus');
+//       return;
+//     }
+//     const options = hostData.options;
+//     let value =  $this.text();
+    
+//     if (!validator.isInt(value)) value = options.value;
+//     value = Math.max(0, value);
+//     options.value = value;
+//     $this.text(value);
 //     $(document).trigger('property-preview', [options]);
 //   });
-// }
+//   return NAME;
+// }(jQuery);
 
-type T_Opacity = {
+type T_Spacing = {
   value: Model
 }
-const Opacity: FC<T_Opacity> = ({
+const Spacing: FC<T_Spacing> = ({
   value = null
-}: T_Opacity) => {
-  const { defaultMode, themeModes } = useThemeModes();
+}: T_Spacing) => {
   const { getToken, getPureTokensByProperty } = useTokens();
   const { getProperty } = useProperties();
-  const [ setting, setSetting ] = useState(value || new Model({ themeMode: defaultMode.id }));
+  const [ setting, setSetting ] = useState(value || new Model());
   const { setPropertySetting } = usePropertySetting();
-  const { opacity, useToken } = setting;
+  const { value: spacing, useToken } = setting;
   const pureTokens: Array<Token> = getPureTokensByProperty(setting);
-  const $opacityRef = useRef();
+  const $spacingRef = useRef();
   const _useToken = getToken(useToken) as Token;
-  const opacityValue: string = _useToken ? _useToken.name : `${opacity}%`;
+  const spacingValue = _useToken ? _useToken.name : spacing.toString();
 
   const focusHandler = (e) => {
     if (_useToken) return;
@@ -47,60 +73,54 @@ const Opacity: FC<T_Opacity> = ({
   const keyUpHandler = (e) => {
     inputCheck.call(e.target, e);
   }
+
   const blurHandler = (e) => {
     const $target = e.target;
     const $valContainer = $target.closest('.val-container');
-    const $opacity = $opacityRef.current as HTMLSpanElement;
-    $opacity.textContent = $opacity.textContent.replace('%', '');
+    const $spacing = $spacingRef.current as HTMLSpanElement;
     valChange
-      .call($opacity, opacity, (val) => {
-        let _opacity = val;
-        _opacity = Math.min(Math.max(0, _opacity), 100);
-        if (_opacity === opacity) return { status: InputStatus.NO_CHANGE };
-        return { status: InputStatus.VALID, value: _opacity};
+      .call($spacing, spacing, (val) => {
+        let _spacing = val;
+        _spacing = Math.max(0, _spacing);
+        return { status: InputStatus.VALID, value: _spacing};
       })
       .then(res => {
         if (res.status === InputStatus.VALID) {
-          setting.opacity = res.value;
+          setting.value = res.value;
           setSetting(new Model(setting));
         }
       })
       .catch(res => {
-        if (res.status === InputStatus.NO_CHANGE) {
-          $opacity.textContent = `${$opacity.textContent}%`;
-        }
+        if (res.status === InputStatus.NO_CHANGE) {}
       });
       if ($valContainer) $valContainer.classList.remove('focus');
   }
-  const useThemeHandler = (mode) => {
-    setting.themeMode = mode.id;
-    setSetting(new Model(setting));
-  }
+
   const useTokenHandler = (token) => {
     const usedToken: Token = getToken(token.id) as Token;
     const usedProperty: Model = getProperty(usedToken.properties[0]) as Model;
     setting.useToken = token.id;
-    setting.opacity = usedProperty.opacity;
+    setting.value = usedProperty.value;
     setSetting(new Model(setting));
   }
+
   const detachTokenHandler = () => {
     setting.useToken = '';
     setSetting(new Model(setting));
   }
-
+  
   useEffect(() => {
     setPropertySetting(setting);
   }, [setting]);
 
-  return setting ? <div className={themeModes.length > 1 ? 'property-setting-section hasThemeMode' : 'property-setting-section'}>
+  return setting ? <div className="property-setting-section">
     <div className="custom-val">
       <div className="val-container">
         <PropertyIcon options={[setting]}></PropertyIcon>
-        <span ref={$opacityRef} data-type="int" className={pureTokens.length ? 'opacity-val hasReferenceToken' : 'opacity-val' } title={opacityValue} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{opacityValue}</span>
-        <ThemeModes property={setting} useThemeHandler={useThemeHandler}></ThemeModes>
+        <span ref={$spacingRef} data-type="int" className={pureTokens.length ? 'spacing-val hasReferenceToken' : 'spacing-val' } title={spacingValue} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{spacingValue}</span>
         <PureTokens property={setting} pureTokens={pureTokens} useTokenHandler={useTokenHandler} detachTokenHandler={detachTokenHandler}></PureTokens>
       </div>
     </div>
   </div> : <></>
 }
-export default Opacity;
+export default Spacing;

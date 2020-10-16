@@ -1,35 +1,42 @@
 import React, { useEffect, useRef, useState } from "react";
-import usePropertySetting from 'hooks/usePropertySetting';
-import Model from 'model/Opacity';
-import PureTokens from "./PureTokens";
-// import CommonSettings from './CommonSettings';
-import useThemeModes from 'hooks/useThemeModes';
-import ThemeModes from './ThemeModes';
 import PropertyIcon from './PropertyIcon';
-import SelectText from 'utils/SelectText';
-import { valChange } from 'utils/inputValidator';
+import ThemeModes from './ThemeModes';
+import PureTokens from "./PureTokens";
+import usePropertySetting from 'hooks/usePropertySetting';
+import useThemeModes from 'hooks/useThemeModes';
+import useTokens from "hooks/useTokens";
+import useProperties from 'hooks/useProperties';
 import InputStatus from "enums/InputStatus";
+import Model from 'model/Opacity';
+import SelectText from 'utils/SelectText';
+import { inputCheck, valChange } from 'utils/inputValidator';
 SelectText(jQuery);
 const Opacity = ({ value = null }) => {
     const { defaultMode, themeModes } = useThemeModes();
+    const { getToken, getPureTokensByProperty } = useTokens();
+    const { getProperty } = useProperties();
     const [setting, setSetting] = useState(value || new Model({ themeMode: defaultMode.id }));
     const { setPropertySetting } = usePropertySetting();
-    const [focused, setFocused] = useState(false);
-    const { opacity } = setting;
+    const { opacity, useToken } = setting;
+    const pureTokens = getPureTokensByProperty(setting);
     const $opacityRef = useRef();
-    let opacityValue;
-    // const useToken = getToken(options.useToken);
-    const useToken = false;
-    // useToken ? opacityValue = useToken.name : opacityValue = `${this.options.opacity}%`;
-    opacityValue = `${opacity}%`;
+    const _useToken = getToken(useToken);
+    const opacityValue = _useToken ? _useToken.name : `${opacity}%`;
     const focusHandler = (e) => {
-        setFocused(true);
+        if (_useToken)
+            return;
+        const $target = e.target;
+        const $valContainer = $target.closest('.val-container');
+        $($target).selectText();
+        if ($valContainer)
+            $valContainer.classList.add('focus');
     };
     const keyUpHandler = (e) => {
-        if (e.key === 'Enter')
-            $opacityRef.current.blur();
+        inputCheck.call(e.target, e);
     };
     const blurHandler = (e) => {
+        const $target = e.target;
+        const $valContainer = $target.closest('.val-container');
         const $opacity = $opacityRef.current;
         $opacity.textContent = $opacity.textContent.replace('%', '');
         valChange
@@ -45,32 +52,39 @@ const Opacity = ({ value = null }) => {
                 setting.opacity = res.value;
                 setSetting(new Model(setting));
             }
-            setFocused(false);
         })
             .catch(res => {
             if (res.status === InputStatus.NO_CHANGE) {
                 $opacity.textContent = `${$opacity.textContent}%`;
-                setFocused(false);
             }
         });
+        if ($valContainer)
+            $valContainer.classList.remove('focus');
     };
-    const themeModeChangeHandler = (mode) => {
+    const useThemeHandler = (mode) => {
         setting.themeMode = mode.id;
         setSetting(new Model(setting));
     };
-    useEffect(() => {
-        if (focused)
-            $($opacityRef.current).selectText();
-    }, [focused]);
+    const useTokenHandler = (token) => {
+        const usedToken = getToken(token.id);
+        const usedProperty = getProperty(usedToken.properties[0]);
+        setting.useToken = token.id;
+        setting.opacity = usedProperty.opacity;
+        setSetting(new Model(setting));
+    };
+    const detachTokenHandler = () => {
+        setting.useToken = '';
+        setSetting(new Model(setting));
+    };
     useEffect(() => {
         setPropertySetting(setting);
     }, [setting]);
-    return setting ? React.createElement("div", { className: themeModes.length > 1 ? 'property-setting-section hasThemeMode' : 'property-setting-section', "property-componen": "opacity" },
+    return setting ? React.createElement("div", { className: themeModes.length > 1 ? 'property-setting-section hasThemeMode' : 'property-setting-section' },
         React.createElement("div", { className: "custom-val" },
-            React.createElement("div", { className: focused ? 'val-container focus' : 'val-container' },
+            React.createElement("div", { className: "val-container" },
                 React.createElement(PropertyIcon, { options: [setting] }),
-                React.createElement("span", { ref: $opacityRef, "data-type": "number", className: "opacity-val", title: opacityValue, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, opacityValue),
-                React.createElement(ThemeModes, { property: setting, changeHandler: themeModeChangeHandler }),
-                React.createElement(PureTokens, { property: setting })))) : React.createElement(React.Fragment, null);
+                React.createElement("span", { ref: $opacityRef, "data-type": "int", className: pureTokens.length ? 'opacity-val hasReferenceToken' : 'opacity-val', title: opacityValue, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, opacityValue),
+                React.createElement(ThemeModes, { property: setting, useThemeHandler: useThemeHandler }),
+                React.createElement(PureTokens, { property: setting, pureTokens: pureTokens, useTokenHandler: useTokenHandler, detachTokenHandler: detachTokenHandler })))) : React.createElement(React.Fragment, null);
 };
 export default Opacity;

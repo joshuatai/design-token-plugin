@@ -18,7 +18,7 @@ class CornerRadius {
     if (options.id) this.id = options.id;
     if (options.parent) this.parent = options.parent;
     if (options.useToken) this.useToken = options.useToken;
-    if (options.radius != null) this.radius = typeof options.radius === 'number' ? options.radius : Mixed;
+    if (options.radius != null) this.radius = options.radius === 'Mixed' ? Mixed : options.radius;
     if (options.topLeft != null) this.topLeft = options.topLeft;
     if (options.topRight != null) this.topRight = options.topRight;
     if (options.bottomRight != null) this.bottomRight = options.bottomRight;

@@ -1,7 +1,6 @@
 import validator from 'validator';
 import StrokeWidthAlign from 'model/StrokeWidthAlign';
 import BrowserEvents from 'enums/BrowserEvents';
-import { getToken, getPureToken } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
 import StrokeAligns from 'enums/StrokeAligns';
 // import CommonSettings from './CommonSettings.tss';
@@ -10,7 +9,7 @@ let hostData;
 const NAME = 'stroke';
 export default function ($) {
   var Stroke = function (element, options) {
-    const useToken = getToken(options.useToken);
+    const useToken = null//getToken(options.useToken);
     let strokeValue;
 
     hostData = this;

@@ -1,22 +1,23 @@
 import validator from 'validator';
 import SelectText from 'utils/SelectText';
 import InputStatus from 'enums/InputStatus';
+import { Mixed } from 'symbols/index';
+import { trim } from 'jquery';
 SelectText(jQuery);
 const Validator = {
-    number: (val) => validator.isInt(val)
-};
-const validInt = function (e) {
-    if (!validator.isInt(e.key)) {
-        e.stopPropagation();
-        e.preventDefault();
-        return false;
-    }
+    int: (val) => validator.isInt(val.toString()),
+    mixed: (val, org) => val === 'Mixed' && val === org
 };
 const inputCheck = function (e) {
     const $target = this;
     const newVal = $target.textContent;
     const isRequired = $target.getAttribute('is-required');
-    $target.querySelectorAll('*').forEach(node => node.removeAttribute('style'));
+    const chlidren = Array.from($target.querySelectorAll('*')).reverse();
+    chlidren.forEach((node) => {
+        node.removeAttribute('style');
+        if (node.innerText === '')
+            node.remove();
+    });
     if (e.key === 'Enter') {
         $target.blur();
         return;
@@ -36,7 +37,7 @@ const inputCheck = function (e) {
 function valCheck($editable, orgVal, customValidator, resolve, reject) {
     const dataType = $editable.getAttribute('data-type');
     const isRequired = $editable.getAttribute('is-required');
-    const _orgVal = orgVal ? String(orgVal) : undefined;
+    const _orgVal = orgVal !== undefined ? orgVal === Mixed ? 'Mixed' : String(orgVal) : undefined;
     let newVal = $editable.textContent.trim();
     $editable.removeAttribute('invalid');
     if (_orgVal && newVal === _orgVal) {
@@ -48,7 +49,9 @@ function valCheck($editable, orgVal, customValidator, resolve, reject) {
     }
     if (newVal) {
         if (dataType) {
-            if (!Validator[dataType](newVal)) {
+            const _dataTypes = dataType.split(',');
+            const validType = _dataTypes.find(type => Validator[trim(type)](newVal, _orgVal));
+            if (!validType) {
                 $editable.innerHTML = _orgVal || '';
                 $editable.setAttribute("contenteditable", "false");
                 reject({
@@ -119,6 +122,7 @@ function valCheck($editable, orgVal, customValidator, resolve, reject) {
     // } else {
     //   // save();
     // }
+    return;
 }
 // let valCheckTimer;
 const valChange = function (orgVal, customValidator = null) {
@@ -133,4 +137,4 @@ const valChange = function (orgVal, customValidator = null) {
     });
     ;
 };
-export { validInt, inputCheck, valChange };
+export { Validator, inputCheck, valChange };

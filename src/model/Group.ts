@@ -1,6 +1,5 @@
 import { v4 } from 'uuid';
 import Token from './Token';
-import { setToken } from '../model/DataManager';
 class Group {
   type: string = 'Group';
   id: string = '';

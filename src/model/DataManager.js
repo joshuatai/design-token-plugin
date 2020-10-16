@@ -201,11 +201,6 @@ const getAPI = function () {
 //   }
 //   return response;
 // }
-const getThemeMode = function (id) { return arguments.length ? themeModeMap[id] : themeModes; };
-const setThemeMode = mode => {
-    themeModes.push(mode);
-    themeModeMap[mode.id] = mode;
-};
 const saveThemeMode = () => {
     sendMessage(MessageTypes.SET_MODES, themeModes);
 };
@@ -225,19 +220,6 @@ const getSaveData = function () {
     return group2saveData();
 };
 const getVersion = function (id) { return arguments.length ? versionMap[id] : versions; };
-const getGroup = function (id) { return arguments.length ? groupMap[id] : groups; };
-const getToken = function (id) { return arguments.length ? tokenMap[id] : Object.values(tokenMap); };
-const getProperty = function (id) { return arguments.length ? propertiesMap[id] : Object.values(propertiesMap); };
-const getPureToken = (type) => {
-    if (typeof type === 'string') {
-        return pureToken[type];
-    }
-    else {
-        return type.reduce((calc, item) => {
-            return Object.assign(calc, pureToken[item]);
-        }, {});
-    }
-};
 const removeThemeMode = mode => {
     delete themeModeMap[mode.id];
     const index = themeModes.findIndex((_mode) => _mode.id === mode.id);
@@ -250,38 +232,26 @@ const setCurrentThemeMode = themeMode => {
 const setFonts = _fonts => {
     fonts = _fonts;
 };
-const setGroup = (group) => {
-    groups.push(group);
-    groupMap[group.id] = group;
-    return group;
-};
-const setToken = (token) => {
-    if (!getToken(token.id)) {
-        tokenMap[token.id] = token;
-        getGroup(token.parent).tokens.push(token);
-    }
-    return token;
-};
 const removeGroup = (group) => {
-    if (getGroup(group.id)) {
-        const index = groups.findIndex((_group) => _group.id === group.id);
-        group.tokens.forEach(token => {
-            removeToken(getToken(token));
-        });
-        delete groupMap[group.id];
-        groups.splice(index, 1);
-    }
+    // if (getGroup(group.id)) {
+    //   const index = groups.findIndex((_group: Group) => _group.id === group.id);
+    //   group.tokens.forEach(token => {
+    //     removeToken(getToken(token));
+    //   });
+    //   delete groupMap[group.id];
+    //   groups.splice(index, 1);
+    // }
 };
 const removeToken = (token) => {
-    if (getToken(token.id)) {
-        token.properties.forEach((prop) => {
-            delete propertiesMap[prop.id];
-        });
-        const tokens = getGroup(token.parent).tokens;
-        const index = tokens.findIndex((_token) => _token.id === token.id);
-        delete tokenMap[token.id];
-        tokens.splice(index, 1);
-    }
+    // if (getToken(token.id)) {
+    //   token.properties.forEach((prop: any) => {
+    //     delete propertiesMap[prop.id];
+    //   });
+    //   const tokens = getGroup(token.parent).tokens;
+    //   const index = tokens.findIndex((_token: Token) => _token.id === token.id);
+    //   delete tokenMap[token.id];
+    //   tokens.splice(index, 1);
+    // }
 };
 const setProperty = property => propertiesMap[property.id] = property;
 const setPureToken = (token) => token.propertyType && token.propertyType !== Mixed && (pureToken[token.propertyType][token.id] = token);
@@ -319,15 +289,14 @@ const group2saveData = () => {
     clearPureToken();
     saveData = _groups.map(({ id, name, tokens }, groupIndex) => {
         tokens.forEach((token, tokenIndex) => {
-            setPureToken(token);
-            if (token.propertyType === Mixed)
-                token.propertyType = String(Mixed);
-            token.properties.forEach((property, propIndex) => {
-                setProperty(getToken(groups[groupIndex].tokens[tokenIndex]).properties[propIndex]);
-                if (property.type === PropertyTypes.CORNER_RADIUS && property.radius === Mixed) {
-                    property.radius = String(Mixed);
-                }
-            });
+            // setPureToken(token);
+            // if (token.propertyType === Mixed) token.propertyType = String(Mixed);
+            // token.properties.forEach((property: any, propIndex) => {
+            //   setProperty(getToken(groups[groupIndex].tokens[tokenIndex]).properties[propIndex]);
+            //   if (property.type === PropertyTypes.CORNER_RADIUS && property.radius === Mixed) {
+            //     property.radius = String(Mixed);
+            //   }
+            // })
         });
         return { id, name, tokens };
     });
@@ -341,35 +310,37 @@ const setVersion = (version) => {
     versionMap[version.id] = version;
 };
 const saveVersion = () => {
-    sendMessage(MessageTypes.SET_VERSION, versions);
+    // sendMessage(
+    //   MessageTypes.SET_VERSION,
+    //   versions
+    // );
 };
 const syncToken = (token) => {
     const refer = token.properties[0];
-    getProperty().forEach((property) => {
-        const hostToken = getToken(property.parent);
-        if (property.useToken === token.id) {
-            if (property.type === PropertyTypes.CORNER_RADIUS) {
-                property.topLeft = refer.topLeft;
-                property.topRight = refer.topRight;
-                property.bottomRight = refer.bottomRight;
-                property.bottomLeft = refer.bottomLeft;
-                property.radius = refer.radius;
-            }
-            if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
-                property.align = refer.align;
-                property.width = refer.width;
-            }
-            if (property.type === PropertyTypes.FILL_COLOR) {
-                property.blendMode = refer.blendMode;
-                property.color = refer.color;
-                property.fillType = refer.fillType;
-                property.opacity = refer.opacity;
-                property.visible = refer.visible;
-            }
-            if (hostToken.properties.length === 1)
-                syncToken(hostToken);
-        }
-    });
+    // getProperty().forEach((property: any) => {
+    //   const hostToken = getToken(property.parent);
+    //   if (property.useToken === token.id) {
+    //     if (property.type === PropertyTypes.CORNER_RADIUS) {
+    //       property.topLeft = refer.topLeft;
+    //       property.topRight = refer.topRight;
+    //       property.bottomRight = refer.bottomRight;
+    //       property.bottomLeft = refer.bottomLeft;
+    //       property.radius = refer.radius;
+    //     }
+    //     if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
+    //       property.align = refer.align;
+    //       property.width = refer.width;
+    //     }
+    //     if (property.type === PropertyTypes.FILL_COLOR) {
+    //       property.blendMode = refer.blendMode;
+    //       property.color = refer.color;
+    //       property.fillType = refer.fillType;
+    //       property.opacity = refer.opacity;
+    //       property.visible = refer.visible;
+    //     } 
+    //     if (hostToken.properties.length === 1) syncToken(hostToken);
+    //   }
+    // });
 };
 const syncPageThemeMode = () => {
     sendMessage(MessageTypes.SYNC_CURRENT_THEME_MODE);
@@ -377,12 +348,16 @@ const syncPageThemeMode = () => {
 const restore = (id) => {
     sendMessage(MessageTypes.RESTRORE_VERSION, id);
 };
-const referByToken = (token) => getProperty()
-    .filter((property) => property.useToken === token.id)
-    .map((property) => getToken(property.parent));
-const syncNode = (token) => {
-    sendMessage(MessageTypes.SYNC_NODES, token);
-};
+const referByToken = (token) => null;
+//   getProperty()
+//     .filter((property: any) => property.useToken === token.id)
+//     .map((property: any) => getToken(property.parent));
+// const syncNode = (token: Token) => {
+//   sendMessage(
+//     MessageTypes.SYNC_NODES,
+//     token
+//   );
+// };
 const sendMessage = (type, message = "") => parent.postMessage({
     pluginMessage: {
         type,
@@ -391,6 +366,20 @@ const sendMessage = (type, message = "") => parent.postMessage({
 }, "*");
 export { 
 // checkApiKey,
-getAPI, fetchInitial, getVersion, getThemeMode, getCurrentThemeMode, getFonts, getGroup, getToken, getProperty, getPureToken, getSaveData, 
+getAPI, fetchInitial, getVersion, 
+// getThemeMode,
+getCurrentThemeMode, getFonts, 
+// getGroup,
+// getToken,
+// getProperty,
+// getPureToken,
+getSaveData, 
 // setAPI,
-setVersion, setThemeMode, setCurrentThemeMode, removeThemeMode, setFonts, setGroup, setToken, setProperty, setPureToken, removeGroup, removeToken, save, saveThemeMode, saveVersion, syncToken, syncNode, syncPageThemeMode, restore, referByToken, sendMessage };
+setVersion, 
+// setThemeMode,
+setCurrentThemeMode, removeThemeMode, setFonts, 
+// setGroup,
+// setToken,
+setProperty, setPureToken, removeGroup, removeToken, save, saveThemeMode, saveVersion, syncToken, 
+// syncNode,
+syncPageThemeMode, restore, referByToken, sendMessage };

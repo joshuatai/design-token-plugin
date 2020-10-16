@@ -13,7 +13,7 @@ import TokenSetting from './TokenSetting';
 import ThemeModesContainer from './ThemeModesContainer';
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
-import { getSaveData, removeGroup, referByToken, getCurrentThemeMode, setCurrentThemeMode, getThemeMode, getGroup, getToken, setToken, removeToken, save, sendMessage, setFonts, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
+import { getSaveData, removeGroup, getCurrentThemeMode, setCurrentThemeMode, removeToken, save, sendMessage, setFonts, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
 // import { themeModeIcon } from './property-components/CommonSettings.tss';
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
@@ -63,7 +63,7 @@ const Tokens = ({ data = {
     };
     const Renderer = {
         themeModes: function () {
-            const modes = getThemeMode();
+            const modes = []; //getThemeMode();
             const $themeModes = $(`<div class="dropdown theme-modes"></div>`);
             // const $themeModeIcon = $(themeModeIcon);
             const $themeModeList = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>`);
@@ -133,19 +133,19 @@ const Tokens = ({ data = {
                         axis: "y"
                     })
                         .append(useTokens.map(_token => {
-                        const token = getToken(_token);
+                        const token = []; //getToken(_token);
                         let $icon;
-                        if (token.propertyType !== Mixed) {
-                            // $icon = PropertyIcon(token.properties, true).$icon;
-                        }
+                        // if (token.propertyType !== Mixed) {
+                        // $icon = PropertyIcon(token.properties, true).$icon;
+                        // }
                         return $(`<li class="token-item"></li>`)
-                            .data({
-                            'group': token.parent,
-                            'token': token.id
-                        })
+                            // .data({
+                            //   'group': token.parent,
+                            //   'token': token.id
+                            // })
                             .append($(`<span class="ui-sortable-handle"></span>`))
-                            .append($icon ? $icon : null)
-                            .append($('<span class="token-key"></span>').text(token.name));
+                            .append($icon ? $icon : null);
+                        // .append($('<span class="token-key"></span>').text(token.name));
                     })))));
                 });
             }
@@ -155,28 +155,27 @@ const Tokens = ({ data = {
         },
         updateToken: function (token) {
             const { $expend, $heading } = $(`#${token.parent}`).data();
-            getToken().forEach(_token => {
-                this.token(_token);
-            });
+            // getToken().forEach(_token => {
+            //   this.token(_token);
+            // });
             if ($heading.is('[aria-expanded="false"]')) {
                 $expend.trigger('click');
             }
         },
         updateThemeMode: function () {
-            $('#design-tokens-container .fill-color-icon').parent().each((index, item) => {
-                const { token } = $(item).data();
-                this.token(getToken(token));
-            });
+            // $('#design-tokens-container .fill-color-icon').parent().each((index, item) => {
+            //   const { token } = $(item).data();
+            //   this.token(getToken(token));
+            // });
         },
         removeGroup: function (group) {
             $(`#${group.id}`).remove();
         },
         removeToken: function (token) {
-            const group = getGroup(token.parent);
-            const { $expend } = $(`#${token.parent}`).data();
-            $(`#${token.id}`).remove();
-            if (group.tokens.length === 1)
-                $expend.hide();
+            // const group = getGroup(token.parent);
+            // const { $expend } = $(`#${token.parent}`).data();
+            // $(`#${token.id}`).remove();
+            // if (group.tokens.length === 1) $expend.hide();
         }
     };
     function initVersion(versions) {
@@ -200,7 +199,9 @@ const Tokens = ({ data = {
             setAllTokens(_tokens);
         }
         if (data.properties) {
-            const _properties = data.properties.map(property => new Properties[property._type](property));
+            const _properties = data.properties.map(property => {
+                return new Properties[property._type](property);
+            });
             setAllProperties(_properties);
         }
         //groups: Array<Object>
@@ -277,8 +278,8 @@ const Tokens = ({ data = {
         //   initThemeMode(msg.message);
         // }
         if (msg.type === MessageTypes.GET_INIT_THEME_MODE) {
-            msg.message ? setCurrentThemeMode(msg.message) : setCurrentThemeMode(getThemeMode()[0].id);
-            updateCurrentThemeMode();
+            // msg.message ? setCurrentThemeMode(msg.message) : setCurrentThemeMode(getThemeMode()[0].id);
+            // updateCurrentThemeMode();
         }
         if (msg.type === MessageTypes.GET_CURRENT_THEME_MODE) {
             updateCurrentThemeMode();
@@ -331,7 +332,7 @@ const Tokens = ({ data = {
                 if (!editBtn.length && $item.is('#design-tokens-container .token-item') && type === BrowserEvents.CLICK) {
                     $('.token-item-selected').removeClass('token-item-selected');
                     $item.addClass('token-item-selected');
-                    sendMessage(MessageTypes.ASSIGN_TOKEN, getToken($item.data('token')));
+                    // sendMessage(MessageTypes.ASSIGN_TOKEN ,getToken($item.data('token')));
                 }
                 if (type === BrowserEvents.MOUSE_OVER) {
                     // if (!$item.is($tokenActionWrapper.data('hoveredItem'))) {
@@ -368,34 +369,32 @@ const Tokens = ({ data = {
                 .removeAttr('title');
             Utils.clearSelection();
             if (token) {
-                if ($this.is('#design-tokens-container .token-edit-btn')) {
-                    const refers = referByToken(getToken(token));
-                    if (refers.length > 0) {
-                        $tokenActionDelete
-                            .addClass('disabled')
-                            .attr('title', `This token has been linked by token: ${refers.map(refer => refer.name)}`);
-                    }
-                    $tokenActionClone.add($tokenActionDelete).show();
-                    $tokenActionUnassign.hide();
-                }
-                else {
-                    $tokenActionClone.add($tokenActionDelete).hide();
-                    $tokenActionUnassign.show();
-                }
+                // if ($this.is('#design-tokens-container .token-edit-btn')) {
+                //   const refers = referByToken(getToken(token));
+                //   if (refers.length > 0) {
+                //     $tokenActionDelete
+                //       .addClass('disabled')
+                //       .attr('title', `This token has been linked by token: ${refers.map(refer => refer.name)}`);
+                //   }
+                //   $tokenActionClone.add($tokenActionDelete).show();
+                //   $tokenActionUnassign.hide();
+                // } else {
+                //   $tokenActionClone.add($tokenActionDelete).hide();
+                //   $tokenActionUnassign.show();
+                // }
             }
             else {
-                const _group = getGroup(group);
+                const _group = []; //getGroup(group);
                 const refers = [];
-                _group.tokens.forEach(token => {
-                    const refer = referByToken(token);
-                    if (refer.length)
-                        refers.push(...refer);
-                });
+                // _group.tokens.forEach(token => { 
+                //   const refer = referByToken(token);
+                //   if (refer.length) refers.push(...refer);
+                // });
                 $dropdownContainer.append($groupActionDropdown);
                 if (refers.length) {
                     $groupActionDelete
-                        .addClass('disabled')
-                        .attr('title', `The tokens under the group ${_group.name} has been linked by other tokens: ${refers.map(refer => refer.name)}`);
+                        .addClass('disabled');
+                    // .attr('title', `The tokens under the group ${_group.name} has been linked by other tokens: ${refers.map(refer => refer.name)}`);
                 }
                 else {
                     $groupActionDelete
@@ -407,8 +406,8 @@ const Tokens = ({ data = {
         $(document).on(BrowserEvents.CLICK, '.delete-token:not(".disabled"), .clone-token, .delete-group:not(".disabled"), .unassign-token', function (e) {
             const $this = $(this);
             const { group, token } = $this.closest('.token-item, .panel-heading, .group-item').data();
-            const _group = getGroup(group);
-            const _token = getToken(token);
+            const _group = null; //getGroup(group);
+            const _token = null; //getToken(token);
             if ($this.is('.delete-group')) {
                 Renderer.removeGroup(_group);
                 removeGroup(_group);
@@ -423,7 +422,7 @@ const Tokens = ({ data = {
                 const _cloneToken = _cloneDeep(_token);
                 _cloneToken.id = v4();
                 _cloneToken.name = `${_cloneToken.name}-copy`;
-                setToken(_cloneToken);
+                // setToken(_cloneToken);
                 Utils.clearSelection();
                 $tokenContainer.removeClass('show');
                 $tokenSetting.TokenSetting({ group, token: _cloneToken.id });
@@ -461,7 +460,7 @@ const Tokens = ({ data = {
                 $('.open').removeClass('open');
             }
             // if ($radiusSeparateBtns.length === 0) {
-            //   $separatorModeSign.attr('separate-type', 'top-left');
+            //   $separatorModeSign.attr('separate-type', 'topLeft');
             // }
         });
         // done
@@ -521,8 +520,7 @@ const Tokens = ({ data = {
             const $sortableContainer = $sortedItem.parent();
             const tokens = $.makeArray($sortableContainer.children()).map($token => {
                 const tokenId = $($token).data('token');
-                return getToken(tokenId);
-                ;
+                // return getToken(tokenId);;
             });
             if ($sortedItem.is('#assigned-tokens-node-list .token-item')) {
                 sendMessage(MessageTypes.REORDER_ASSIGN_TOKEN, {
@@ -531,8 +529,8 @@ const Tokens = ({ data = {
                 });
             }
             else {
-                const group = getGroup($sortedItem.data('group'));
-                group.tokens = tokens;
+                // const group = getGroup($sortedItem.data('group'));
+                // group.tokens = tokens;
                 save();
             }
         });

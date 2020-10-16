@@ -1,14 +1,13 @@
 import validator from 'validator';
 import StrokeWidthAlign from 'model/StrokeWidthAlign';
 import BrowserEvents from 'enums/BrowserEvents';
-import { getToken } from 'model/DataManager';
 import StrokeAligns from 'enums/StrokeAligns';
 // import CommonSettings from './CommonSettings.tss';
 let hostData;
 const NAME = 'stroke';
 export default function ($) {
     var Stroke = function (element, options) {
-        const useToken = getToken(options.useToken);
+        const useToken = null; //getToken(options.useToken);
         let strokeValue;
         hostData = this;
         this.options = new StrokeWidthAlign(options);

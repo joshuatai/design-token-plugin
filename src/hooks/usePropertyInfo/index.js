@@ -1,5 +1,6 @@
 import useThemeModes from 'hooks/useThemeModes';
 import PropertyTypes from 'enums/PropertyTypes';
+import { Mixed } from 'symbols/index';
 // function traversingUseToken (token) {
 //   const themeModes = getThemeMode();
 //   const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
@@ -84,15 +85,16 @@ const usePropertyInfo = (property, isCalc = false) => {
     //         borderColor: color.isLight() ? '#dddddd' : '#FFFFFF'
     //       });
     //   }
-    //   if (property.type === PropertyTypes.CORNER_RADIUS) {
-    //     if (typeof property.radius === 'symbol') {
-    //       value = 'Mixed';
-    //       title = `top-left: ${property.topLeft}; top-right: ${property.topRight}; bottom-right: ${property.bottomRight}; bottom-left: ${property.bottomLeft};`;
-    //     } else {
-    //       value = property.radius;
-    //       title = `Corner Radius: ${value}`;
-    //     }
-    //   }
+    if (property.type === PropertyTypes.CORNER_RADIUS) {
+        if (property.radius === Mixed) {
+            value = 'Mixed';
+            title = `top-left: ${property.topLeft}; top-right: ${property.topRight}; bottom-right: ${property.bottomRight}; bottom-left: ${property.bottomLeft};`;
+        }
+        else {
+            value = property.radius;
+            title = `Corner Radius: ${value}`;
+        }
+    }
     //   if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
     //     value = property.width;
     //     secondValue = property.align;
@@ -118,10 +120,10 @@ const usePropertyInfo = (property, isCalc = false) => {
     //     secondValue = property.fontSize;
     //     title = `Font Family: ${property.fontName.family}, Font Size: ${property.fontSize}`;
     //   }
-    //   if (property.type === PropertyTypes.SPACING) {
-    //     value = property.value;
-    //     title = `Spacing: ${value}`;
-    //   }
+    if (property.type === PropertyTypes.SPACING) {
+        value = property.value;
+        title = `Spacing: ${value}`;
+    }
     // if (property.useToken) {
     //   let tokenName = getToken(property.useToken).name;
     //   value = tokenName;

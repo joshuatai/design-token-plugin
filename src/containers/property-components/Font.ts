@@ -1,7 +1,7 @@
 import validator from 'validator';
 import FontModel from 'model/Font';
 import BrowserEvents from 'enums/BrowserEvents';
-import { getToken, getFonts } from 'model/DataManager';
+import { getFonts } from 'model/DataManager';
 // import CommonSettings from './CommonSettings.tss';
 import FontStyls from 'enums/FontStyles';
 
@@ -46,7 +46,7 @@ const styleCompare = (a, b) => {
 
 export default function ($) {
   var Font = function (element, options) {
-    const useToken = getToken(options.useToken);
+    const useToken = null//getToken(options.useToken);
     const fontList = getFonts();
     let familyVal;
 

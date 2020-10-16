@@ -3,7 +3,7 @@ import usePropertySetting from 'hooks/usePropertySetting';
 import usePropertyInfo from 'hooks/usePropertyInfo';
 import preventEvent from 'utils/preventEvent';
 import BrowserEvents from 'enums/BrowserEvents';
-import { getToken, referByToken } from 'model/DataManager';
+import { referByToken } from 'model/DataManager';
 import PropertyIcon from './property-components/PropertyIcon';
 
 const RemoveIcon = () => <svg className="svg" width="12" height="6" viewBox="0 0 12 6" xmlns="http://www.w3.org/2000/svg"><path d="M11.5 3.5H.5v-1h11v1z" fillRule="nonzero" fillOpacity="1" fill="#000" stroke="none"></path></svg>;

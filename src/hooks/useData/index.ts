@@ -10,16 +10,26 @@ import ThemeMode from 'model/ThemeMode';
 import Group from 'model/Group';
 import Token from 'model/Token';
 import Property from 'model/Property';
+import Properties from 'model/Properties';
+import PropertyTypes from 'enums/PropertyTypes';
+import { Mixed } from 'symbols/index';
 
 export const JSONBIN_URL = `https://api.jsonbin.io`;
 
+const toSaveProperties = (properties) => {
+  const _properties = properties.map((prop: Property) => {
+    const _prop = new Properties[prop.type](prop);
+    if (_prop.type === PropertyTypes.CORNER_RADIUS && _prop.radius === Mixed) _prop.radius = 'Mixed';
+    return _prop;
+  })
+  return _properties;
+}
 const useData = () => {
   const { api } = useAPI();
   const themeModes: Array<ThemeMode> = useContext(ThemeModesContext);
   const groups: Array<Group> = useContext(groupsContext);
   const tokens: Array<Token> = useContext(tokensContext);
   const properties: Array<Property> = useContext(propertiesContext);
-  
   const options = {
     method: 'GET',
     headers: {
@@ -181,7 +191,7 @@ const useData = () => {
         themeModes: _themeModes,
         groups,
         tokens,
-        properties
+        properties: toSaveProperties(properties)
       }
     });
 
@@ -194,8 +204,6 @@ const useData = () => {
         return res.json();
       });
   }
-
-
   const saveGroups = (_groups: Array<Group>) => {
     if (!api.admin) return;
     
@@ -209,14 +217,13 @@ const useData = () => {
         themeModes,
         groups: _groups,
         tokens,
-        properties
+        properties: toSaveProperties(properties)
       }
     });
 
     return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
       .then(res => Promise.resolve(res.json()));
   }
-
   const saveTokens = (_tokens: Array<Token>) => {
     if (!api.admin) return;
     options.method = 'PUT';
@@ -229,14 +236,13 @@ const useData = () => {
         themeModes,
         groups,
         tokens: _tokens,
-        properties
+        properties: toSaveProperties(properties)
       }
     });
 
     return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
       .then(res => Promise.resolve(res.json()));
   }
-
   const saveProperties = (_properties: Array<Property>) => {
     if (!api.admin) return;
     
@@ -250,13 +256,12 @@ const useData = () => {
         themeModes,
         groups,
         tokens,
-        properties: _properties
+        properties: toSaveProperties(_properties)
       }
     });
     return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
       .then(res => Promise.resolve(res.json()));
   }
-
   const saveTokensProperties = (_groups: Array<Group>, _tokens: Array<Token>, _properties: Array<Property>) => {
     if (!api.admin) return;
 
@@ -270,7 +275,7 @@ const useData = () => {
         themeModes,
         groups: _groups,
         tokens: _tokens,
-        properties: _properties
+        properties: toSaveProperties(_properties)
       }
     });
     return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)

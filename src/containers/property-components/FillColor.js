@@ -2,7 +2,7 @@ import validator from 'validator';
 import Color from 'color';
 import { validateHTMLColorHex } from "validate-color";
 import BrowserEvents from 'enums/BrowserEvents';
-import { getToken, getThemeMode, getCurrentThemeMode } from 'model/DataManager';
+import { getCurrentThemeMode } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
 import FillColor from 'model/FillColor';
 import StrokeFill from 'model/StrokeFill';
@@ -14,14 +14,14 @@ let $host;
 let hostData;
 const NAME = 'color';
 function traversingUseToken(token) {
-    const themeModes = getThemeMode();
+    const themeModes = []; //getThemeMode();
     const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
     const useThemeMode = getCurrentThemeMode();
     const existCurrentMode = token.properties.find(prop => prop.themeMode === useThemeMode);
     const defaultMode = token.properties.find(prop => prop.themeMode === defaultThemeMode);
     const property = existCurrentMode ? existCurrentMode : defaultMode;
     if (property.useToken) {
-        return traversingUseToken(getToken(property.useToken));
+        // return traversingUseToken(getToken(property.useToken));
     }
     else {
         return property;
@@ -29,7 +29,7 @@ function traversingUseToken(token) {
 }
 export default function ($) {
     var Fill = function (element, options) {
-        const useToken = getToken(options.useToken);
+        const useToken = null; // getToken(options.useToken);
         let colorValue;
         let opacityValue;
         hostData = this;
@@ -70,7 +70,7 @@ export default function ($) {
         // }
     };
     Fill.prototype.useToken = function (token) {
-        const themeModes = getThemeMode();
+        const themeModes = []; // getThemeMode();
         const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
         let property = token.properties.find(prop => prop.themeMode === getCurrentThemeMode());
         if (!property)
@@ -87,7 +87,7 @@ export default function ($) {
         if (token.properties.length === 1) {
             let usedProperty = token.properties[0];
             if (usedProperty.useToken) {
-                usedProperty = traversingUseToken(getToken(usedProperty.useToken));
+                // usedProperty = traversingUseToken(getToken(usedProperty.useToken));
             }
             this.$colorValue
                 .text(usedProperty.color)

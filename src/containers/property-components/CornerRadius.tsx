@@ -1,94 +1,22 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import PropertyIcon from './PropertyIcon';
 import PureTokens from "./PureTokens";
 import useTokens from "hooks/useTokens";
 import usePropertySetting from 'hooks/usePropertySetting';
 import useProperties from 'hooks/useProperties';
-
-
-import validator from 'validator';
 import Model from 'model/CornerRadius';
 import Token from 'model/Token';
 import { Mixed } from 'symbols/index';
-import { inputCheck, valChange } from 'utils/inputValidator';
 import InputStatus from "enums/InputStatus";
-import camelize from 'utils/camelize';
-import BrowserEvents from 'enums/BrowserEvents';
-
-import { getToken } from 'model/DataManager';
+import { Validator, inputCheck, valChange } from 'utils/inputValidator';
 import SelectText from 'utils/SelectText';
 
 declare var $: any;
 SelectText(jQuery);
-
-
   // var Radius = function (element, options) {
-  //   const useToken = getToken(options.useToken);
-  //   let radiusValue;
-    
-    
-  //   // this.$token = CommonSettings(this).$token;
-  //   const commonSetting = { $token: null } //CommonSettings(this);
-  //   this.$token = commonSetting.$token;
-
-  // 
-
-
   //   $(document).trigger('property-preview', [this.options]);
   // }
-  // Radius.prototype.detachToken = function (token) {
-
-  // }
-
-
-  // $(document).on(BrowserEvents.CLICK, `[property-component="Name"] [data-separate-type]`, function () {
-  //   const separateBtn = $(this);
-  //   hostData.$separateIcon.attr('separate-type', separateBtn.data('separate-type'));
-  // });
-
   // $(document).on(`${BrowserEvents.BLUR} `, `[property-component="Radius"] .separator-vals [data-separate-type], [property-component="Radius"] .corner-radius-val[contenteditable="true"]`, function (event) {
-  //   const $this = $(this);
-  //   const { separateType } = $this.data();
-  //   const options = hostData.options;
-  //   let value =  $this.text();
-  //   let oldVal;
-    
-  //   if (separateType) {
-  //     oldVal = options[camelize(separateType)];
-  //     if (validator.isInt(value)) {
-  //       value = Math.max(0, Number(value));
-  //       options[camelize(separateType)] = value;
-  //       const uniqueValues = [...new Set(
-  //           separators.map(type => options[camelize(type)])
-  //         )
-  //       ];
-  //       if (uniqueValues.length === 1) {
-  //         hostData.$radiusValue.text(value);
-  //         options.radius = Number(value);
-  //       } else {
-  //         hostData.$radiusValue.text('Mixed');
-  //         options.radius = Mixed;
-  //       }
-  //     } else {
-  //       $this.text(oldVal);
-  //     }
-  //   } else {
-  //     oldVal = options.radius;
-  //     if (validator.isInt(value)) {
-  //       value = Math.max(0, Number(value));
-  //       options.radius = value;
-  //       separators.forEach(type => {
-  //         options[camelize(type)] = Number(value);
-  //       }); 
-  //       hostData.$radiusValue.add(hostData.$separateRadius).text(value);
-  //     } else {
-  //       if (typeof oldVal === 'symbol') {
-  //         $this.text('Mixed');
-  //       } else {
-  //         $this.text(oldVal);
-  //       }
-  //     }
-  //   }
   //   $(document).trigger('property-preview', [options]);
   // });
 
@@ -102,42 +30,35 @@ const CornerRadius: FC<T_CornerRadius> = ({
   const { getToken, getPureTokensByProperty } = useTokens();
   const { getProperty } = useProperties();
   const [ setting, setSetting ] = useState(value || new Model());
+  const defaultSeparateType = 'topLeft';
+  const [ separateType, setSeparateType ] = useState(defaultSeparateType);
   const { setPropertySetting } = usePropertySetting();
-  const [ focused, setFocused ] = useState(false);
   const { radius, topLeft, topRight, bottomLeft, bottomRight, useToken } = setting;
   const pureTokens: Array<Token> = getPureTokensByProperty(setting);
   const _useToken = getToken(useToken) as Token;
-  const $radiusRef = useRef();
   const radiusValue = _useToken ? _useToken.name : radius === Mixed ? 'Mixed' : radius.toString();
 
   const focusHandler = (e) => {
     if (_useToken) return;
-    $(e.target).selectText();
-    setFocused(true);
+    const $target = e.target;
+    const $container = $target.closest('.val-container, .btn-group');
+    $($target).selectText();
+    if ($container) {
+      $container.classList.add('focus');
+      if ($container.classList.contains('btn-group')) {
+        setSeparateType($target.getAttribute('prop-type'));
+      }
+    }
   }
   const keyUpHandler = (e) => {
-    // if (e.key === 'Enter') ($radiusRef.current as HTMLSpanElement).blur();
-    const input = e.target;
-    inputCheck.call(input, e);
-      // if (_apiKeyInput.getAttribute('invalid') || _binIDInput.getAttribute('invalid') || _adminPWDInput.getAttribute('invalid')) {
-      //   setSavable(false);
-      // } else {
-      //   if (!_binIDInput.textContent && !_adminPWDInput.textContent) {
-      //     setSavable(false);
-      //     return 
-      //   }
-      //   setSavable(true);
-      // }
-    
-    
+    inputCheck.call(e.target, e);
   }
   const blurHandler = (e) => {
     const $target = e.target;
+    const $container = $target.closest('.val-container, .btn-group');
     const propType = $target.getAttribute('prop-type');
     const orginVal = setting[propType];
-    console.log(orginVal)
-    // const $opacity = $opacityRef.current as HTMLSpanElement;
-    // $opacity.textContent = $opacity.textContent.replace('%', '');
+    
     valChange
       .call($target, orginVal, (val) => {
         let _val = val;
@@ -146,18 +67,42 @@ const CornerRadius: FC<T_CornerRadius> = ({
         return { status: InputStatus.VALID, value: _val};
       })
       .then(res => {
+        const value = res.value;
         if (res.status === InputStatus.VALID) {
-          setting[propType] = res.value;
+          if (propType === 'radius') {
+            if (Validator.int(value)) {
+              setting.radius = value;
+              setting.topLeft = value;
+              setting.topRight = value;
+              setting.bottomRight = value;
+              setting.bottomLeft = value;
+            }
+          } else {
+            if (Validator.int(value)) {
+              setting[propType] = value;
+              const uniqueValues = [...new Set(
+                [
+                  setting.topLeft,
+                  setting.topRight,
+                  setting.bottomRight,
+                  setting.bottomLeft
+                ]
+              )];
+              uniqueValues.length === 1 ? setting.radius = value : setting.radius = Mixed;
+            }
+          }
           setSetting(new Model(setting));
         }
-        setFocused(false);
       })
       .catch(res => {
-        if (res.status === InputStatus.NO_CHANGE) {
-          // $target.textContent = `${$opacity.textContent}%`;
-          setFocused(false);
-        }
+        if (res.status === InputStatus.NO_CHANGE) {}
       });
+      if ($container) {
+        $container.classList.remove('focus');
+        if ($container.classList.contains('btn-group')) {
+          setSeparateType(defaultSeparateType);
+        }
+      }
   }
   const useTokenHandler = (token) => {
     const usedToken: Token = getToken(token.id) as Token;
@@ -175,22 +120,9 @@ const CornerRadius: FC<T_CornerRadius> = ({
     setSetting(new Model(setting));
   }
   const detachTokenHandler = () => {
-    const detachedToken = getToken(setting.useToken);
     setting.useToken = '';
     setSetting(new Model(setting));
-      //   const usedProperty = token.properties[0];
-  //   this.$radiusValue
-  //     .text(typeof usedProperty.radius === 'symbol' ? 'Mixed' : usedProperty.radius)
-  //     .attr('contenteditable', true)
-  //     .removeAttr('title');
-  //   separators.forEach(type => {
-  //     $(`[data-separate-type="${type}"]`).text(this.options[camelize(type)]);
-  //   });
   }
-
-  // useEffect(() => {
-  //   // if (focused) $($opacityRef.current).selectText();
-  // }, [focused]);
 
   useEffect(() => {
     setPropertySetting(setting);
@@ -205,18 +137,18 @@ const CornerRadius: FC<T_CornerRadius> = ({
           </svg>
         </button>
       }
-      <div className={ focused ? 'val-container focus' : 'val-container' }>
+      <div className="val-container">
         <PropertyIcon options={[setting]}></PropertyIcon>
-        <span ref={$radiusRef} data-type="number" prop-type="radius" className={pureTokens.length ? 'corner-radius-val hasReferenceToken' : 'corner-radius-val' } title={radiusValue} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{radiusValue}</span>
+        <span data-type="int, mixed" prop-type="radius" className={pureTokens.length ? 'corner-radius-val hasReferenceToken' : 'corner-radius-val' } title={radiusValue} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{radiusValue}</span>
         <PureTokens property={setting} pureTokens={pureTokens} useTokenHandler={useTokenHandler} detachTokenHandler={detachTokenHandler}></PureTokens>
       </div>
       <div className="separator-vals">
-        <i className="separator-mode-sign" separate-type="top-left"></i>
+        <i className="separator-mode-sign" separate-type={separateType}></i>
         <div className="btn-group">
-          <div className="btn" prop-type="top-left" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{topLeft}</div>
-          <div className="btn" prop-type="top-right" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{topRight}</div>
-          <div className="btn" prop-type="bottom-right" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{bottomRight}</div>
-          <div className="btn" prop-type="bottom-left" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{bottomLeft}</div>
+          <div className="btn" data-type="int" prop-type="topLeft" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{topLeft}</div>
+          <div className="btn" data-type="int" prop-type="topRight" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{topRight}</div>
+          <div className="btn" data-type="int" prop-type="bottomRight" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{bottomRight}</div>
+          <div className="btn" data-type="int" prop-type="bottomLeft" contentEditable="false" suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{bottomLeft}</div>
         </div>
       </div>
     </div>

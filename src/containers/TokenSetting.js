@@ -24,6 +24,7 @@ const PropertySetting = ({ token = null, property = null, cancelHandler = null, 
     const $chooseType = useRef();
     const Property = PropertyConponents[PropertyTypes[choosedType]];
     const _chooseTypeHandler = (e) => {
+        setPropertySetting(null);
         const type = e.target.getAttribute('type');
         setChoosedType(type);
     };

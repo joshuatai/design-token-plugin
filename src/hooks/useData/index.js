@@ -6,7 +6,19 @@ import { ThemeModesContext } from '../ThemeModeProvider';
 import { groupsContext } from '../GroupProvider';
 import { tokensContext } from '../TokenProvider';
 import { propertiesContext } from '../PropertyProvider';
+import Properties from 'model/Properties';
+import PropertyTypes from 'enums/PropertyTypes';
+import { Mixed } from 'symbols/index';
 export const JSONBIN_URL = `https://api.jsonbin.io`;
+const toSaveProperties = (properties) => {
+    const _properties = properties.map((prop) => {
+        const _prop = new Properties[prop.type](prop);
+        if (_prop.type === PropertyTypes.CORNER_RADIUS && _prop.radius === Mixed)
+            _prop.radius = 'Mixed';
+        return _prop;
+    });
+    return _properties;
+};
 const useData = () => {
     const { api } = useAPI();
     const themeModes = useContext(ThemeModesContext);
@@ -170,7 +182,7 @@ const useData = () => {
                 themeModes: _themeModes,
                 groups,
                 tokens,
-                properties
+                properties: toSaveProperties(properties)
             }
         });
         return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
@@ -192,7 +204,7 @@ const useData = () => {
                 themeModes,
                 groups: _groups,
                 tokens,
-                properties
+                properties: toSaveProperties(properties)
             }
         });
         return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
@@ -211,7 +223,7 @@ const useData = () => {
                 themeModes,
                 groups,
                 tokens: _tokens,
-                properties
+                properties: toSaveProperties(properties)
             }
         });
         return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
@@ -230,7 +242,7 @@ const useData = () => {
                 themeModes,
                 groups,
                 tokens,
-                properties: _properties
+                properties: toSaveProperties(_properties)
             }
         });
         return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
@@ -249,7 +261,7 @@ const useData = () => {
                 themeModes,
                 groups: _groups,
                 tokens: _tokens,
-                properties: _properties
+                properties: toSaveProperties(_properties)
             }
         });
         return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)

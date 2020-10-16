@@ -452,17 +452,6 @@ body {
         right: auto;
       }
     }
-    .corner-radius-icon {
-      width: 16px;
-      height: 16px;
-      margin: 8px;
-      border-color: #B3B3B3;
-      border-top-style: solid;
-      border-top-width: 1px;
-      border-left-width: 1px;
-      border-top-left-radius: 3px;
-      border-left-style: solid;
-    }
     &:hover,
     &.focus {
       border-color: rgba(0,0,0,.1);
@@ -538,6 +527,18 @@ body {
       display: none;
     }
   }
+}
+
+.corner-radius-icon {
+  width: 16px;
+  height: 16px;
+  margin: 8px;
+  border-color: #B3B3B3;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-left-width: 1px;
+  border-top-left-radius: 3px;
+  border-left-style: solid;
 }
 
 #property-list .remove-property[disabled],

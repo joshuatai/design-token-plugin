@@ -201,7 +201,8 @@
   height: 32px;
   line-height: 32px;
 }
-#property-setting .separator-vals .btn-group:hover .btn {
+#property-setting .separator-vals .btn-group:hover .btn,
+#property-setting .separator-vals .btn-group.focus .btn {
   border-color: #cccccc;
 }
 .separator-mode-sign {
@@ -213,22 +214,22 @@
   border-width: 0;
   margin: 10px;
 }
-.separator-mode-sign[separate-type="top-left"] {
+.separator-mode-sign[separate-type="topLeft"] {
   border-top-width: 1px;
   border-left-width: 1px;
   border-top-left-radius: 3px;
 }
-.separator-mode-sign[separate-type="top-right"] {
+.separator-mode-sign[separate-type="topRight"] {
   border-top-width: 1px;
   border-right-width: 1px;
   border-top-right-radius: 3px;
 }
-.separator-mode-sign[separate-type="bottom-right"] {
+.separator-mode-sign[separate-type="bottomRight"] {
   border-bottom-width: 1px;
   border-right-width: 1px;
   border-bottom-right-radius: 3px;
 }
-.separator-mode-sign[separate-type="bottom-left"] {
+.separator-mode-sign[separate-type="bottomLeft"] {
   border-bottom-width: 1px;
   border-left-width: 1px;
   border-bottom-left-radius: 3px;

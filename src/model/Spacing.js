@@ -7,6 +7,8 @@ class Spacing {
         this.parent = '';
         this.value = 4;
         this.useToken = '';
+        if (!options)
+            return;
         if (options.id)
             this.id = options.id;
         if (options.parent)

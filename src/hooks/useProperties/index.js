@@ -7,11 +7,8 @@ const useProperties = () => {
     const { saveProperties } = useData();
     const properties = useContext(propertiesContext);
     const { setProperties } = useContext(propertiesSetterContext);
-    const _getProperty = (id) => {
-        if (id) {
-            return properties.slice().find(_property => _property.id === id);
-        }
-        return properties.slice();
+    const _getProperty = function (id) {
+        return arguments.length ? properties.slice().find(_property => _property.id === id) : properties.slice();
     };
     const _removeProperty = (property) => {
         const nextProperties = properties.slice().filter(_property => _property.id != property.id);
@@ -19,7 +16,6 @@ const useProperties = () => {
         return nextProperties;
     };
     const _addProperties = (_properties) => {
-        console.log(properties, _properties);
         const nextProperties = properties.slice();
         const existIndex = _properties.map(_prop => nextProperties.findIndex(_property => _property.id === _prop.id));
         existIndex.forEach((existIndex, index) => {

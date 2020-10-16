@@ -221,11 +221,6 @@ const getAPI = function () {
 //   }
 //   return response;
 // }
-const getThemeMode = function (id?) { return arguments.length ? themeModeMap[id] : themeModes; };
-const setThemeMode = mode => {
-  themeModes.push(mode);
-  themeModeMap[mode.id] = mode;
-}
 const saveThemeMode = () => {
   sendMessage(
     MessageTypes.SET_MODES,
@@ -244,26 +239,12 @@ const onMessageReceived = (event) => {
 }
 window.addEventListener("message", onMessageReceived, false);
 
-
-
 const getCurrentThemeMode = () => currentThemeMode;
 
 const getSaveData = function () {
   return group2saveData();
 };
 const getVersion = function (id?) { return arguments.length ? versionMap[id] : versions; }
-const getGroup = function (id?) { return arguments.length ? groupMap[id] : groups; };
-const getToken = function (id?) { return arguments.length ? tokenMap[id] : Object.values(tokenMap); };
-const getProperty = function (id?) { return arguments.length ? propertiesMap[id] : Object.values(propertiesMap); };
-const getPureToken = (type): Object => {
-  if (typeof type === 'string') {
-    return pureToken[type];
-  } else {
-    return type.reduce((calc, item) => {
-      return Object.assign(calc, pureToken[item]);
-    }, {});
-  }
-};
 
 const removeThemeMode = mode => {
   delete themeModeMap[mode.id];
@@ -280,38 +261,27 @@ const setCurrentThemeMode = themeMode => {
 const setFonts = _fonts => {
   fonts = _fonts;
 };
-const setGroup = (group: Group): Group => {
-  groups.push(group);
-  groupMap[group.id] = group;
-  return group;
-};
-const setToken = (token: Token): Token => {
-  if (!getToken(token.id)) {
-    tokenMap[token.id] = token;
-    getGroup(token.parent).tokens.push(token);
-  }
-  return token;
-};
+
 const removeGroup = (group: Group) => {
-  if (getGroup(group.id)) {
-    const index = groups.findIndex((_group: Group) => _group.id === group.id);
-    group.tokens.forEach(token => {
-      removeToken(getToken(token));
-    });
-    delete groupMap[group.id];
-    groups.splice(index, 1);
-  }
+  // if (getGroup(group.id)) {
+  //   const index = groups.findIndex((_group: Group) => _group.id === group.id);
+  //   group.tokens.forEach(token => {
+  //     removeToken(getToken(token));
+  //   });
+  //   delete groupMap[group.id];
+  //   groups.splice(index, 1);
+  // }
 }
 const removeToken = (token: Token) => {
-  if (getToken(token.id)) {
-    token.properties.forEach((prop: any) => {
-      delete propertiesMap[prop.id];
-    });
-    const tokens = getGroup(token.parent).tokens;
-    const index = tokens.findIndex((_token: Token) => _token.id === token.id);
-    delete tokenMap[token.id];
-    tokens.splice(index, 1);
-  }
+  // if (getToken(token.id)) {
+  //   token.properties.forEach((prop: any) => {
+  //     delete propertiesMap[prop.id];
+  //   });
+  //   const tokens = getGroup(token.parent).tokens;
+  //   const index = tokens.findIndex((_token: Token) => _token.id === token.id);
+  //   delete tokenMap[token.id];
+  //   tokens.splice(index, 1);
+  // }
 };
 const setProperty = property => propertiesMap[property.id] = property;
 const setPureToken = (token: Token) => token.propertyType && token.propertyType !== Mixed && (pureToken[token.propertyType][token.id] = token);
@@ -351,14 +321,14 @@ const group2saveData = () => {
   clearPureToken();
   saveData = _groups.map(({ id, name, tokens }, groupIndex) => {
     tokens.forEach((token: Token, tokenIndex) => {
-      setPureToken(token);
-      if (token.propertyType === Mixed) token.propertyType = String(Mixed);
-      token.properties.forEach((property: any, propIndex) => {
-        setProperty(getToken(groups[groupIndex].tokens[tokenIndex]).properties[propIndex]);
-        if (property.type === PropertyTypes.CORNER_RADIUS && property.radius === Mixed) {
-          property.radius = String(Mixed);
-        }
-      })
+      // setPureToken(token);
+      // if (token.propertyType === Mixed) token.propertyType = String(Mixed);
+      // token.properties.forEach((property: any, propIndex) => {
+      //   setProperty(getToken(groups[groupIndex].tokens[tokenIndex]).properties[propIndex]);
+      //   if (property.type === PropertyTypes.CORNER_RADIUS && property.radius === Mixed) {
+      //     property.radius = String(Mixed);
+      //   }
+      // })
     });
     return { id, name, tokens };
   });
@@ -375,37 +345,37 @@ const setVersion = (version: Version) => {
   versionMap[version.id] = version;
 };
 const saveVersion = () => {
-  sendMessage(
-    MessageTypes.SET_VERSION,
-    versions
-  );
+  // sendMessage(
+  //   MessageTypes.SET_VERSION,
+  //   versions
+  // );
 }
 const syncToken = (token: Token) => {
   const refer: any = token.properties[0];
-  getProperty().forEach((property: any) => {
-    const hostToken = getToken(property.parent);
-    if (property.useToken === token.id) {
-      if (property.type === PropertyTypes.CORNER_RADIUS) {
-        property.topLeft = refer.topLeft;
-        property.topRight = refer.topRight;
-        property.bottomRight = refer.bottomRight;
-        property.bottomLeft = refer.bottomLeft;
-        property.radius = refer.radius;
-      }
-      if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
-        property.align = refer.align;
-        property.width = refer.width;
-      }
-      if (property.type === PropertyTypes.FILL_COLOR) {
-        property.blendMode = refer.blendMode;
-        property.color = refer.color;
-        property.fillType = refer.fillType;
-        property.opacity = refer.opacity;
-        property.visible = refer.visible;
-      } 
-      if (hostToken.properties.length === 1) syncToken(hostToken);
-    }
-  });
+  // getProperty().forEach((property: any) => {
+  //   const hostToken = getToken(property.parent);
+  //   if (property.useToken === token.id) {
+  //     if (property.type === PropertyTypes.CORNER_RADIUS) {
+  //       property.topLeft = refer.topLeft;
+  //       property.topRight = refer.topRight;
+  //       property.bottomRight = refer.bottomRight;
+  //       property.bottomLeft = refer.bottomLeft;
+  //       property.radius = refer.radius;
+  //     }
+  //     if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
+  //       property.align = refer.align;
+  //       property.width = refer.width;
+  //     }
+  //     if (property.type === PropertyTypes.FILL_COLOR) {
+  //       property.blendMode = refer.blendMode;
+  //       property.color = refer.color;
+  //       property.fillType = refer.fillType;
+  //       property.opacity = refer.opacity;
+  //       property.visible = refer.visible;
+  //     } 
+  //     if (hostToken.properties.length === 1) syncToken(hostToken);
+  //   }
+  // });
 };
 const syncPageThemeMode = () => {
   sendMessage(
@@ -419,16 +389,16 @@ const restore = (id) => {
     id
   );
 };
-const referByToken = (token: Token): Array<Token> =>
-  getProperty()
-    .filter((property: any) => property.useToken === token.id)
-    .map((property: any) => getToken(property.parent));
-const syncNode = (token: Token) => {
-  sendMessage(
-    MessageTypes.SYNC_NODES,
-    token
-  );
-};
+const referByToken = (token: Token): Array<Token> => null
+//   getProperty()
+//     .filter((property: any) => property.useToken === token.id)
+//     .map((property: any) => getToken(property.parent));
+// const syncNode = (token: Token) => {
+//   sendMessage(
+//     MessageTypes.SYNC_NODES,
+//     token
+//   );
+// };
 const sendMessage = (type: MessageTypes | string, message: string | object = "") => parent.postMessage(
   {
     pluginMessage: {
@@ -444,23 +414,23 @@ export {
   getAPI,
   fetchInitial,
   getVersion,
-  getThemeMode,
+  // getThemeMode,
   getCurrentThemeMode,
   getFonts,
-  getGroup,
-  getToken,
-  getProperty,
-  getPureToken,
+  // getGroup,
+  // getToken,
+  // getProperty,
+  // getPureToken,
   getSaveData,
 
   // setAPI,
   setVersion,
-  setThemeMode,
+  // setThemeMode,
   setCurrentThemeMode,
   removeThemeMode,
   setFonts,
-  setGroup,
-  setToken,
+  // setGroup,
+  // setToken,
   setProperty,
   setPureToken,
   removeGroup,
@@ -469,7 +439,7 @@ export {
   saveThemeMode,
   saveVersion,
   syncToken,
-  syncNode,
+  // syncNode,
   syncPageThemeMode,
   restore,
   referByToken,

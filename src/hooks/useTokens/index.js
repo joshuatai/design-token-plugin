@@ -2,23 +2,23 @@ import { useContext } from 'react';
 import { tokensContext, tokensSetterContext, purePropertyTokensContext, purePropertyTokensSetterContext } from '../TokenProvider';
 import useAPI from 'hooks/useAPI';
 import { Mixed } from 'symbols/index';
+import PropertyTypes from 'enums/PropertyTypes';
 const useTokens = () => {
     const { api } = useAPI();
     const tokens = useContext(tokensContext);
     const { setTokens } = useContext(tokensSetterContext);
     const pureTokens = useContext(purePropertyTokensContext);
     const { setPureTokens } = useContext(purePropertyTokensSetterContext);
-    const _getPureTokensByType = (types) => {
-        const _types = [];
-        typeof (types) === 'string' ? _types.push(types) : _types.concat(types);
-        const _pureTokens = _types.map(type => pureTokens[type]);
-        return _pureTokens;
+    const _getPureTokensByProperty = (property) => {
+        const types = property.type === PropertyTypes.STROKE_FILL ? [PropertyTypes.FILL_COLOR, PropertyTypes.STROKE_FILL] : [property.type];
+        return types
+            .map(type => pureTokens[type])
+            .filter(tokens => tokens)
+            .flat()
+            .filter(token => !property.parent || token.id !== property.parent);
     };
-    const _getToken = (id) => {
-        if (id) {
-            return tokens.slice().find(_token => _token.id === id);
-        }
-        return tokens.slice();
+    const _getToken = function (id) {
+        return arguments.length ? tokens.slice().find(_token => _token.id === id) : tokens.slice();
     };
     const _removeToken = (token) => {
         const nextTokens = tokens.slice().filter(_token => _token.id != token.id);
@@ -52,7 +52,7 @@ const useTokens = () => {
     return {
         tokens,
         pureTokens,
-        getPureTokensByType: _getPureTokensByType,
+        getPureTokensByProperty: _getPureTokensByProperty,
         getToken: _getToken,
         removeToken: _removeToken,
         addToken: _addToken,

@@ -1,3 +1,4 @@
+import PropertyTypes from 'enums/PropertyTypes';
 import CornerRadius from "./CornerRadius";
 import StrokeWidthAlign from "./StrokeWidthAlign";
 import FillColor from "./FillColor";
@@ -6,11 +7,11 @@ import Opacity from "./Opacity";
 import Font from "./Font";
 import Spacing from "./Spacing";
 export default {
-    CornerRadius,
-    FillColor,
-    Opacity,
-    StrokeFill,
-    StrokeWidthAlign,
-    Font,
-    Spacing,
+    [PropertyTypes.CORNER_RADIUS]: CornerRadius,
+    [PropertyTypes.FILL_COLOR]: FillColor,
+    [PropertyTypes.OPACITY]: Opacity,
+    [PropertyTypes.STROKE_FILL]: StrokeFill,
+    [PropertyTypes.STROKE_WIDTH_ALIGN]: StrokeWidthAlign,
+    [PropertyTypes.FONT]: Font,
+    [PropertyTypes.SPACING]: Spacing,
 };
