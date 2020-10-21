@@ -16,6 +16,14 @@ import { Mixed } from 'symbols/index';
 
 export const JSONBIN_URL = `https://api.jsonbin.io`;
 
+const toSaveTokens = (tokens: Array<Token>) => {
+  const _tokens = tokens.map((token: Token) => {
+    const _token = new Token(token);
+    if (_token.propertyType === Mixed) _token.propertyType = 'Mixed';
+    return _token;
+  })
+  return _tokens;
+}
 const toSaveProperties = (properties) => {
   const _properties = properties.map((prop: Property) => {
     const _prop = new Properties[prop.type](prop);
@@ -190,7 +198,7 @@ const useData = () => {
       "data": {
         themeModes: _themeModes,
         groups,
-        tokens,
+        tokens: toSaveTokens(tokens),
         properties: toSaveProperties(properties)
       }
     });
@@ -216,7 +224,7 @@ const useData = () => {
       "data": {
         themeModes,
         groups: _groups,
-        tokens,
+        tokens: toSaveTokens(tokens),
         properties: toSaveProperties(properties)
       }
     });
@@ -235,7 +243,7 @@ const useData = () => {
       "data": {
         themeModes,
         groups,
-        tokens: _tokens,
+        tokens: toSaveTokens(_tokens),
         properties: toSaveProperties(properties)
       }
     });
@@ -255,7 +263,7 @@ const useData = () => {
       "data": {
         themeModes,
         groups,
-        tokens,
+        tokens: toSaveTokens(tokens),
         properties: toSaveProperties(_properties)
       }
     });
@@ -274,7 +282,7 @@ const useData = () => {
       "data": {
         themeModes,
         groups: _groups,
-        tokens: _tokens,
+        tokens: toSaveTokens(_tokens),
         properties: toSaveProperties(_properties)
       }
     });

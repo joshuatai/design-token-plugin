@@ -6,10 +6,20 @@ import { ThemeModesContext } from '../ThemeModeProvider';
 import { groupsContext } from '../GroupProvider';
 import { tokensContext } from '../TokenProvider';
 import { propertiesContext } from '../PropertyProvider';
+import Token from 'model/Token';
 import Properties from 'model/Properties';
 import PropertyTypes from 'enums/PropertyTypes';
 import { Mixed } from 'symbols/index';
 export const JSONBIN_URL = `https://api.jsonbin.io`;
+const toSaveTokens = (tokens) => {
+    const _tokens = tokens.map((token) => {
+        const _token = new Token(token);
+        if (_token.propertyType === Mixed)
+            _token.propertyType = 'Mixed';
+        return _token;
+    });
+    return _tokens;
+};
 const toSaveProperties = (properties) => {
     const _properties = properties.map((prop) => {
         const _prop = new Properties[prop.type](prop);
@@ -181,7 +191,7 @@ const useData = () => {
             "data": {
                 themeModes: _themeModes,
                 groups,
-                tokens,
+                tokens: toSaveTokens(tokens),
                 properties: toSaveProperties(properties)
             }
         });
@@ -203,7 +213,7 @@ const useData = () => {
             "data": {
                 themeModes,
                 groups: _groups,
-                tokens,
+                tokens: toSaveTokens(tokens),
                 properties: toSaveProperties(properties)
             }
         });
@@ -222,7 +232,7 @@ const useData = () => {
             "data": {
                 themeModes,
                 groups,
-                tokens: _tokens,
+                tokens: toSaveTokens(_tokens),
                 properties: toSaveProperties(properties)
             }
         });
@@ -241,7 +251,7 @@ const useData = () => {
             "data": {
                 themeModes,
                 groups,
-                tokens,
+                tokens: toSaveTokens(tokens),
                 properties: toSaveProperties(_properties)
             }
         });
@@ -260,7 +270,7 @@ const useData = () => {
             "data": {
                 themeModes,
                 groups: _groups,
-                tokens: _tokens,
+                tokens: toSaveTokens(_tokens),
                 properties: toSaveProperties(_properties)
             }
         });

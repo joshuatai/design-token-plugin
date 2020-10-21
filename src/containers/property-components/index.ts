@@ -7,12 +7,6 @@ import Opacity from './Opacity';
 import Font from './Font';
 import Spacing from './Spacing';
 
-// $(document).on(`${BrowserEvents.FOCUSIN} ${BrowserEvents.FOCUSOUT}`, '.val-container [contenteditable="true"], .separator-vals [contenteditable="true"]', function (event) {
-//   const input = $(this);
-//   if (event.type === BrowserEvents.FOCUSIN) input['selectText']();
-//   input.closest('.val-container')[event.type === BrowserEvents.FOCUSIN ? 'addClass' : 'removeClass']('focus');
-// });
-
 $(document).on(
   "shown.bs.dropdown hidden.bs.dropdown",
   ".input-group-btn, .dropdown",

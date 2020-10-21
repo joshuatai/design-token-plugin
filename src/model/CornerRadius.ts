@@ -2,7 +2,17 @@ import { v4 } from 'uuid';
 import PropertyType from 'enums/PropertyTypes';
 import { Mixed } from 'symbols/index';
 
-class CornerRadius {
+interface I_CornerRadius {
+  id: string,
+  parent: string,
+  radius: number | symbol,
+  topLeft: number,
+  topRight: number,
+  bottomRight: number,
+  bottomLeft: number,
+  useToken: string,
+}
+class CornerRadius implements I_CornerRadius {
   private _type: string = PropertyType.CORNER_RADIUS;
   id: string = v4();
   parent: string = '';

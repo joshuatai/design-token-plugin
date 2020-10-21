@@ -13,36 +13,19 @@ import TokenSetting from './TokenSetting';
 import ThemeModesContainer from './ThemeModesContainer';
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
-import { getSaveData, removeGroup, getCurrentThemeMode, setCurrentThemeMode, removeToken, save, sendMessage, setFonts, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
+import { getSaveData, getCurrentThemeMode, setCurrentThemeMode, removeToken, save, sendMessage, setFonts, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
 // import { themeModeIcon } from './property-components/CommonSettings.tss';
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
 import Group from 'model/Group';
 import Token from 'model/Token';
 import Properties from 'model/Properties';
-import { Mixed } from 'symbols/index';
 import MessageTypes from 'enums/MessageTypes';
-// import PropertyIcon from './property-components/PropertyIcon';
 import BrowserEvents from 'enums/BrowserEvents';
 import preventEvent from 'utils/preventEvent';
 import { inputCheck } from 'utils/inputValidator';
-// TokenSetting(jQuery);
 SelectText(jQuery);
 PluginDestroy(jQuery);
-const $groupActionDelete = $(`<li class="delete-group"><a href="#">Delete Group</a></li>`);
-const $groupActionDropdown = $(`<ul class="dropdown-menu pull-right "></ul>`).append($groupActionDelete);
-const $tokenActionWrapper = $(``);
-const $tokenEditBtn = $('');
-const $tokenActionDropdown = $(``);
-const $tokenActionClone = $(``);
-const $tokenActionDelete = $(``);
-const $tokenActionUnassign = $(``);
-$tokenActionWrapper
-    .append($tokenEditBtn)
-    .append($tokenActionDropdown
-    .append($tokenActionClone)
-    .append($tokenActionUnassign)
-    .append($tokenActionDelete));
 const Tokens = ({ data = {
     themeModes: [],
     groups: [],
@@ -55,12 +38,7 @@ const Tokens = ({ data = {
     const { setAllProperties } = useProperties();
     const { setAllThemeModes } = useThemeModes();
     const tokenSetting = useContext(tokenSettingContext);
-    let $tokenContainer, $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $groupCreator, $themeModeList, $versionCreator, $versionList;
-    const Utils = {
-        clearSelection: () => {
-            document.getSelection().removeAllRanges();
-        }
-    };
+    let $tokenContainer, $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $themeModeList, $versionCreator, $versionList;
     const Renderer = {
         themeModes: function () {
             const modes = []; //getThemeMode();
@@ -99,15 +77,6 @@ const Tokens = ({ data = {
                 $remove
             })));
             return $version;
-        },
-        token: function (token) {
-            const { $tokenList, $expend } = $(`#${token.parent}`).data();
-            let $token = $(`#${token.id}`);
-            let $icon;
-            if (token.propertyType !== Mixed) {
-                // $icon = PropertyIcon(token.properties, true).$icon;
-            }
-            return $token;
         },
         tokensAssigned: function (nodes) {
             $assignedTokensNodeList.empty();
@@ -154,22 +123,15 @@ const Tokens = ({ data = {
             }
         },
         updateToken: function (token) {
-            const { $expend, $heading } = $(`#${token.parent}`).data();
-            // getToken().forEach(_token => {
-            //   this.token(_token);
-            // });
-            if ($heading.is('[aria-expanded="false"]')) {
-                $expend.trigger('click');
-            }
+            // if ($heading.is('[aria-expanded="false"]')) {
+            //   $expend.trigger('click');
+            // }
         },
         updateThemeMode: function () {
             // $('#design-tokens-container .fill-color-icon').parent().each((index, item) => {
             //   const { token } = $(item).data();
             //   this.token(getToken(token));
             // });
-        },
-        removeGroup: function (group) {
-            $(`#${group.id}`).remove();
         },
         removeToken: function (token) {
             // const group = getGroup(token.parent);
@@ -207,22 +169,9 @@ const Tokens = ({ data = {
         //groups: Array<Object>
         // let isTokenOpen = false;
         // groups.forEach((group: Group) => {
-        //   const $group = Renderer.group(new Group({
-        //     id: group.id,
-        //     name: group.name
-        //   }));
         //   const { $expend, data } = $group.data();
         //   if (group.tokens.length > 0) {
         //     group.tokens.forEach(token => {
-        //       token.properties = token.properties.map((property: any) => {
-        //         const data = new Properties[property._type.replace(/[^A-Za-z]/g, '')](property);
-        //         setProperty(data);
-        //         return data;
-        //       });
-        //       if (token.propertyType === String(Mixed)) token.propertyType = Mixed;
-        //       const $token = Renderer.token(new Token(token));
-        //       setToken($token.data);
-        //       setPureToken($token.data);
         //     });
         //     if (!isTokenOpen) {
         //       isTokenOpen = true;
@@ -230,21 +179,6 @@ const Tokens = ({ data = {
         //     }
         //   }
         // });
-    }
-    function createMode() {
-        // const $mode = Renderer.themeMode(new ThemeMode({}));
-        // const { data, $name } = $mode.data();
-        // $name.seelctText();
-        // setThemeMode(data);
-    }
-    function createGroup() {
-        // const $group = Renderer.group(new Group({
-        //   name: Utils.newGroupName()
-        // }));
-        // const { data, $name } = $group.data();
-        // $name.selectText();
-        // setGroup(data);
-        // save();
     }
     function createVersion() {
         const saveData = getSaveData();
@@ -304,7 +238,6 @@ const Tokens = ({ data = {
         $tokenContainer = $('#design-tokens-container');
         $desiginSystemTabs = $('#desigin-system-tabs');
         $tokenSetting = $('#token-setting');
-        $groupCreator = $('#group-creator');
         $themeModeList = $('#mode-list');
         // $tabTokensAssigned = $('[aria-controls="selections"]').parent();
         $assignedTokensNodeList = $('#assigned-tokens-node-list');
@@ -325,96 +258,55 @@ const Tokens = ({ data = {
             updateCurrentThemeMode();
         });
         //done
-        $(document).on(`${BrowserEvents.CLICK} ${BrowserEvents.MOUSE_OVER} ${BrowserEvents.MOUSE_OUT}`, '#design-tokens-container .token-item, #assigned-tokens-node-list .token-item, #design-tokens-container .group-item', $.debounce(20, function ({ type, target }) {
-            const $item = $(this);
-            if ($item.is('.token-item')) {
-                const editBtn = $(target).closest('.token-edit-btn');
-                if (!editBtn.length && $item.is('#design-tokens-container .token-item') && type === BrowserEvents.CLICK) {
-                    $('.token-item-selected').removeClass('token-item-selected');
-                    $item.addClass('token-item-selected');
-                    // sendMessage(MessageTypes.ASSIGN_TOKEN ,getToken($item.data('token')));
-                }
-                if (type === BrowserEvents.MOUSE_OVER) {
-                    // if (!$item.is($tokenActionWrapper.data('hoveredItem'))) {
-                    //   $('.open').removeClass('open');
-                    // }
-                }
-            }
-            else {
-                if (type === BrowserEvents.MOUSE_OVER) {
-                    if (!$item.is($groupActionDropdown.data('hoveredItem'))) {
-                        $groupActionDropdown.data('hoveredItem', $item);
-                        $('.open').removeClass('open');
-                    }
-                }
-            }
-        }));
-        // This event listener is to prevent collapse event.
-        // $(document).on(BrowserEvents.CLICK, '.group-name, .add-token', preventEvent);
+        // $(document).on(`${BrowserEvents.CLICK} ${BrowserEvents.MOUSE_OVER} ${BrowserEvents.MOUSE_OUT}`, '#design-tokens-container .token-item, #assigned-tokens-node-list .token-item, #design-tokens-container .group-item',
+        //   $.debounce(20, function ({ type, target }) {
+        //     const $item = $(this);
+        //     if ($item.is('.token-item')) {
+        //       const editBtn = $(target).closest('.token-edit-btn');
+        //       if (!editBtn.length && $item.is('#design-tokens-container .token-item') &&  type === BrowserEvents.CLICK) {
+        //         $('.token-item-selected').removeClass('token-item-selected');
+        //         $item.addClass('token-item-selected');
+        //         // sendMessage(MessageTypes.ASSIGN_TOKEN ,getToken($item.data('token')));
+        //       }
+        //       if (type === BrowserEvents.MOUSE_OVER) {
+        //         // if (!$item.is($tokenActionWrapper.data('hoveredItem'))) {
+        //         //   $('.open').removeClass('open');
+        //         // }
+        //       }
+        //     }
+        //   })
+        // );
         // token setting
-        $(document).on(BrowserEvents.CLICK, '.token-edit-btn, .add-token', function () {
-            // let { group, token } = $(this).closest('.token-item, .panel-heading').data();
-            // Utils.clearSelection();
-            // $tokenSetting.TokenSetting({ group, token });
-            // $tokenSetting.prev().removeClass('show');
-        });
-        $(document).on(BrowserEvents.CONTEXTMENU, '.token-edit-btn, #design-tokens-container .panel-heading .panel-title', function (e) {
-            const $this = $(this);
-            let { group, token } = $this.closest('.token-item, .panel-heading').data();
-            const $dropdownContainer = $this.parent();
-            $('.dropdown').removeClass('open');
-            $dropdownContainer.addClass('open');
-            $tokenActionDelete
-                .removeClass('disabled')
-                .removeAttr('title');
-            Utils.clearSelection();
-            if (token) {
-                // if ($this.is('#design-tokens-container .token-edit-btn')) {
-                //   const refers = referByToken(getToken(token));
-                //   if (refers.length > 0) {
-                //     $tokenActionDelete
-                //       .addClass('disabled')
-                //       .attr('title', `This token has been linked by token: ${refers.map(refer => refer.name)}`);
-                //   }
-                //   $tokenActionClone.add($tokenActionDelete).show();
-                //   $tokenActionUnassign.hide();
-                // } else {
-                //   $tokenActionClone.add($tokenActionDelete).hide();
-                //   $tokenActionUnassign.show();
-                // }
-            }
-            else {
-                const _group = []; //getGroup(group);
-                const refers = [];
-                // _group.tokens.forEach(token => { 
-                //   const refer = referByToken(token);
-                //   if (refer.length) refers.push(...refer);
-                // });
-                $dropdownContainer.append($groupActionDropdown);
-                if (refers.length) {
-                    $groupActionDelete
-                        .addClass('disabled');
-                    // .attr('title', `The tokens under the group ${_group.name} has been linked by other tokens: ${refers.map(refer => refer.name)}`);
-                }
-                else {
-                    $groupActionDelete
-                        .removeClass('disabled')
-                        .removeAttr('title');
-                }
-            }
-        });
-        $(document).on(BrowserEvents.CLICK, '.delete-token:not(".disabled"), .clone-token, .delete-group:not(".disabled"), .unassign-token', function (e) {
+        // $(document).on(BrowserEvents.CONTEXTMENU, '.token-edit-btn, #design-tokens-container .panel-heading .panel-title', function (e) {
+        // const $this = $(this);
+        // let { group, token } = $this.closest('.token-item, .panel-heading').data();
+        // const $dropdownContainer = $this.parent();
+        // 
+        // $dropdownContainer.addClass('open');
+        // $tokenActionDelete
+        //   .removeClass('disabled')
+        //   .removeAttr('title');
+        // Utils.clearSelection();
+        // if (token) {
+        // if ($this.is('#design-tokens-container .token-edit-btn')) {
+        //   const refers = referByToken(getToken(token));
+        //   if (refers.length > 0) {
+        //     $tokenActionDelete
+        //       .addClass('disabled')
+        //       .attr('title', `This token has been linked by token: ${refers.map(refer => refer.name)}`);
+        //   }
+        //   $tokenActionClone.add($tokenActionDelete).show();
+        //   $tokenActionUnassign.hide();
+        // } else {
+        //   $tokenActionClone.add($tokenActionDelete).hide();
+        //   $tokenActionUnassign.show();
+        // }
+        // });
+        $(document).on(BrowserEvents.CLICK, '.delete-token:not(".disabled"), .clone-token, .unassign-token', function (e) {
             const $this = $(this);
             const { group, token } = $this.closest('.token-item, .panel-heading, .group-item').data();
-            const _group = null; //getGroup(group);
             const _token = null; //getToken(token);
-            if ($this.is('.delete-group')) {
-                Renderer.removeGroup(_group);
-                removeGroup(_group);
-                save();
-            }
-            else if ($this.is('.delete-token')) {
-                Renderer.removeToken(_token);
+            if ($this.is('.delete-token')) {
                 removeToken(_token);
                 save();
             }
@@ -423,7 +315,6 @@ const Tokens = ({ data = {
                 _cloneToken.id = v4();
                 _cloneToken.name = `${_cloneToken.name}-copy`;
                 // setToken(_cloneToken);
-                Utils.clearSelection();
                 $tokenContainer.removeClass('show');
                 $tokenSetting.TokenSetting({ group, token: _cloneToken.id });
             }
@@ -433,9 +324,6 @@ const Tokens = ({ data = {
                     tokenId: token
                 });
             }
-            preventEvent(e);
-        });
-        $(document).on(BrowserEvents.CLICK, '.delete-token, .clone-token, .delete-group', function (e) {
             preventEvent(e);
         });
         // done
@@ -454,17 +342,17 @@ const Tokens = ({ data = {
                 if ($tokenItem.length === 0) {
                     $('.token-item').removeClass('token-item-selected');
                 }
-                $('.open').removeClass('open');
+                // $('.open').removeClass('open');
             }
             else if (type === BrowserEvents.MOUSE_OVER && $tokenItem.length === 0 && $groupItem.length === 0) {
-                $('.open').removeClass('open');
+                // $('.open').removeClass('open');
             }
             // if ($radiusSeparateBtns.length === 0) {
             //   $separatorModeSign.attr('separate-type', 'topLeft');
             // }
         });
         // done
-        // $(document).on(`${BrowserEvents.BLUR}`, '.group-name, .theme-mode-name, .version-name', function () {
+        // $(document).on(`${BrowserEvents.BLUR}`, '.theme-mode-name, .version-name', function () {
         //   valChange.call(this);
         //   const $this = $(this);
         //   setTimeout(() => {
@@ -489,31 +377,8 @@ const Tokens = ({ data = {
             $versionCreator.attr('disabled', true);
             preventEvent(e);
         });
-        $(document).on(BrowserEvents.CLICK, `#token-setting .mode-item`, function (event) {
-            // const $this = $(this);
-            // const useMode = $this.data('themeMode');
-            // const property = $this.parent().data('property');
-            // property.options.themeMode = useMode.id;
-            // property.$themeModeList
-            //     .children()
-            //     .removeClass('selected')
-            //     .filter((index, item) => $(item).data('id') === useMode.id)
-            //     .addClass('selected');
-        });
         $(document).on(BrowserEvents.CLICK, '.version-restore', function (e) {
             restore($(this).closest('li').data('data'));
-        });
-        $(document).on('destroy:TokenSetting', (e, token) => {
-            if (token.name && token.properties.length > 0) {
-                Renderer.updateToken(token);
-            }
-            else {
-                //need to chaeck if there is a token or component already refer this token
-                Renderer.removeToken(token);
-                removeToken(token);
-            }
-            save();
-            $tokenSetting.prev().addClass('show');
         });
         $(document).on("sortupdate", '.token-list', function (event, ui) {
             const $sortedItem = $(ui.item[0]);
@@ -527,11 +392,6 @@ const Tokens = ({ data = {
                     nodeId: $sortedItem.closest('.selected-node').data('id'),
                     tokens: tokens.map(token => token.id)
                 });
-            }
-            else {
-                // const group = getGroup($sortedItem.data('group'));
-                // group.tokens = tokens;
-                save();
             }
         });
     }, []);

@@ -1,7 +1,6 @@
 import { useContext } from 'react';
 import { tokensContext, tokensSetterContext, purePropertyTokensContext, purePropertyTokensSetterContext } from '../TokenProvider';
 import useAPI from 'hooks/useAPI';
-import useData from 'hooks/useData';
 import Token from 'model/Token';
 import { Mixed } from 'symbols/index';
 import PropertyTypes from 'enums/PropertyTypes';
@@ -21,7 +20,7 @@ const useTokens = () => {
       .map(type => pureTokens[type])
       .filter(tokens => tokens)
       .flat()
-      .filter(token => !property.parent || token.id !== property.parent);
+      .filter(token => token.id !== property.parent);
   }
   const _getToken = function (id?: string): Token | Array<Token> {
     return arguments.length ? tokens.slice().find(_token => _token.id === id) : tokens.slice();

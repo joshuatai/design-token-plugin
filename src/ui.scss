@@ -97,6 +97,19 @@ body {
     margin: 0 !important;
   }
 }
+.contextmenu {
+  border-width: 0 !important;
+  max-height: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  overflow: hidden !important;
+}
+.open .contextmenu {
+  border-width: 1px !important;
+  max-height: 9999px !important;
+  padding: 8px 0 !important;
+  transition: max-height .35s cubic-bezier(0, 1, 0, 1);
+}
 [contenteditable] {
   border: 1px solid transparent;
   padding: 2px 4px !important;
@@ -389,6 +402,7 @@ body {
 
   button {
     min-width: 0;
+    margin-top: 0;
     position: relative;
   }
 
@@ -541,7 +555,7 @@ body {
   border-left-style: solid;
 }
 
-#property-list .remove-property[disabled],
+#property-list .remove-property[data-disabled=true],
 #mode-list .remove-mode[data-disabled=true],
 #version-list .remove-version[disabled] {
   opacity: 0.3;
@@ -558,7 +572,7 @@ body {
   background: #fff;
   padding: 12px;
   width: 100%;
-  margin: 8px 0;
+  margin: 8px 0 0;
   color: #999;
   cursor: pointer;
 
@@ -583,10 +597,13 @@ body {
 #group-creator,
 #mode-creator,
 .version-create {
-  margin: 5px;
+  margin: 8px;
   width: auto;
 }
 .version-create {
   margin: 5px 0;
   flex-basis: 100%;
+}
+#save-button-container {
+  margin-top: 8px;
 }

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import PropertyIcon from './PropertyIcon';
 import PureTokens from "./PureTokens";
+import useTokenSetting from 'hooks/useTokenSetting';
 import usePropertySetting from 'hooks/usePropertySetting';
 import useTokens from "hooks/useTokens";
 import useProperties from 'hooks/useProperties';
@@ -12,8 +13,9 @@ SelectText(jQuery);
 const Spacing = ({ value = null }) => {
     const { getToken, getPureTokensByProperty } = useTokens();
     const { getProperty } = useProperties();
-    const [setting, setSetting] = useState(value || new Model());
+    const { setting: tokenSetting } = useTokenSetting();
     const { setPropertySetting } = usePropertySetting();
+    const [setting, setSetting] = useState(value || new Model({ parent: tokenSetting.token.id }));
     const { value: spacing, useToken } = setting;
     const pureTokens = getPureTokensByProperty(setting);
     const $spacingRef = useRef();

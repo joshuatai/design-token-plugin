@@ -1,6 +1,6 @@
 import React from "react";
 const PureTokens = ({ property = null, useTokenHandler = null, detachTokenHandler = null, pureTokens = [] }) => {
-    let title = 'Reference an existing token.';
+    let title = 'To link an existing token.';
     const selectHandler = (token) => () => {
         useTokenHandler(token);
     };

@@ -14,7 +14,7 @@ const PureTokens: FC<T_PureTokens> = ({
   detachTokenHandler = null,
   pureTokens = []
 }: T_PureTokens): ReactElement => {
-  let title = 'Reference an existing token.';
+  let title = 'To link an existing token.';
   const selectHandler = (token: Token) => () => {
     useTokenHandler(token);
   };

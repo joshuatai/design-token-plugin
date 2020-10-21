@@ -6,20 +6,29 @@ const initialProperty: Property = null;
 const initialPropertySetter = {
   setProperty: null
 };
+const initialPropertyEdit: Property = null;
+const initialPropertyEditSetter = {
+  setPropertyEdit: null
+};
 const initialProperties: Array<Property> = [];
 const initialPropertiesSetter = {
   setProperties: null
 };
 const propertyContext = React.createContext(initialProperty);
 const propertySetterContext = React.createContext(initialPropertySetter);
-
+const propertyEditContext = React.createContext(initialPropertyEdit);
+const propertyEditSetterContext = React.createContext(initialPropertyEditSetter);
 const propertiesContext = React.createContext(initialProperties);
 const propertiesSetterContext = React.createContext(initialPropertiesSetter);
 const PropertySettingProvider = ({ value = initialProperties, children }) => {
   const [ property, setProperty ] = useState(initialProperty);
+  const [ propertyEdit, setPropertyEdit ] = useState(null);
   const [ properties, setProperties ] = useState(value);
   const propertySetterRef = useRef({
     setProperty
+  });
+  const propertyEditSetterRef = useRef({
+    setPropertyEdit
   });
   const propertiesSetterRef = useRef({
     setProperties
@@ -30,7 +39,11 @@ const PropertySettingProvider = ({ value = initialProperties, children }) => {
       <propertiesSetterContext.Provider value={propertiesSetterRef.current}>
         <propertyContext.Provider value={property}>
           <propertySetterContext.Provider value={propertySetterRef.current}>
-          {children}
+            <propertyEditContext.Provider value={propertyEdit}>
+              <propertyEditSetterContext.Provider value={propertyEditSetterRef.current}>
+                {children}
+              </propertyEditSetterContext.Provider>
+            </propertyEditContext.Provider>
           </propertySetterContext.Provider>
         </propertyContext.Provider>
       </propertiesSetterContext.Provider>
@@ -44,4 +57,4 @@ PropertySettingProvider.propTypes = {
 PropertySettingProvider.displayName = "PropertySettingProvider";
 
 export default PropertySettingProvider;
-export { propertyContext, propertySetterContext, propertiesContext, propertiesSetterContext };
+export { propertyContext, propertySetterContext, propertyEditContext, propertyEditSetterContext, propertiesContext, propertiesSetterContext };

@@ -15,7 +15,7 @@ const useTokens = () => {
             .map(type => pureTokens[type])
             .filter(tokens => tokens)
             .flat()
-            .filter(token => !property.parent || token.id !== property.parent);
+            .filter(token => token.id !== property.parent);
     };
     const _getToken = function (id) {
         return arguments.length ? tokens.slice().find(_token => _token.id === id) : tokens.slice();

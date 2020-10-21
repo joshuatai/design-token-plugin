@@ -1,12 +1,17 @@
 import { useContext } from 'react';
 import { propertiesContext, propertiesSetterContext } from '../PropertyProvider';
 import useAPI from 'hooks/useAPI';
-import useData from 'hooks/useData';
+import useTokens from 'hooks/useTokens';
 const useProperties = () => {
     const { api } = useAPI();
-    const { saveProperties } = useData();
+    const { getToken } = useTokens();
     const properties = useContext(propertiesContext);
     const { setProperties } = useContext(propertiesSetterContext);
+    const _referedTokens = (id) => properties
+        .filter(property => property.useToken === id)
+        .map((property) => property.parent)
+        .filter((tokenId, index, tokens) => tokens.indexOf(tokenId) === index)
+        .map(token => getToken(token));
     const _getProperty = function (id) {
         return arguments.length ? properties.slice().find(_property => _property.id === id) : properties.slice();
     };
@@ -29,6 +34,7 @@ const useProperties = () => {
     };
     return {
         properties,
+        referedTokens: _referedTokens,
         getProperty: _getProperty,
         removeProperty: _removeProperty,
         addProperties: _addProperties,

@@ -1,4 +1,5 @@
 import { v4 } from 'uuid';
+import { Mixed } from 'symbols/index';
 class Token {
   type: string = 'Token';
   id: string = '';
@@ -16,7 +17,7 @@ class Token {
     this.description = description || this.description;
     this.parent = parent || this.parent;
     this.properties = properties || this.properties;
-    this.propertyType = propertyType || this.propertyType;
+    this.propertyType = propertyType ? propertyType === 'Mixed' ? Mixed : propertyType : this.propertyType;
   }
 }
 

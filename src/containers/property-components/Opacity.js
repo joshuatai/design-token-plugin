@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import PropertyIcon from './PropertyIcon';
 import ThemeModes from './ThemeModes';
 import PureTokens from "./PureTokens";
+import useTokenSetting from 'hooks/useTokenSetting';
 import usePropertySetting from 'hooks/usePropertySetting';
 import useThemeModes from 'hooks/useThemeModes';
 import useTokens from "hooks/useTokens";
@@ -15,8 +16,9 @@ const Opacity = ({ value = null }) => {
     const { defaultMode, themeModes } = useThemeModes();
     const { getToken, getPureTokensByProperty } = useTokens();
     const { getProperty } = useProperties();
-    const [setting, setSetting] = useState(value || new Model({ themeMode: defaultMode.id }));
+    const { setting: tokenSetting } = useTokenSetting();
     const { setPropertySetting } = usePropertySetting();
+    const [setting, setSetting] = useState(value || new Model({ parent: tokenSetting.token.id, themeMode: defaultMode.id }));
     const { opacity, useToken } = setting;
     const pureTokens = getPureTokensByProperty(setting);
     const $opacityRef = useRef();

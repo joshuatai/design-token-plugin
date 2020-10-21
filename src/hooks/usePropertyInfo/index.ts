@@ -1,36 +1,50 @@
-import { useContext } from 'react';
 import useThemeModes from 'hooks/useThemeModes';
+import useTokens from 'hooks/useTokens';
 import ThemeMode from 'model/ThemeMode';
+import Token from 'model/Token';
 import PropertyTypes from 'enums/PropertyTypes';
 import { Mixed } from 'symbols/index';
+import useProperties from 'hooks/useProperties';
+import Property from 'model/Property';
 
-// function traversingUseToken (token) {
-//   const themeModes = getThemeMode();
-//   const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
-//   const useThemeMode = formTokenList ? getCurrentThemeMode() : applyThemeMode;
-//   const existCurrentMode = token.properties.find(prop => prop.themeMode === useThemeMode);
-//   const defaultMode = token.properties.find(prop => prop.themeMode === defaultThemeMode);
-//   const property = existCurrentMode ? existCurrentMode : defaultMode;
-//   if (property.useToken) {
-//     return traversingUseToken(getToken(property.useToken));
-//   } else {
-//     return property;
-//   }
-// }
+const useTraversingUsedToken = () => {
+  const { defaultMode } = useThemeModes();
+  const { getToken } = useTokens();
+  const { getProperty, properties } = useProperties();
+  const traversing = (token, applyMode) => {
+    // const useThemeMode = formTokenList ? getCurrentThemeMode() : applyModes;
+    const useThemeMode: ThemeMode = applyMode;
+    const existCurrentModePropId: string = token.properties.find(id => (getProperty(id) as Property).themeMode === useThemeMode.id);
+    const defaultModePropId: string = token.properties.find(id => (getProperty(id) as Property).themeMode === defaultMode.id);
+    const property: Property = existCurrentModePropId ? getProperty(existCurrentModePropId) as Property : getProperty(defaultModePropId) as Property;
+    if (property.useToken) {
+      return traversing(getToken(property.useToken), useThemeMode);
+    } else {
+      return property;
+    }
+  }
+  return {
+    traversing
+  }
+}
 
-const usePropertyInfo = (property, isCalc = false) => {
+const usePropertyInfo = (property, fromTokenList = false) => {
   const { themeModes, defaultMode, getThemeMode } = useThemeModes();
+  const { traversing } = useTraversingUsedToken();
+  const { getToken } = useTokens();
   let css, value, title, secondValue, thridValue, applyThemeMode;
   css = value = title = secondValue = thridValue = applyThemeMode = '';
 
-  if (isCalc && property instanceof Array) {
+  if (fromTokenList && property instanceof Array) {
     // const currentThemeMode = getCurrentThemeMode();
-    // const currentThemeProperty = property.filter(prop => prop.themeMode === currentThemeMode);
-    // if (currentThemeProperty.length > 0) {
-    //   property = currentThemeProperty[0]
-    // } else {
-    //   property = property.filter(prop => prop.themeMode = defaultMode.id)[0];
-    // }
+    const currentThemeMode = defaultMode;
+    const currentThemeProperties = property.filter(prop => prop.themeMode === currentThemeMode.id);
+    const defaultThmeeProperties = property.filter(prop => prop.themeMode = defaultMode.id);
+    if (currentThemeProperties.length > 0) {
+      property = currentThemeProperties.pop(); // not completed 
+    } else {
+      property = defaultThmeeProperties.pop(); // not completed 
+    }
   }
 
   if (property.type === PropertyTypes.FILL_COLOR) {
@@ -109,18 +123,18 @@ const usePropertyInfo = (property, isCalc = false) => {
 //     title = `Stroke Width: ${value} and Stroke Align: ${secondValue}`;
 //   }
     if (property.type === PropertyTypes.OPACITY) {
-      // const isUseToken = property.useToken;
+      let applyThemeMode: ThemeMode;
       if (themeModes.length > 1) {
-        applyThemeMode = property.themeMode;
-        applyThemeMode ? thridValue = (getThemeMode(applyThemeMode) as ThemeMode).name : thridValue = defaultMode.name;
+        applyThemeMode = getThemeMode(property.themeMode) as ThemeMode;
+        applyThemeMode ? thridValue = applyThemeMode.name : thridValue = defaultMode.name;
       }
       value = `${property.opacity}%`;
-      // if (isUseToken) {
-      //   const useToken = getToken(property.useToken);
-      //   value = useToken.name;
-      //   secondValue = '';
-      //   property = traversingUseToken(useToken);
-      // }
+      if (property.useToken) {
+        const useToken = getToken(property.useToken) as Token;
+        value = useToken.name;
+        secondValue = '';
+        property = traversing(useToken, applyThemeMode);
+      }
       title = `Opacity: ${property.opacity}%`;
     }
 //   if (property.type === PropertyTypes.FONT) {
@@ -132,12 +146,14 @@ const usePropertyInfo = (property, isCalc = false) => {
       value = property.value;
       title = `Spacing: ${value}`;
     }
-    // if (property.useToken) {
-    //   let tokenName = getToken(property.useToken).name;
-    //   value = tokenName;
-    // }
+
+    if (property.useToken) {
+      let token = getToken(property.useToken) as Token;
+      value = token.name;
+    }
 
     return {
+      type: property.type,
       value,
       title,
       secondValue,

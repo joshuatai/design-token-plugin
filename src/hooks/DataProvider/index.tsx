@@ -6,6 +6,7 @@ import TokenProvider from '../TokenProvider';
 import PropertyProvider from '../PropertyProvider';
 import TokenSettingProvider from '../TokenSettingProvider';
 import PropertySettingProvider from '../PropertySettingProvider';
+import ContextmenuProvider from '../ContextmenuProvider';
 
 const DataProvider = ({ children }) => {
   return (
@@ -16,7 +17,9 @@ const DataProvider = ({ children }) => {
             <PropertyProvider>
               <TokenSettingProvider>
                 <PropertySettingProvider>
-                  {children}
+                  <ContextmenuProvider>
+                    {children}
+                  </ContextmenuProvider>
                 </PropertySettingProvider>
               </TokenSettingProvider>
             </PropertyProvider>

@@ -1,11 +1,11 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import PropertyIcon from './PropertyIcon';
 import PureTokens from "./PureTokens";
+import useTokenSetting from 'hooks/useTokenSetting';
 import usePropertySetting from 'hooks/usePropertySetting';
 import useTokens from "hooks/useTokens";
 import useProperties from 'hooks/useProperties';
 import InputStatus from "enums/InputStatus";
-import validator from 'validator';
 import Model from 'model/Spacing';
 import Token from 'model/Token';
 import SelectText from 'utils/SelectText';
@@ -13,38 +13,11 @@ import { inputCheck, valChange } from 'utils/inputValidator';
 
 declare var $: any;
 SelectText(jQuery);
-
-
 //     $(document).trigger('property-preview', [this.options]);
 //   }
-//   Spacing.prototype.useToken = function (token) {
-//     this.options.value = token.properties[0].value;
-//     this.$spacingValue.text(token.name).attr('contenteditable', false).attr('title', token.name);
-//   }
-//   Spacing.prototype.detachToken = function (token) {
-//     const usedProperty = token.properties[0];
-//     this.$spacingValue
-//       .text(usedProperty.value)
-//       .attr('contenteditable', true)
-//       .removeAttr('title');
-//   }
-
 //   $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .spacing-val[contenteditable="true"]`, function (event) {
-//     const $this = $(this);
-//     if (event.type === BrowserEvents.KEY_UP) {
-//       if (event.key === 'Enter') $('.btn-primary').trigger('focus');
-//       return;
-//     }
-//     const options = hostData.options;
-//     let value =  $this.text();
-    
-//     if (!validator.isInt(value)) value = options.value;
-//     value = Math.max(0, value);
-//     options.value = value;
-//     $this.text(value);
 //     $(document).trigger('property-preview', [options]);
 //   });
-//   return NAME;
 // }(jQuery);
 
 type T_Spacing = {
@@ -55,8 +28,9 @@ const Spacing: FC<T_Spacing> = ({
 }: T_Spacing) => {
   const { getToken, getPureTokensByProperty } = useTokens();
   const { getProperty } = useProperties();
-  const [ setting, setSetting ] = useState(value || new Model());
+  const { setting: tokenSetting } = useTokenSetting();
   const { setPropertySetting } = usePropertySetting();
+  const [ setting, setSetting ] = useState(value || new Model({ parent: tokenSetting.token.id }));
   const { value: spacing, useToken } = setting;
   const pureTokens: Array<Token> = getPureTokensByProperty(setting);
   const $spacingRef = useRef();
@@ -70,6 +44,7 @@ const Spacing: FC<T_Spacing> = ({
     $($target).selectText();
     if ($valContainer) $valContainer.classList.add('focus');
   }
+
   const keyUpHandler = (e) => {
     inputCheck.call(e.target, e);
   }
@@ -108,7 +83,7 @@ const Spacing: FC<T_Spacing> = ({
     setting.useToken = '';
     setSetting(new Model(setting));
   }
-  
+
   useEffect(() => {
     setPropertySetting(setting);
   }, [setting]);
