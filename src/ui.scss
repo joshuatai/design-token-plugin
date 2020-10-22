@@ -206,7 +206,7 @@ body {
       margin-right: 0;
   
       &:hover {
-        background: #f4f4f4;
+        background: #bcdcff;
         opacity: 1;
       }
       &:focus {
@@ -219,7 +219,7 @@ body {
       display: block;
     }
     &.token-item-selected {
-      background: #daebf7;
+      background: #cbe9ff;
   
       .token-edit-btn {
         background: #18a0fb;
@@ -280,6 +280,10 @@ body {
   box-sizing: border-box;
   cursor: default;
   position: relative;
+
+  &:hover {
+    background-color: #e5f4ff;
+  }
 }
 #version-list li {
   padding: 0;

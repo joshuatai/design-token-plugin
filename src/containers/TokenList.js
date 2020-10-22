@@ -1,13 +1,13 @@
 import React, { useEffect, useRef } from "react";
 import TokenItem from "./TokenItem";
 import useData from "hooks/useData";
+import useGroups from "hooks/useGroups";
 import useTokens from "hooks/useTokens";
-import useGroup from "hooks/useGroups";
-const TokenList = ({ group = null, }) => {
+const TokenList = ({ group = null }) => {
     const { saveGroups } = useData();
+    const { addGroup } = useGroups();
     const { getToken } = useTokens();
     const tokens = group.tokens.map((id) => getToken(id));
-    const { addGroup } = useGroup();
     const $tokensContainerRef = useRef();
     useEffect(() => {
         if (tokens.length > 1) {
@@ -25,7 +25,7 @@ const TokenList = ({ group = null, }) => {
         }
     });
     return (React.createElement("ul", { ref: $tokensContainerRef, className: "token-list" }, tokens.map((token) => {
-        return (React.createElement(TokenItem, { key: token.id, group: group, token: token }));
+        return (React.createElement(TokenItem, { key: token.id, token: token }));
     })));
 };
 export default TokenList;

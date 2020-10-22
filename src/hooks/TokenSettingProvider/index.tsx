@@ -3,7 +3,6 @@ import React, { useRef, useState } from "react";
 import Group from 'model/Group';
 import Token from 'model/Token';
 
-
 export type T_TokenSetting = {
   group: Group,
   token: Token
@@ -13,7 +12,7 @@ export const initialTokenSetting: T_TokenSetting = {
   token: null
 };
 const initialTokenSettingSetter = {
-  setTokenSetting: null
+  setTokenSetting: null,
 };
 export const tokenSettingContext = React.createContext(initialTokenSetting);
 export const tokenSettingSetterContext = React.createContext(initialTokenSettingSetter);

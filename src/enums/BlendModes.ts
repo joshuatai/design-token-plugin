@@ -15,7 +15,6 @@ enum BlendModes {
     SATURATION = 'SATURATION',
     COLOR = 'COLOR',
     LUMINOSITY = 'LUMINOSITY'
-
 }
 
 export default BlendModes;

@@ -152,7 +152,7 @@ const TokenSetting = () => {
             const newToken = new Token({ parent: group.id });
             setTokenSetting({
                 group,
-                token: newToken,
+                token: newToken
             });
         }
         else if (!token.name) {

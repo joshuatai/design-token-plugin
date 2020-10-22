@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import { tokensContext, tokensSetterContext, purePropertyTokensContext, purePropertyTokensSetterContext } from '../TokenProvider';
 import useAPI from 'hooks/useAPI';
+import Token from 'model/Token';
 import { Mixed } from 'symbols/index';
 import PropertyTypes from 'enums/PropertyTypes';
 const useTokens = () => {
@@ -26,13 +27,14 @@ const useTokens = () => {
         return nextTokens;
     };
     const _addToken = (token) => {
+        const _token = new Token(token);
         const nextTokens = tokens.slice();
-        const existIndex = nextTokens.findIndex(_token => _token.id === token.id);
+        const existIndex = nextTokens.findIndex(token => token.id === _token.id);
         if (existIndex === -1) {
-            nextTokens.push(token);
+            nextTokens.push(_token);
         }
         else {
-            nextTokens.splice(existIndex, 1, token);
+            nextTokens.splice(existIndex, 1, _token);
         }
         _setAllTokens(nextTokens);
         return nextTokens;

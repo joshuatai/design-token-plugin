@@ -123,9 +123,8 @@ const usePropertyInfo = (property, fromTokenList = false) => {
 //     title = `Stroke Width: ${value} and Stroke Align: ${secondValue}`;
 //   }
     if (property.type === PropertyTypes.OPACITY) {
-      let applyThemeMode: ThemeMode;
+      const applyThemeMode: ThemeMode = getThemeMode(property.themeMode) as ThemeMode;
       if (themeModes.length > 1) {
-        applyThemeMode = getThemeMode(property.themeMode) as ThemeMode;
         applyThemeMode ? thridValue = applyThemeMode.name : thridValue = defaultMode.name;
       }
       value = `${property.opacity}%`;

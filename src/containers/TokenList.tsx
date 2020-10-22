@@ -3,20 +3,21 @@ import TokenItem from "./TokenItem";
 import Group from "model/Group";
 import Token from "model/Token";
 import useData from "hooks/useData";
+import useGroups from "hooks/useGroups";
 import useTokens from "hooks/useTokens";
-import useGroup from "hooks/useGroups";
 
 type T_TokenList = {
-  group: Group;
+  group: Group
 };
 const TokenList: FC<T_TokenList> = ({
-  group = null,
+  group = null
 }: T_TokenList): ReactElement => {
   const { saveGroups } = useData();
+  const { addGroup } = useGroups();
   const { getToken } = useTokens();
   const tokens = group.tokens.map((id) => getToken(id));
-  const { addGroup } = useGroup();
   const $tokensContainerRef = useRef();
+
   useEffect(() => {
     if (tokens.length > 1) {
       $($tokensContainerRef.current)
@@ -39,7 +40,7 @@ const TokenList: FC<T_TokenList> = ({
     <ul ref={$tokensContainerRef} className="token-list">
       {tokens.map((token: Token) => {
         return (
-          <TokenItem key={token.id} group={group} token={token}></TokenItem>
+          <TokenItem key={token.id} token={token}></TokenItem>
         );
       })}
     </ul>

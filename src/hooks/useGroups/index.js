@@ -2,12 +2,16 @@ import { useContext } from 'react';
 import { groupsContext, groupsSetterContext } from '../GroupProvider';
 import useAPI from 'hooks/useAPI';
 import useData from 'hooks/useData';
+import Group from 'model/Group';
 const useGroups = () => {
     const { api } = useAPI();
     const { saveGroups } = useData();
     const groups = useContext(groupsContext);
     const { setGroups } = useContext(groupsSetterContext);
-    const _getGroup = (id) => (groups.slice().find(group => group.id === id) || groups.slice());
+    const _getGroup = (id) => {
+        const group = groups.slice().find(group => group.id === id);
+        return group ? new Group(group) : groups.slice();
+    };
     const _getGroupName = () => {
         const lastNumber = _getGroup()
             .filter(group => (group.name.match(/^Group \d+$/) ? true : false))
@@ -22,13 +26,14 @@ const useGroups = () => {
         return nextGroups;
     };
     const _addGroup = (group) => {
+        const _group = new Group(group);
         const nextGroups = groups.slice();
-        const existIndex = nextGroups.findIndex(_group => _group.id === group.id);
+        const existIndex = nextGroups.findIndex(group => group.id === _group.id);
         if (existIndex === -1) {
-            nextGroups.push(group);
+            nextGroups.push(_group);
         }
         else {
-            nextGroups.splice(existIndex, 1, group);
+            nextGroups.splice(existIndex, 1, _group);
         }
         _setAllGroups(nextGroups);
         return nextGroups;

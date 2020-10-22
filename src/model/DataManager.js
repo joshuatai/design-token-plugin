@@ -1,7 +1,6 @@
 import _cloneDeep from 'lodash/cloneDeep';
 import MessageTypes from 'enums/MessageTypes';
 import PropertyTypes from 'enums/PropertyTypes';
-import { Mixed } from 'symbols/index';
 export const JSONBIN_URL = `https://api.jsonbin.io`;
 const versions = [];
 const themeModes = [];
@@ -20,11 +19,6 @@ let fonts = {};
 let propertiesMap = {};
 let currentThemeMode;
 const pureToken = Object.keys(PropertyTypes).reduce((calc, type) => (calc[PropertyTypes[type]] = {}, calc), {});
-const clearPureToken = () => {
-    Object.keys(pureToken).forEach(key => {
-        pureToken[key] = {};
-    });
-};
 const getFonts = () => fonts;
 const fetchInitial = () => {
     // sendMessage(MessageTypes.GET_FONTS);
@@ -216,9 +210,6 @@ const onMessageReceived = (event) => {
 };
 window.addEventListener("message", onMessageReceived, false);
 const getCurrentThemeMode = () => currentThemeMode;
-const getSaveData = function () {
-    return group2saveData();
-};
 const getVersion = function (id) { return arguments.length ? versionMap[id] : versions; };
 const removeThemeMode = mode => {
     delete themeModeMap[mode.id];
@@ -232,78 +223,9 @@ const setCurrentThemeMode = themeMode => {
 const setFonts = _fonts => {
     fonts = _fonts;
 };
-const removeGroup = (group) => {
-    // if (getGroup(group.id)) {
-    //   const index = groups.findIndex((_group: Group) => _group.id === group.id);
-    //   group.tokens.forEach(token => {
-    //     removeToken(getToken(token));
-    //   });
-    //   delete groupMap[group.id];
-    //   groups.splice(index, 1);
-    // }
-};
-const removeToken = (token) => {
-    // if (getToken(token.id)) {
-    //   token.properties.forEach((prop: any) => {
-    //     delete propertiesMap[prop.id];
-    //   });
-    //   const tokens = getGroup(token.parent).tokens;
-    //   const index = tokens.findIndex((_token: Token) => _token.id === token.id);
-    //   delete tokenMap[token.id];
-    //   tokens.splice(index, 1);
-    // }
-};
 const setProperty = property => propertiesMap[property.id] = property;
-const setPureToken = (token) => token.propertyType && token.propertyType !== Mixed && (pureToken[token.propertyType][token.id] = token);
-const saveData2Group = () => {
-    let isTokenOpen = false;
-    // groups.forEach((group: Group) => {
-    //   const $group = Renderer.group(new Group({
-    //     id: group.id,
-    //     name: group.name
-    //   }));
-    //   const { $expend, data } = $group.data();
-    //   setGroup(data);
-    //   if (group.tokens.length > 0) {
-    //     group.tokens.forEach(token => {
-    //       token.properties = token.properties.map((property: any) => {
-    //         const data = new Properties[property._type.replace(/[^A-Za-z]/g, '')](property);
-    //         setProperty(data);
-    //         return data;
-    //       });
-    //       if (token.propertyType === String(Mixed)) token.propertyType = Mixed;
-    //       const $token = Renderer.token(new Token(token));
-    //       setToken($token.data);
-    //       setPureToken($token.data);
-    //     });
-    //     if (!isTokenOpen) {
-    //       isTokenOpen = true;
-    //       $expend.trigger('click');
-    //     }
-    //   }
-    // });
-};
-const group2saveData = () => {
-    const _groups = _cloneDeep(groups);
-    propertiesMap = {};
-    clearPureToken();
-    saveData = _groups.map(({ id, name, tokens }, groupIndex) => {
-        tokens.forEach((token, tokenIndex) => {
-            // setPureToken(token);
-            // if (token.propertyType === Mixed) token.propertyType = String(Mixed);
-            // token.properties.forEach((property: any, propIndex) => {
-            //   setProperty(getToken(groups[groupIndex].tokens[tokenIndex]).properties[propIndex]);
-            //   if (property.type === PropertyTypes.CORNER_RADIUS && property.radius === Mixed) {
-            //     property.radius = String(Mixed);
-            //   }
-            // })
-        });
-        return { id, name, tokens };
-    });
-    return saveData;
-};
 const save = () => {
-    sendMessage(MessageTypes.SET_TOKENS, group2saveData());
+    sendMessage(MessageTypes.SET_TOKENS, _cloneDeep(groups));
 };
 const setVersion = (version) => {
     versions.push(version);
@@ -371,15 +293,12 @@ getAPI, fetchInitial, getVersion,
 getCurrentThemeMode, getFonts, 
 // getGroup,
 // getToken,
-// getProperty,
-// getPureToken,
-getSaveData, 
 // setAPI,
 setVersion, 
 // setThemeMode,
 setCurrentThemeMode, removeThemeMode, setFonts, 
 // setGroup,
 // setToken,
-setProperty, setPureToken, removeGroup, removeToken, save, saveThemeMode, saveVersion, syncToken, 
+setProperty, save, saveThemeMode, saveVersion, syncToken, 
 // syncNode,
 syncPageThemeMode, restore, referByToken, sendMessage };

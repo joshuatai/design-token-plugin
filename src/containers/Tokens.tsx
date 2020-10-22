@@ -1,5 +1,4 @@
 import React, { useEffect, FC, useContext } from 'react';
-import { v4 } from 'uuid';
 import hash from 'hash.js';
 import _cloneDeep from 'lodash/cloneDeep';
 
@@ -17,7 +16,7 @@ import ThemeModesContainer from './ThemeModesContainer';
 
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
-import { getSaveData, getVersion, fetchInitial, removeGroup, referByToken, getCurrentThemeMode, setCurrentThemeMode, removeThemeMode, removeToken, setPureToken, setProperty, save, sendMessage, setFonts, saveThemeMode, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
+import {getVersion, fetchInitial, referByToken, getCurrentThemeMode, setCurrentThemeMode, removeThemeMode, setProperty, save, sendMessage, setFonts, saveThemeMode, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
 // import { themeModeIcon } from './property-components/CommonSettings.tss';
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
@@ -56,7 +55,7 @@ const Tokens:FC<Props> = ({
   const { setAllProperties } = useProperties();
   const { setAllThemeModes } = useThemeModes();
   const tokenSetting: T_TokenSetting = useContext(tokenSettingContext);
-  let $tokenContainer, $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $themeModeList, $versionCreator, $versionList;
+  let $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $themeModeList, $versionCreator, $versionList;
 
   const Renderer = {
     themeModes: function () {
@@ -165,23 +164,11 @@ const Tokens:FC<Props> = ({
         $assignedTokensNodeList.append(`<div class="no-node-selected">Please select a node that has assigned at least one token.</div>`)
       }
     },
-    updateToken: function (token: Token) {
-      // if ($heading.is('[aria-expanded="false"]')) {
-      //   $expend.trigger('click');
-      // }
-    },
     updateThemeMode: function () {
       // $('#design-tokens-container .fill-color-icon').parent().each((index, item) => {
       //   const { token } = $(item).data();
       //   this.token(getToken(token));
       // });
-    },
-    removeToken: function (token: Token) {
-      // const group = getGroup(token.parent);
-      // const { $expend } = $(`#${token.parent}`).data();
-  
-      // $(`#${token.id}`).remove();
-      // if (group.tokens.length === 1) $expend.hide();
     }
   };
   function initVersion (versions: Array<Version>) {
@@ -211,26 +198,10 @@ const Tokens:FC<Props> = ({
       });
       setAllProperties(_properties);
     }
-
-    //groups: Array<Object>
-    // let isTokenOpen = false;
-    // groups.forEach((group: Group) => {
-  
-    //   const { $expend, data } = $group.data();
-
-    //   if (group.tokens.length > 0) {
-    //     group.tokens.forEach(token => {
-    //     });
-    //     if (!isTokenOpen) {
-    //       isTokenOpen = true;
-    //       $expend.trigger('click');
-    //     }
-    //   }
-    // });
   }
 
   function createVersion () {
-    const saveData = getSaveData();
+    const saveData = 'group data';
     const dataHash = hash.sha256().update(JSON.stringify(saveData)).digest('hex');
     const $version = Renderer.version(new Version({ hash: dataHash, data: saveData }));
     const { data, $name } = $version.data();
@@ -288,7 +259,6 @@ const Tokens:FC<Props> = ({
 
   useEffect(() => {
     // if (themeModes.length === 0) return;
-    $tokenContainer = $('#design-tokens-container');
     $desiginSystemTabs = $('#desigin-system-tabs');
     $tokenSetting = $('#token-setting');
     $themeModeList = $('#mode-list');
@@ -319,59 +289,16 @@ const Tokens:FC<Props> = ({
     //         $item.addClass('token-item-selected');
     //         // sendMessage(MessageTypes.ASSIGN_TOKEN ,getToken($item.data('token')));
     //       }
-    //       if (type === BrowserEvents.MOUSE_OVER) {
-    //         // if (!$item.is($tokenActionWrapper.data('hoveredItem'))) {
-              
-              
-    //         //   $('.open').removeClass('open');
-    //         // }
-    //       }
     //     }
     //   })
     // );
-    // token setting
-    // $(document).on(BrowserEvents.CONTEXTMENU, '.token-edit-btn, #design-tokens-container .panel-heading .panel-title', function (e) {
-      // const $this = $(this);
-      // let { group, token } = $this.closest('.token-item, .panel-heading').data();
-      // const $dropdownContainer = $this.parent();
-      // 
-      // $dropdownContainer.addClass('open');
-      // $tokenActionDelete
-      //   .removeClass('disabled')
-      //   .removeAttr('title');
-      // Utils.clearSelection();
-      // if (token) {
-        // if ($this.is('#design-tokens-container .token-edit-btn')) {
-        //   const refers = referByToken(getToken(token));
-        //   if (refers.length > 0) {
-        //     $tokenActionDelete
-        //       .addClass('disabled')
-        //       .attr('title', `This token has been linked by token: ${refers.map(refer => refer.name)}`);
-        //   }
-        //   $tokenActionClone.add($tokenActionDelete).show();
-        //   $tokenActionUnassign.hide();
-        // } else {
-        //   $tokenActionClone.add($tokenActionDelete).hide();
-        //   $tokenActionUnassign.show();
-        // }
-    // });
+
     $(document).on(BrowserEvents.CLICK, '.delete-token:not(".disabled"), .clone-token, .unassign-token', function (e) {
       const $this = $(this);
       const { group, token } = $this.closest('.token-item, .panel-heading, .group-item').data();
       
       const _token = null//getToken(token);
-      if ($this.is('.delete-token')) {
-        removeToken(_token);
-        save();
-      } else if ($this.is('.clone-token')) {
-        const _cloneToken = _cloneDeep(_token);
-        _cloneToken.id = v4();
-        _cloneToken.name = `${_cloneToken.name}-copy`;
-        // setToken(_cloneToken);
-        
-        $tokenContainer.removeClass('show');
-        $tokenSetting.TokenSetting({ group, token: _cloneToken.id });
-      } else if ($this.is('.unassign-token')) {
+      if ($this.is('.unassign-token')) {
         sendMessage(MessageTypes.UNASSIGN_TOKEN , {
           nodeId: $this.closest('.selected-node').data('id'),
           tokenId: token
@@ -399,13 +326,8 @@ const Tokens:FC<Props> = ({
       } else if (type === BrowserEvents.MOUSE_OVER && $tokenItem.length === 0 && $groupItem.length === 0) {
         // $('.open').removeClass('open');
       }
-      
-      // if ($radiusSeparateBtns.length === 0) {
-      //   $separatorModeSign.attr('separate-type', 'topLeft');
-      // }
     });
     // done
-    
     // $(document).on(`${BrowserEvents.BLUR}`, '.theme-mode-name, .version-name', function () {
     //   valChange.call(this);
     //   const $this = $(this);
@@ -438,18 +360,18 @@ const Tokens:FC<Props> = ({
       restore($(this).closest('li').data('data'));
     });  
     $(document).on( "sortupdate", '.token-list', function(event, ui) {
-      const $sortedItem = $(ui.item[0]);
-      const $sortableContainer = $sortedItem.parent();
-      const tokens = $.makeArray($sortableContainer.children()).map($token => {
-        const tokenId = $($token).data('token');
-        // return getToken(tokenId);;
-      });
-      if ($sortedItem.is('#assigned-tokens-node-list .token-item')) {
-        sendMessage(MessageTypes.REORDER_ASSIGN_TOKEN , {
-          nodeId: $sortedItem.closest('.selected-node').data('id'),
-          tokens: tokens.map(token => token.id)
-        });
-      }
+      // const $sortedItem = $(ui.item[0]);
+      // const $sortableContainer = $sortedItem.parent();
+      // const tokens = $.makeArray($sortableContainer.children()).map($token => {
+      //   const tokenId = $($token).data('token');
+      //   // return getToken(tokenId);;
+      // });
+      // if ($sortedItem.is('#assigned-tokens-node-list .token-item')) {
+      //   sendMessage(MessageTypes.REORDER_ASSIGN_TOKEN , {
+      //     nodeId: $sortedItem.closest('.selected-node').data('id'),
+      //     tokens: tokens.map(token => token.id)
+      //   });
+      // }
     });
   }, []);
 

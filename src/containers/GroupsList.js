@@ -24,26 +24,6 @@ const GroupItem = ({ data, creatable }) => {
     const { properties, referedTokens, setAllProperties } = useProperties();
     const { setGroup } = useTokenSetting();
     const tokenLinks = _tokens.map(token => referedTokens(token)).flat();
-    const removeHandler = (e) => {
-        if (!admin)
-            return;
-        let _groups = groups.slice().filter(group => group.id !== id);
-        let _tokens = tokens.slice();
-        let _properties = properties.slice();
-        data.tokens.forEach((_tokenId) => {
-            const token = getToken(_tokenId);
-            token.properties.forEach(_propId => {
-                const index = _properties.findIndex(_prop => _prop.id === _propId);
-                _properties.splice(index, 1);
-            });
-            const index = _tokens.findIndex(token => token.id === _tokenId);
-            _tokens.splice(index, 1);
-        });
-        setAllProperties(_properties);
-        setAllTokens(_tokens);
-        setAllGroups(_groups);
-        saveTokensProperties(_groups, _tokens, _properties);
-    };
     const focusHandler = (e) => {
         if (!admin)
             return;
@@ -84,6 +64,26 @@ const GroupItem = ({ data, creatable }) => {
             return;
         setGroup(data);
     };
+    const removeGroupHandler = (e) => {
+        if (!admin)
+            return;
+        let _groups = groups.slice().filter(group => group.id !== id);
+        let _tokens = tokens.slice();
+        let _properties = properties.slice();
+        data.tokens.forEach((_tokenId) => {
+            const token = getToken(_tokenId);
+            token.properties.forEach(_propId => {
+                const index = _properties.findIndex(_prop => _prop.id === _propId);
+                _properties.splice(index, 1);
+            });
+            const index = _tokens.findIndex(token => token.id === _tokenId);
+            _tokens.splice(index, 1);
+        });
+        setAllProperties(_properties);
+        setAllTokens(_tokens);
+        setAllGroups(_groups);
+        saveTokensProperties(_groups, _tokens, _properties);
+    };
     const contextMenuHandler = (e) => {
         if (!admin)
             return;
@@ -96,7 +96,7 @@ const GroupItem = ({ data, creatable }) => {
     };
     const deleteGroupProps = {
         className: 'delete-group',
-        onClick: removeHandler
+        onClick: removeGroupHandler
     };
     if (tokenLinks.length) {
         delete deleteGroupProps.onClick;

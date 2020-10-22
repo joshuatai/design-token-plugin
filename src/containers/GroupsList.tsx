@@ -8,14 +8,12 @@ import useTokenSetting from 'hooks/useTokenSetting';
 import useProperties from 'hooks/useProperties';
 import Group from 'model/Group';
 import Token from 'model/Token';
-import Property from 'model/Property';
 import TokenList from './TokenList';
 import { inputCheck, valChange } from 'utils/inputValidator';
 import SelectText from 'utils/SelectText';
 import BrowserEvents from 'enums/BrowserEvents';
 import preventEvent from 'utils/preventEvent';
 import InputStatus from 'enums/InputStatus';
-
 
 declare var $: any;
 SelectText(jQuery);
@@ -39,25 +37,6 @@ const GroupItem:FC<T_Group> = ({
   const { properties, referedTokens, setAllProperties } = useProperties();
   const { setGroup } = useTokenSetting();
   const tokenLinks = _tokens.map(token => referedTokens(token)).flat();
-  const removeHandler = (e) => {
-    if (!admin) return;
-    let _groups = groups.slice().filter(group => group.id !== id);
-    let _tokens = tokens.slice();
-    let _properties = properties.slice();
-    data.tokens.forEach((_tokenId: string) => {
-      const token = getToken(_tokenId) as Token;
-      token.properties.forEach(_propId => {
-        const index = _properties.findIndex(_prop => _prop.id === _propId);
-        _properties.splice(index, 1);
-      });
-      const index = _tokens.findIndex(token => token.id === _tokenId);
-      _tokens.splice(index, 1);
-    });
-    setAllProperties(_properties);
-    setAllTokens(_tokens);
-    setAllGroups(_groups);
-    saveTokensProperties(_groups, _tokens, _properties);
-  }
   const focusHandler = (e) => {
     if (!admin) return;
     $(groupNameRef.current).selectText();
@@ -93,6 +72,25 @@ const GroupItem:FC<T_Group> = ({
     if (!admin) return;
     setGroup(data);
   }
+  const removeGroupHandler = (e) => {
+    if (!admin) return;
+    let _groups = groups.slice().filter(group => group.id !== id);
+    let _tokens = tokens.slice();
+    let _properties = properties.slice();
+    data.tokens.forEach((_tokenId: string) => {
+      const token = getToken(_tokenId) as Token;
+      token.properties.forEach(_propId => {
+        const index = _properties.findIndex(_prop => _prop.id === _propId);
+        _properties.splice(index, 1);
+      });
+      const index = _tokens.findIndex(token => token.id === _tokenId);
+      _tokens.splice(index, 1);
+    });
+    setAllProperties(_properties);
+    setAllTokens(_tokens);
+    setAllGroups(_groups);
+    saveTokensProperties(_groups, _tokens, _properties);
+  }
   const contextMenuHandler = (e) => {
     if (!admin) return;
     setContextmenu(true);
@@ -103,7 +101,7 @@ const GroupItem:FC<T_Group> = ({
   }
   const deleteGroupProps = {
     className: 'delete-group',
-    onClick: removeHandler
+    onClick: removeGroupHandler
   };
   if (tokenLinks.length) {
     delete deleteGroupProps.onClick;

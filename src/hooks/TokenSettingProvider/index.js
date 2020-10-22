@@ -5,7 +5,7 @@ export const initialTokenSetting = {
     token: null
 };
 const initialTokenSettingSetter = {
-    setTokenSetting: null
+    setTokenSetting: null,
 };
 export const tokenSettingContext = React.createContext(initialTokenSetting);
 export const tokenSettingSetterContext = React.createContext(initialTokenSettingSetter);

@@ -6,7 +6,6 @@ import TokenProvider from '../TokenProvider';
 import PropertyProvider from '../PropertyProvider';
 import TokenSettingProvider from '../TokenSettingProvider';
 import PropertySettingProvider from '../PropertySettingProvider';
-import ContextmenuProvider from '../ContextmenuProvider';
 const DataProvider = ({ children }) => {
     return (React.createElement(APIProvider, null,
         React.createElement(ThemeModesProvider, null,
@@ -14,8 +13,7 @@ const DataProvider = ({ children }) => {
                 React.createElement(TokenProvider, null,
                     React.createElement(PropertyProvider, null,
                         React.createElement(TokenSettingProvider, null,
-                            React.createElement(PropertySettingProvider, null,
-                                React.createElement(ContextmenuProvider, null, children)))))))));
+                            React.createElement(PropertySettingProvider, null, children))))))));
 };
 DataProvider.propTypes = {};
 DataProvider.displayName = "DataProvider";
