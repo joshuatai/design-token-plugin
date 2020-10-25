@@ -13,10 +13,11 @@ import { tokenSettingContext, T_TokenSetting } from 'hooks/TokenSettingProvider'
 import GroupsListContainer from './GroupsListContainer';
 import TokenSetting from './TokenSetting';
 import ThemeModesContainer from './ThemeModesContainer';
+import ThemeModesSetter from './ThemeModesSetter';
 
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
-import {getVersion, fetchInitial, referByToken, getCurrentThemeMode, setCurrentThemeMode, removeThemeMode, setProperty, save, sendMessage, setFonts, saveThemeMode, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
+import {getVersion, fetchInitial, referByToken, getCurrentThemeMode, setCurrentThemeMode, removeThemeMode, setProperty, save, sendMessage, saveThemeMode, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
 // import { themeModeIcon } from './property-components/CommonSettings.tss';
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
@@ -223,10 +224,7 @@ const Tokens:FC<Props> = ({
 
   const onMessageReceived = (event) => {
     const msg = event.data.pluginMessage;
-    // console.log(event);
-    if (msg.type === MessageTypes.GET_FONTS) {
-      setFonts(msg.message);
-    }
+    
     if (msg.type === MessageTypes.GET_VERSIONS) {
       initVersion(msg.message);
     }
@@ -258,7 +256,6 @@ const Tokens:FC<Props> = ({
   }
 
   useEffect(() => {
-    // if (themeModes.length === 0) return;
     $desiginSystemTabs = $('#desigin-system-tabs');
     $tokenSetting = $('#token-setting');
     $themeModeList = $('#mode-list');
@@ -268,11 +265,6 @@ const Tokens:FC<Props> = ({
     $versionList = $('#version-list');
   //   addPostMessageListener();
     init();
-    $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
-      $($(this).attr('href')).append($tokenSetting);
-      if ($tokenSetting.prev().is(':visible')) $tokenSetting.hide();
-        else $tokenSetting.show();
-    })
     $(document).on(`${BrowserEvents.CLICK}`, '.theme-mode', function () {
       const themeModeId = $(this).data('id');
       setCurrentThemeMode(themeModeId);
@@ -384,7 +376,9 @@ const Tokens:FC<Props> = ({
         {
           admin && <li role="presentation"><a href="#io" aria-controls="io" role="tab" data-toggle="tab">I/O</a></li>
         }
+
         <div id="export" title="Export a JSON file" className="export"><span className="tmicon tmicon-export"></span></div>
+        <ThemeModesSetter></ThemeModesSetter>
       </ul>
       <div className="tab-content">
         <div role="tabpanel" className="tab-pane active" id="tokens">

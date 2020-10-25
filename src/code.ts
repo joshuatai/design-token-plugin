@@ -309,37 +309,8 @@ figma.ui.onmessage = async (msg) => {
     figma.clientStorage.setAsync('admin-id', settings['admin-id']);
     figma.clientStorage.setAsync('admin', settings['admin']);
   }
-
-  // if (type === MessageTypes.GET_MODES) {
-  //   const themeModes = figma.root.getPluginData('ThemeModes');
-  //   let modes = [];
-  //   if (themeModes) {
-  //     modes = JSON.parse(themeModes);
-  //   }
-  //   postMessage(type, modes);
-  // }
-  if (type === MessageTypes.SET_MODES) {
-    themeModes = JSON.parse(message);
-    const currentTheme = figma.currentPage.getPluginData('themeMode');
-    if (!currentTheme || !themeModes.find(mode => mode.id === currentTheme)) {
-      figma.currentPage.setPluginData('themeMode', themeModes[0].id);
-    }
-  }
-
-
-
-
-
-  
-
-  
-
   if (type === MessageTypes.GET_FONTS) {
-    let fontList = await figma.clientStorage.getAsync('font-list');
-    if (!fontList) {
-      fontList = await figma.listAvailableFontsAsync();
-      figma.clientStorage.setAsync('font-list', fontList);
-    }
+    const fontList = await figma.listAvailableFontsAsync();
     const fonts = fontList.reduce((calc, font) => {
       if (!calc[font.fontName.family]) calc[font.fontName.family] = [];
       calc[font.fontName.family].push(font.fontName);
@@ -347,16 +318,24 @@ figma.ui.onmessage = async (msg) => {
     }, {});
     postMessage(MessageTypes.GET_FONTS, fonts);
   }
+
+
+
+  if (type === MessageTypes.SET_MODES) {
+    themeModes = JSON.parse(message);
+    const currentTheme = figma.currentPage.getPluginData('themeMode');
+    if (!currentTheme || !themeModes.find(mode => mode.id === currentTheme)) {
+      // figma.currentPage.setPluginData('themeMode', themeModes[0].id);
+    }
+  }
+  
+
+  
   if (type === MessageTypes.GET_VERSIONS) {
     const versionData = figma.root.getPluginData('versions');
     versions = versionData ? JSON.parse(versionData) : [];
     postMessage(type, versions);
   }
-  
-
-
-
-
   if (type === MessageTypes.GET_INIT_THEME_MODE) {
     getInitThemeMode();
     setTimeout(selectionchange, 1000);

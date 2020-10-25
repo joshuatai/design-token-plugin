@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import * as ReactDOM from 'react-dom';
 import useAPI from 'hooks/useAPI';
+import useFonts from 'hooks/useFonts';
 import Tokens from './containers/Tokens';
 import APISetting from './containers/APISetting';
 import Loader from './containers/Loader';
@@ -13,6 +14,7 @@ import MessageTypes from 'enums/MessageTypes';
 const { useEffect } = React;
 const Root = () => {
     const { api: { checked: apiChecked, apiKey, tokensID }, checkAPI, connectAPI, setAPI } = useAPI();
+    const { connectFonts, setFonts } = useFonts();
     const [isFetched, setIsFetched] = useState(false);
     const dataRef = useRef();
     const onMessageReceived = (event) => {
@@ -45,9 +47,9 @@ const Root = () => {
                 });
             }
         }
-        // if (msg.type === MessageTypes.GET_FONTS) {
-        //   setFonts(msg.message);
-        // }
+        if (msg.type === MessageTypes.GET_FONTS) {
+            setFonts(msg.message);
+        }
         // if (msg.type === MessageTypes.GET_VERSIONS) {
         //   initVersion(msg.message);
         // }
@@ -79,6 +81,7 @@ const Root = () => {
     useEffect(function () {
         addPostMessageListener();
         checkAPI();
+        connectFonts();
         return () => removePostMessageListener();
     }, []);
     useEffect(() => {
@@ -89,7 +92,6 @@ const Root = () => {
             }
         }
     }, [apiChecked, tokensID]);
-    // console.log('render root');
     return (!apiChecked ?
         React.createElement(Loader, null) :
         apiKey && tokensID && isFetched ?

@@ -243,9 +243,6 @@ const setCurrentThemeMode = themeMode => {
     themeMode
   );
 }
-const setFonts = _fonts => {
-  fonts = _fonts;
-};
 const setProperty = property => propertiesMap[property.id] = property;
 const save = () => {
   sendMessage(
@@ -338,7 +335,6 @@ export {
   // setThemeMode,
   setCurrentThemeMode,
   removeThemeMode,
-  setFonts,
   // setGroup,
   // setToken,
   setProperty,

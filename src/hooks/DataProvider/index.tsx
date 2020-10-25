@@ -6,6 +6,7 @@ import TokenProvider from '../TokenProvider';
 import PropertyProvider from '../PropertyProvider';
 import TokenSettingProvider from '../TokenSettingProvider';
 import PropertySettingProvider from '../PropertySettingProvider';
+import FontProvider from '../FontProvider';
 
 const DataProvider = ({ children }) => {
   return (
@@ -16,7 +17,9 @@ const DataProvider = ({ children }) => {
             <PropertyProvider>
               <TokenSettingProvider>
                 <PropertySettingProvider>
-                  {children}
+                  <FontProvider>
+                    {children}
+                  </FontProvider>
                 </PropertySettingProvider>
               </TokenSettingProvider>
             </PropertyProvider>

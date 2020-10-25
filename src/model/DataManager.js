@@ -220,9 +220,6 @@ const setCurrentThemeMode = themeMode => {
     currentThemeMode = themeMode;
     sendMessage(MessageTypes.SET_CURRENT_THEME_MODE, themeMode);
 };
-const setFonts = _fonts => {
-    fonts = _fonts;
-};
 const setProperty = property => propertiesMap[property.id] = property;
 const save = () => {
     sendMessage(MessageTypes.SET_TOKENS, _cloneDeep(groups));
@@ -296,7 +293,7 @@ getCurrentThemeMode, getFonts,
 // setAPI,
 setVersion, 
 // setThemeMode,
-setCurrentThemeMode, removeThemeMode, setFonts, 
+setCurrentThemeMode, removeThemeMode, 
 // setGroup,
 // setToken,
 setProperty, save, saveThemeMode, saveVersion, syncToken, 

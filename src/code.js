@@ -307,27 +307,8 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
         figma.clientStorage.setAsync('admin-id', settings['admin-id']);
         figma.clientStorage.setAsync('admin', settings['admin']);
     }
-    // if (type === MessageTypes.GET_MODES) {
-    //   const themeModes = figma.root.getPluginData('ThemeModes');
-    //   let modes = [];
-    //   if (themeModes) {
-    //     modes = JSON.parse(themeModes);
-    //   }
-    //   postMessage(type, modes);
-    // }
-    if (type === MessageTypes.SET_MODES) {
-        themeModes = JSON.parse(message);
-        const currentTheme = figma.currentPage.getPluginData('themeMode');
-        if (!currentTheme || !themeModes.find(mode => mode.id === currentTheme)) {
-            figma.currentPage.setPluginData('themeMode', themeModes[0].id);
-        }
-    }
     if (type === MessageTypes.GET_FONTS) {
-        let fontList = yield figma.clientStorage.getAsync('font-list');
-        if (!fontList) {
-            fontList = yield figma.listAvailableFontsAsync();
-            figma.clientStorage.setAsync('font-list', fontList);
-        }
+        const fontList = yield figma.listAvailableFontsAsync();
         const fonts = fontList.reduce((calc, font) => {
             if (!calc[font.fontName.family])
                 calc[font.fontName.family] = [];
@@ -335,6 +316,13 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
             return calc;
         }, {});
         postMessage(MessageTypes.GET_FONTS, fonts);
+    }
+    if (type === MessageTypes.SET_MODES) {
+        themeModes = JSON.parse(message);
+        const currentTheme = figma.currentPage.getPluginData('themeMode');
+        if (!currentTheme || !themeModes.find(mode => mode.id === currentTheme)) {
+            // figma.currentPage.setPluginData('themeMode', themeModes[0].id);
+        }
     }
     if (type === MessageTypes.GET_VERSIONS) {
         const versionData = figma.root.getPluginData('versions');
