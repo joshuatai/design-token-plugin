@@ -15,7 +15,7 @@ const useFonts = () => {
     setFonts(_fonts);
   }
 
-  const _connectFonts = () => {
+  const _fetchFonts = () => {
     sendMessage(MessageTypes.GET_FONTS);
   }
 
@@ -23,7 +23,7 @@ const useFonts = () => {
     fonts,
     getFont: _getFont,
     setFonts: _setFonts,
-    connectFonts: _connectFonts
+    fetchFonts: _fetchFonts
   };
 };
 

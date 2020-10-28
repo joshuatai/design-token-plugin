@@ -209,17 +209,19 @@ const onMessageReceived = (event) => {
     // }
 };
 window.addEventListener("message", onMessageReceived, false);
-const getCurrentThemeMode = () => currentThemeMode;
 const getVersion = function (id) { return arguments.length ? versionMap[id] : versions; };
 const removeThemeMode = mode => {
     delete themeModeMap[mode.id];
     const index = themeModes.findIndex((_mode) => _mode.id === mode.id);
     themeModes.splice(index, 1);
 };
-const setCurrentThemeMode = themeMode => {
-    currentThemeMode = themeMode;
-    sendMessage(MessageTypes.SET_CURRENT_THEME_MODE, themeMode);
-};
+// const setCurrentThemeMode = themeMode => {
+//   currentThemeMode = themeMode;
+//   sendMessage(
+//     MessageTypes.SET_CURRENT_THEME_MODE,
+//     themeMode
+//   );
+// }
 const setProperty = property => propertiesMap[property.id] = property;
 const save = () => {
     sendMessage(MessageTypes.SET_TOKENS, _cloneDeep(groups));
@@ -287,13 +289,14 @@ export {
 // checkApiKey,
 getAPI, fetchInitial, getVersion, 
 // getThemeMode,
-getCurrentThemeMode, getFonts, 
+getFonts, 
 // getGroup,
 // getToken,
 // setAPI,
 setVersion, 
 // setThemeMode,
-setCurrentThemeMode, removeThemeMode, 
+// setCurrentThemeMode,
+removeThemeMode, 
 // setGroup,
 // setToken,
 setProperty, save, saveThemeMode, saveVersion, syncToken, 

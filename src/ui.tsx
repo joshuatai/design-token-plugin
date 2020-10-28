@@ -18,7 +18,7 @@ const { useEffect } = React;
 
 const Root:FC = () => {
   const { api: { checked: apiChecked, apiKey, tokensID }, checkAPI, connectAPI, setAPI } = useAPI(); 
-  const { connectFonts, setFonts } = useFonts();
+  const { fetchFonts, setFonts } = useFonts();
   const [ isFetched, setIsFetched ] = useState(false);
   const dataRef = useRef();
   const onMessageReceived = (event) => {
@@ -56,13 +56,6 @@ const Root:FC = () => {
     // if (msg.type === MessageTypes.GET_VERSIONS) {
     //   initVersion(msg.message);
     // }
-    // if (msg.type === MessageTypes.GET_MODES) {
-    //   initThemeMode(msg.message);
-    // }
-    // if (msg.type === MessageTypes.GET_INIT_THEME_MODE) {
-    //   msg.message ? setCurrentThemeMode(msg.message) : setCurrentThemeMode(getThemeMode()[0].id);
-    //   updateCurrentThemeMode();
-    // }
     // if (msg.type === MessageTypes.GET_CURRENT_THEME_MODE) {
     //   updateCurrentThemeMode();
     // }
@@ -86,7 +79,7 @@ const Root:FC = () => {
   useEffect(function () {
     addPostMessageListener();
     checkAPI();
-    connectFonts();
+    fetchFonts();
     return () => removePostMessageListener();
   }, []);
   

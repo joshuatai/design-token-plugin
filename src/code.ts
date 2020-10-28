@@ -36,6 +36,17 @@ let allProperties = [];
 function postMessage (type: string, message: string | Object): void {
   figma.ui.postMessage({ type, message });
 }
+function getCurrentThemeMode () {
+  return figma.currentPage.getPluginData('themeMode');
+}
+function setCurrentThemeMode (message) {
+  figma.currentPage.setPluginData('themeMode', message);
+}
+function sendCurrentThemeMode () {
+  // postMessage(MessageTypes.FETCH_CURRENT_THEME_MODE, figma.currentPage.getPluginData('themeMode'));
+}
+
+
 function propertyMaps (properties) {
   return properties.reduce((calc, property) => {
     if (
@@ -201,15 +212,9 @@ function getUsedTokens (properties, token: string) {
     .map(prop => prop.parent);
   return usedTokens.concat(...usedTokens.map(token => getUsedTokens(properties, token)));
 }
-function getInitThemeMode () {
-  postMessage(MessageTypes.GET_INIT_THEME_MODE, figma.currentPage.getPluginData('themeMode'));
-}
-function getCurrentThemeMode () {
-  return figma.currentPage.getPluginData('themeMode');
-}
-function setCurrentThemeMode (message) {
-  figma.currentPage.setPluginData('themeMode', message);
-}
+
+
+
 function syncCurrentThemeMode (node) {
   const currentThemeMode = getCurrentThemeMode();
   function traverse(node) {
@@ -318,6 +323,18 @@ figma.ui.onmessage = async (msg) => {
     }, {});
     postMessage(MessageTypes.GET_FONTS, fonts);
   }
+  if (type === MessageTypes.FETCH_CURRENT_THEME_MODE) {
+    postMessage(MessageTypes.FETCH_CURRENT_THEME_MODE, getCurrentThemeMode());
+    // setTimeout(selectionchange, 1000);
+  }
+  if (type === MessageTypes.SET_CURRENT_THEME_MODE) {
+    setCurrentThemeMode(message);
+  }
+  if (type === MessageTypes.GET_CURRENT_THEME_MODE) {
+    postMessage(MessageTypes.GET_CURRENT_THEME_MODE, getCurrentThemeMode());
+  }
+
+
 
 
 
@@ -336,17 +353,10 @@ figma.ui.onmessage = async (msg) => {
     versions = versionData ? JSON.parse(versionData) : [];
     postMessage(type, versions);
   }
-  if (type === MessageTypes.GET_INIT_THEME_MODE) {
-    getInitThemeMode();
-    setTimeout(selectionchange, 1000);
-  }
-  if (type === MessageTypes.GET_CURRENT_THEME_MODE) {
-    postMessage(MessageTypes.GET_CURRENT_THEME_MODE, getCurrentThemeMode());
-  }
   
-  if (type === MessageTypes.SET_CURRENT_THEME_MODE) {
-    setCurrentThemeMode(message);
-  }
+
+  
+  
   
   if (type === MessageTypes.SET_VERSION) {
     figma.root.setPluginData('versions', message);
@@ -435,7 +445,7 @@ figma.ui.onmessage = async (msg) => {
   }
 };
 figma.on('currentpagechange', () => {
-  getInitThemeMode();
+  sendCurrentThemeMode();
   selectionchange();
 });
 figma.on("selectionchange", () => {

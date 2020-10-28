@@ -72,14 +72,6 @@ SelectText(jQuery);
 //   TokenSetting.prototype.changeThemeMode = function () {
 //     this.$propertyView.propertyView('rerender');
 //   }
-//   // done
-//   $(document).on(BrowserEvents.CLICK, '#token-setting #turn-back-btn', $.debounce(260, function () {
-//     const { token } = hostData;
-//     hostData.$element.trigger('destroy:TokenSetting', [token]).destroy();
-//   }));
-//   $(document).on(BrowserEvents.DBCLICK, '.token-name, .token-description', function (e) {
-//     $(this).selectText();
-//   });
 
 //   $(document).on('property-sort', '#property-list', function (event, properties) {
 //     hostData.token.properties = properties;

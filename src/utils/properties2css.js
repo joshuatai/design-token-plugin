@@ -1,5 +1,4 @@
 import Color from 'color';
-import { getCurrentThemeMode } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
 import StrokeAligns from 'enums/StrokeAligns';
 import FillType from 'enums/FillTypes';
@@ -12,7 +11,8 @@ var FontStyles;
 function traversingUseToken(token) {
     const themeModes = []; // getThemeMode();
     const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
-    const useThemeMode = getCurrentThemeMode();
+    // const useThemeMode = getCurrentThemeMode();
+    const useThemeMode = null;
     const existCurrentMode = token.properties.find(prop => prop.themeMode === useThemeMode);
     const defaultMode = token.properties.find(prop => prop.themeMode === defaultThemeMode);
     const property = existCurrentMode ? existCurrentMode : defaultMode;
@@ -26,7 +26,8 @@ function traversingUseToken(token) {
 export default (properties) => {
     const themeModes = []; //getThemeMode();
     const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
-    const currentThemeMode = getCurrentThemeMode();
+    // const currentThemeMode = getCurrentThemeMode();
+    const currentThemeMode = null;
     const existCurrentMode = {};
     properties.forEach(prop => {
         if (prop.themeMode === currentThemeMode) {

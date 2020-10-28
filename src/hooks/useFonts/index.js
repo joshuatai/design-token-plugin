@@ -12,14 +12,14 @@ const useFonts = () => {
     const _setFonts = (_fonts = []) => {
         setFonts(_fonts);
     };
-    const _connectFonts = () => {
+    const _fetchFonts = () => {
         sendMessage(MessageTypes.GET_FONTS);
     };
     return {
         fonts,
         getFont: _getFont,
         setFonts: _setFonts,
-        connectFonts: _connectFonts
+        fetchFonts: _fetchFonts
     };
 };
 export default useFonts;

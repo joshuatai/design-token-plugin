@@ -1,13 +1,5 @@
 
-#io .setting-row {
-  flex-wrap: wrap;
-}
-#io label {
-  flex-basis: 100%;
-  font-weight: bold;
-  line-height: 32px;
-  margin: 0;
-}
+
 #import-setting {
   resize: none;
   height: 100px;

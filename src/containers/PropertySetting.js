@@ -51,7 +51,7 @@ const PropertySetting = ({ token = null, property = null, hidePropertySetting = 
                             React.createElement("a", { href: "#", type: PropertyTypes[type] }, PropertyTypes[type])));
                     }
                 }))))) : null,
-        React.createElement("div", { id: "property-setting-sections", className: "setting-row" }, PropertyComponent && (React.createElement(PropertyComponent, { value: property }))),
+        React.createElement("div", { id: "property-setting-sections", className: "setting-row" }, PropertyComponent && (React.createElement(PropertyComponent, { value: property, propType: choosedType }))),
         React.createElement("div", { className: "setting-row" },
             React.createElement("button", { id: "property-setting-cancel", type: "button", className: "btn btn-sm btn-border", onClick: hidePropertySetting }, "Cancel"),
             choosedType &&

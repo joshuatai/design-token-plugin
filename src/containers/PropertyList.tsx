@@ -12,8 +12,10 @@ const PropertyList: FC = (): ReactElement => {
 
   useEffect(() => {
     if (propertiesSetting.length > 1) {
-      const $container = $itemContainerRef.current;
-      $($container)
+      const $container = $($itemContainerRef.current);
+      const sortable = $container.sortable('instance');
+      sortable && $container.sortable('destroy');
+      $container
         .sortable({
           placeholder: "ui-sortable-placeholder",
           handle: ".sortable-handler",
@@ -21,7 +23,7 @@ const PropertyList: FC = (): ReactElement => {
         })
         .on("sortupdate", function (event, ui) {
           const sortedProperties = Array.from(
-            $container.children
+            $container.children()
           ).map((item: HTMLElement) => getPropertySetting(item.dataset["id"]));
 
           setPropertiesSetting(sortedProperties);

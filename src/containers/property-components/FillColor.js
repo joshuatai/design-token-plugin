@@ -1,189 +1,187 @@
-import validator from 'validator';
-import Color from 'color';
-import { validateHTMLColorHex } from "validate-color";
+import React, { useEffect, useRef, useState } from "react";
+import PropertyIcon from './PropertyIcon';
+import ThemeModes from './ThemeModes';
+import PureTokens from "./PureTokens";
+import useTokenSetting from 'hooks/useTokenSetting';
+import usePropertySetting from 'hooks/usePropertySetting';
+import useThemeModes from 'hooks/useThemeModes';
+import useTokens from "hooks/useTokens";
+import useProperties from 'hooks/useProperties';
+import FillColorModel from 'model/FillColor';
+import SelectText from 'utils/SelectText';
+import { inputCheck } from 'utils/inputValidator';
 import BrowserEvents from 'enums/BrowserEvents';
-import { getCurrentThemeMode } from 'model/DataManager';
 import PropertyTypes from 'enums/PropertyTypes';
-import FillColor from 'model/FillColor';
-import StrokeFill from 'model/StrokeFill';
+import StrokeColorModel from 'model/StrokeFill';
 import colorPicker from 'utils/colorPicker';
-// import PropertyIcon from './PropertyIcon';
-// import CommonSettings from './CommonSettings.tss';
+SelectText(jQuery);
 colorPicker(jQuery);
-let $host;
-let hostData;
-const NAME = 'color';
-function traversingUseToken(token) {
-    const themeModes = []; //getThemeMode();
-    const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
-    const useThemeMode = getCurrentThemeMode();
-    const existCurrentMode = token.properties.find(prop => prop.themeMode === useThemeMode);
-    const defaultMode = token.properties.find(prop => prop.themeMode === defaultThemeMode);
-    const property = existCurrentMode ? existCurrentMode : defaultMode;
-    if (property.useToken) {
-        // return traversingUseToken(getToken(property.useToken));
-    }
-    else {
-        return property;
-    }
-}
-export default function ($) {
-    var Fill = function (element, options) {
-        const useToken = null; // getToken(options.useToken);
-        let colorValue;
-        let opacityValue;
-        hostData = this;
-        this.options = options.type === PropertyTypes.FILL_COLOR ? new FillColor(options) : new StrokeFill(options);
-        $host = this.$element = $(element).attr('property-component', NAME);
-        this.$customVal = $('<div class="custom-val"></div>');
-        this.$valContainer = $('<div class="val-container"></div>');
-        this.$colorValue = $('<span class="color-val"></span>').attr('contenteditable', !useToken);
-        this.$colorOpacity = $('<span class="opacity-val"></span>').attr('contenteditable', !useToken);
-        const commonSetting = { $token: null, $themeMode: null }; //CommonSettings(this);
-        this.$token = commonSetting.$token;
-        // const commonSetting = CommonSettings(this);
-        // this.$token = commonSetting.$token;
-        this.$themeMode = commonSetting.$themeMode;
-        useToken ? colorValue = useToken.name : colorValue = this.options.color;
-        opacityValue = this.options.opacity;
-        this.$element
-            .append(this.$customVal
-            .append(this.$valContainer
-            .append(this.$icon)
-            .append(this.$colorValue.text(colorValue).attr('title', colorValue))
-            .append(this.$colorOpacity.text(`${Math.floor(opacityValue * 100)}%`).addClass(this.tokenList.length ? 'hasReferenceToken' : ''))
-            .append(this.$themeMode)
-            .append(this.$token)));
-        this.setIcon();
-        $(document).trigger('property-preview', [this.options]);
-    };
-    Fill.prototype.setIcon = function () {
-        // const newIcon = PropertyIcon([this.options]).$icon;
-        // hostData.$icon.replaceWith(newIcon);
-        // hostData.$icon = newIcon;
-        // if (this.options.useToken || this.options.color === 'transparent' || this.options.color === 'null') {
-        //   this.$colorOpacity.hide();
-        //   this.$icon.attr('disabled', true);
-        // } else {
-        //   this.$colorOpacity.show();
-        //   this.$icon.attr('disabled', false);
-        // }
-    };
-    Fill.prototype.useToken = function (token) {
-        const themeModes = []; // getThemeMode();
-        const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
-        let property = token.properties.find(prop => prop.themeMode === getCurrentThemeMode());
-        if (!property)
-            property = token.properties.find(prop => prop.themeMode === defaultThemeMode);
-        const { color, blendMode, fillType, opacity, visible } = property;
-        Object.assign(this.options, { color, blendMode, fillType, opacity, visible });
-        this.$colorValue
-            .text(token.name)
-            .attr('contenteditable', false)
-            .attr('title', token.name);
-        this.setIcon();
-    };
-    Fill.prototype.detachToken = function (token) {
-        if (token.properties.length === 1) {
-            let usedProperty = token.properties[0];
-            if (usedProperty.useToken) {
-                // usedProperty = traversingUseToken(getToken(usedProperty.useToken));
-            }
-            this.$colorValue
-                .text(usedProperty.color)
-                .attr({
-                'contenteditable': true,
-                'title': usedProperty.color
-            });
-            this.$colorOpacity.text(`${Math.floor(usedProperty.opacity * 100)}%`).attr('contenteditable', true).show();
-            this.setIcon();
+const FillColor = ({ value = null, propType }) => {
+    const { defaultMode, themeModes, currentMode } = useThemeModes();
+    const { getToken, getPureTokensByProperty } = useTokens();
+    const { getProperty } = useProperties();
+    const { setting: tokenSetting } = useTokenSetting();
+    const { setPropertySetting } = usePropertySetting();
+    const newOption = { parent: tokenSetting.token.id, themeMode: defaultMode.id };
+    const Model = propType === PropertyTypes.FILL_COLOR ? FillColorModel : StrokeColorModel;
+    const [setting, setSetting] = useState(value || new Model(newOption));
+    const { color, opacity, useToken } = setting;
+    const pureTokens = getPureTokensByProperty(setting);
+    const $colorRef = useRef();
+    const $opacityRef = useRef();
+    const _useToken = getToken(useToken);
+    const colorValue = _useToken ? _useToken.name : color;
+    const opacityValue = opacity;
+    function traversingUseToken(token) {
+        const existCurrentMode = token.properties.find(prop => prop.themeMode === currentMode.id);
+        const useDefaultMode = token.properties.find(prop => prop.themeMode === defaultMode.id);
+        const property = existCurrentMode ? existCurrentMode : useDefaultMode;
+        if (property.useToken) {
+            return traversingUseToken(getToken(property.useToken));
         }
         else {
-            $host.trigger('property-edit', [token.properties]);
+            return property;
         }
-    };
-    Fill.prototype.destroy = function () {
-        return this.$element.removeAttr('property-component').empty().removeData().hide();
-    };
-    function Plugin(option) {
-        return this.each(function () {
-            const $this = $(this);
-            let data = $this.data(NAME);
-            let options;
-            if (typeof option === 'object') {
-                options = option;
-            }
-            else {
-                options = { type: option };
-            }
-            if (data)
-                data.destroy(), data = undefined;
-            if (!data)
-                $this.data(NAME, (data = new Fill(this, options)));
-        });
     }
-    var old = $.fn[NAME];
-    $.fn[NAME] = Plugin;
-    $.fn[NAME].Constructor = Fill;
-    $.fn[NAME].noConflict = function () {
-        $.fn[NAME] = old;
-        return this;
-    };
-    function change(event) {
-        const $this = $(this);
-        if (event.type === BrowserEvents.KEY_UP) {
-            if (event.key === 'Enter')
-                $('.btn-primary').trigger('focus');
+    const focusHandler = (e) => {
+        if (_useToken)
             return;
-        }
-        const options = hostData.options;
-        let value = $this.text().replace('#', '');
-        if ($this.is('.color-val')) {
-            if (!validateHTMLColorHex(`#${value}`) && value.toLowerCase() !== 'transparent' && value.toLowerCase() !== 'null') {
-                value = options.color;
-            }
-            if (value.toLowerCase() === 'transparent' || value.toLowerCase() === 'null') {
-                value = value.toLowerCase();
-            }
-            else {
-                value = Color(`#${value}`).hex().replace('#', '');
-            }
-            options.color = value;
-            $this.text(value);
+        const $target = e.target;
+        const $valContainer = $target.closest('.val-container');
+        $($target).selectText();
+        if ($valContainer)
+            $valContainer.classList.add('focus');
+    };
+    const keyUpHandler = (e) => {
+        inputCheck.call(e.target, e);
+    };
+    const blurHandler = (e) => {
+        // const $this = $(this);
+        // const options: FillColor = hostData.options;
+        // let value =  $this.text().replace('#', '');
+        // if ($this.is('.color-val')) {
+        //   if (!validateHTMLColorHex(`#${value}`) && value.toLowerCase() !== 'transparent' && value.toLowerCase() !== 'null') {
+        //     value = options.color;
+        //   }
+        //   if (value.toLowerCase() === 'transparent' || value.toLowerCase() === 'null') {
+        //     value = value.toLowerCase();
+        //   } else {
+        //     value = Color(`#${value}`).hex().replace('#', '');
+        //   }
+        //   options.color = value;
+        //   $this.text(value);
+        // } else {
+        //   value = value.replace('%', '');
+        //   if (!validator.isInt(value)) value = Math.floor(options.opacity * 100);
+        //   value = Math.min(Math.max(0, value), 100);
+        //   options.opacity = value / 100;
+        //   $this.text(`${value}%`);
+        // }
+        // hostData.setIcon();
+        // $(document).trigger('property-preview', [options]);
+        // const $opacity = $opacityRef.current as HTMLSpanElement;
+        // $opacity.textContent = $opacity.textContent.replace('%', '');
+        // const $target = e.target;
+        // const $valContainer = $target.closest('.val-container');
+        // const propType = $target.getAttribute('prop-type');
+        // const orginVal = setting[propType];
+        // valChange
+        //   .call($target, orginVal, (val) => {
+        //     let _val = val;
+        //     _val = Math.max(0, _val);
+        //     if (_val === orginVal) return { status: InputStatus.NO_CHANGE };
+        //     return { status: InputStatus.VALID, value: _val};
+        //   })
+        //   .then(res => {
+        //     const value = res.value;
+        //     if (res.status === InputStatus.VALID) {
+        //       if (propType === 'radius') {
+        //         if (Validator.int(value)) {
+        //           setting.radius = value;
+        //           setting.topLeft = value;
+        //           setting.topRight = value;
+        //           setting.bottomRight = value;
+        //           setting.bottomLeft = value;
+        //         }
+        //       } else {
+        //         if (Validator.int(value)) {
+        //           setting[propType] = value;
+        //           const uniqueValues = [...new Set(
+        //             [
+        //               setting.topLeft,
+        //               setting.topRight,
+        //               setting.bottomRight,
+        //               setting.bottomLeft
+        //             ]
+        //           )];
+        //           uniqueValues.length === 1 ? setting.radius = value : setting.radius = Mixed;
+        //         }
+        //       }
+        //       setSetting(new Model(setting));
+        //     }
+        //   })
+        //   .catch(res => {
+        //     if (res.status === InputStatus.NO_CHANGE) {}
+        //   });
+        //   if ($valContainer) $valContainer.classList.remove('focus');
+    };
+    const useThemeHandler = (mode) => {
+        setting.themeMode = mode.id;
+        setSetting(new Model(setting));
+    };
+    const useTokenHandler = (usedToken) => {
+        const usedProperty = propType === PropertyTypes.FILL_COLOR ? traversingUseToken(usedToken) : traversingUseToken(usedToken);
+        setting.useToken = usedToken.id;
+        setting.color = usedProperty.color;
+        setting.opacity = usedProperty.opacity;
+        setting.blendMode = usedProperty.blendMode;
+        setting.fillType = usedProperty.fillType;
+        setting.visible = usedProperty.visible;
+        setSetting(new Model(setting));
+    };
+    const detachTokenHandler = () => {
+        const usedProperties = traversingUseToken(getToken(setting.useToken));
+        setting.useToken = '';
+        if (usedProperties.length === 1) {
+            setSetting(new Model(setting));
         }
         else {
-            value = value.replace('%', '');
-            if (!validator.isInt(value))
-                value = Math.floor(options.opacity * 100);
-            value = Math.min(Math.max(0, value), 100);
-            options.opacity = value / 100;
-            $this.text(`${value}%`);
         }
-        hostData.setIcon();
-        $(document).trigger('property-preview', [options]);
-    }
-    function colorPicker(event) {
-        if (!$(this).is('[disabled]')) {
-            hostData.$icon.colorPicker({
+    };
+    function colorPicker(e) {
+        const $icon = $(this);
+        if (!$icon.is('[disabled]')) {
+            $icon.colorPicker({
                 container: '#react-page',
-                color: `#${hostData.options.color}`,
-                opacity: hostData.options.opacity
+                color: `#${setting.color}`,
+                opacity: setting.opacity
             });
         }
     }
     function colorPickerChange(event, picker) {
-        hostData.$colorValue.text(picker.color.replace('#', '')).trigger('blur');
-        hostData.$colorOpacity.text(`${Math.floor(picker.opacity * 100)}%`).trigger('blur');
+        setting.color = picker.color;
+        setting.opacity = picker.opacity * 100;
+        setSetting(setting);
     }
-    $(document)
-        .off(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .color-val[contenteditable="true"], [property-component="${NAME}"] .opacity-val[contenteditable="true"]`)
-        .on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .color-val[contenteditable="true"], [property-component="${NAME}"] .opacity-val[contenteditable="true"]`, change);
-    $(document)
-        .off(BrowserEvents.CLICK, `[property-component="${NAME}"] .fill-color-icon, [property-component="${NAME}"] .stroke-fill-icon`)
-        .on(BrowserEvents.CLICK, `[property-component="${NAME}"] .fill-color-icon, [property-component="${NAME}"] .stroke-fill-icon`, colorPicker);
-    $(document)
-        .off('color-picker-change')
-        .on('color-picker-change', colorPickerChange);
-    return NAME;
-}
-(jQuery);
+    const addPicker = () => {
+        $(document).on(BrowserEvents.CLICK, `.fill-color-icon, .stroke-fill-icon`, colorPicker);
+        $(document).on('color-picker-change', colorPickerChange);
+    };
+    const removePicker = () => {
+        $(document).off(BrowserEvents.CLICK, `.fill-color-icon, .stroke-fill-icon`, colorPicker);
+        $(document).off('color-picker-change');
+    };
+    useEffect(() => {
+        addPicker();
+        return removePicker();
+    }, [setting]);
+    return setting ? React.createElement("div", { className: themeModes.length > 1 ? 'property-setting-section hasThemeMode' : 'property-setting-section' },
+        React.createElement("div", { className: "custom-val" },
+            React.createElement("div", { className: "val-container" },
+                React.createElement(PropertyIcon, { options: [setting] }),
+                React.createElement("span", { ref: $colorRef, "prop-type": "color", "data-type": "hex", className: 'color-val', title: colorValue, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, colorValue),
+                React.createElement("span", { ref: $opacityRef, "prop-type": "opacity", "data-type": "int", className: pureTokens.length ? 'opacity-val hasReferenceToken' : 'opacity-val', title: colorValue, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, `${Math.floor(opacityValue * 100)}%`),
+                React.createElement(ThemeModes, { property: setting, useThemeHandler: useThemeHandler }),
+                React.createElement(PureTokens, { property: setting, pureTokens: pureTokens, useTokenHandler: useTokenHandler, detachTokenHandler: detachTokenHandler })))) : React.createElement(React.Fragment, null);
+};
+export default FillColor;

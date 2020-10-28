@@ -106,7 +106,7 @@ const PropertySetting: FC<T_PropertySetting> = ({
       ) : null}
       <div id="property-setting-sections" className="setting-row">
         {PropertyComponent && (
-          <PropertyComponent value={property}></PropertyComponent>
+          <PropertyComponent value={property} propType={choosedType}></PropertyComponent>
         )}
       </div>
       <div className="setting-row">

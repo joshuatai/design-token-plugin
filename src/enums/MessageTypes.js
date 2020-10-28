@@ -6,7 +6,7 @@ var MessageTypes;
     MessageTypes["GET_VERSIONS"] = "Get Versions";
     MessageTypes["GET_MODES"] = "Get Modes";
     MessageTypes["GET_CURRENT_THEME_MODE"] = "Get Current Theme Mode";
-    MessageTypes["GET_INIT_THEME_MODE"] = "Get Init Theme Mode";
+    MessageTypes["FETCH_CURRENT_THEME_MODE"] = "Fetch Current Theme Mode";
     MessageTypes["SET_CURRENT_THEME_MODE"] = "Set Current Theme Mode";
     MessageTypes["SET_MODES"] = "Set Modes";
     MessageTypes["SET_VERSION"] = "Set Version";

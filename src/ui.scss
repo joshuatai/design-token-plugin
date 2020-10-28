@@ -979,10 +979,24 @@ body {
   margin: 8px;
   width: auto;
 }
-.version-create {
-  margin: 5px 0;
-  flex-basis: 100%;
+
+#io {
+  .setting-row {
+    flex-wrap: wrap;
+    padding: 0 8px;
+  }
+  .version-create {
+    margin: 8px 0;
+    flex-basis: 100%;
+  }
+  label {
+    flex-basis: 100%;
+    font-weight: bold;
+    line-height: 32px;
+    margin: 0;
+  }
 }
+
 #save-button-container {
   margin-top: 8px;
 }

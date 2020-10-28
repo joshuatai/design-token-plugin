@@ -12,8 +12,7 @@ import ThemeModesContainer from './ThemeModesContainer';
 import ThemeModesSetter from './ThemeModesSetter';
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
-import { getCurrentThemeMode, setCurrentThemeMode, sendMessage, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
-// import { themeModeIcon } from './property-components/CommonSettings.tss';
+import { sendMessage, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
 import Group from 'model/Group';
@@ -32,6 +31,7 @@ const Tokens = ({ data = {
     properties: []
 } }) => {
     const { api: { admin } } = useAPI();
+    const { fetchCurrentMode, setCurrentMode, themeModes, getThemeMode, defaultMode } = useThemeModes();
     const { setAllGroups } = useGroups();
     const { setAllTokens } = useTokens();
     const { setAllProperties } = useProperties();
@@ -39,24 +39,6 @@ const Tokens = ({ data = {
     const tokenSetting = useContext(tokenSettingContext);
     let $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $themeModeList, $versionCreator, $versionList;
     const Renderer = {
-        themeModes: function () {
-            const modes = []; //getThemeMode();
-            const $themeModes = $(`<div class="dropdown theme-modes"></div>`);
-            // const $themeModeIcon = $(themeModeIcon);
-            const $themeModeList = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right"></ul>`);
-            $desiginSystemTabs.find('.theme-modes').remove();
-            if (modes.length > 1) {
-                $desiginSystemTabs.append($themeModes
-                    // .append($themeModeIcon)
-                    .append($themeModeList.append(modes.map((mode, index) => {
-                    return `
-                    <li class="theme-mode" data-index="${index}" data-id="${mode.id}">
-                      <a href="#">${mode.name}${mode.isDefault ? ' (Default)' : ''}</a>
-                    </li>
-                  `;
-                }))));
-            }
-        },
         version: function (version) {
             let $version, $name, $remove, $load;
             $versionList
@@ -135,26 +117,6 @@ const Tokens = ({ data = {
             setVersion(data);
         });
     }
-    function init() {
-        if (data.themeModes) {
-            const _themeModes = data.themeModes.map(({ id, name, isDefault }) => new ThemeMode({ id, name, isDefault }));
-            setAllThemeModes(_themeModes);
-        }
-        if (data.groups) {
-            const _groups = data.groups.map(group => new Group(group));
-            setAllGroups(_groups);
-        }
-        if (data.tokens) {
-            const _tokens = data.tokens.map(token => new Token(token));
-            setAllTokens(_tokens);
-        }
-        if (data.properties) {
-            const _properties = data.properties.map(property => {
-                return new Properties[property._type](property);
-            });
-            setAllProperties(_properties);
-        }
-    }
     function createVersion() {
         const saveData = 'group data';
         const dataHash = hash.sha256().update(JSON.stringify(saveData)).digest('hex');
@@ -164,12 +126,6 @@ const Tokens = ({ data = {
         setVersion(data);
     }
     function updateCurrentThemeMode() {
-        const themeMode = getCurrentThemeMode();
-        $desiginSystemTabs.find('.theme-modes ul')
-            .children()
-            .removeClass('selected')
-            .filter((index, item) => $(item).data('id') === themeMode)
-            .addClass('selected');
         Renderer.updateThemeMode();
         $tokenSetting.TokenSetting('changeThemeMode');
         syncPageThemeMode();
@@ -182,8 +138,9 @@ const Tokens = ({ data = {
         // if (msg.type === MessageTypes.GET_MODES) {
         //   initThemeMode(msg.message);
         // }
-        if (msg.type === MessageTypes.GET_INIT_THEME_MODE) {
-            // msg.message ? setCurrentThemeMode(msg.message) : setCurrentThemeMode(getThemeMode()[0].id);
+        if (msg.type === MessageTypes.FETCH_CURRENT_THEME_MODE) {
+            const themeId = msg.message;
+            setCurrentMode(themeId ? getThemeMode(themeId) : defaultMode);
             // updateCurrentThemeMode();
         }
         if (msg.type === MessageTypes.GET_CURRENT_THEME_MODE) {
@@ -212,13 +169,24 @@ const Tokens = ({ data = {
         $assignedTokensNodeList = $('#assigned-tokens-node-list');
         $versionCreator = $('#version-creator');
         $versionList = $('#version-list');
-        //   addPostMessageListener();
-        init();
-        $(document).on(`${BrowserEvents.CLICK}`, '.theme-mode', function () {
-            const themeModeId = $(this).data('id');
-            setCurrentThemeMode(themeModeId);
-            updateCurrentThemeMode();
-        });
+        if (data.themeModes) {
+            const _themeModes = data.themeModes.map(({ id, name, isDefault }) => new ThemeMode({ id, name, isDefault }));
+            setAllThemeModes(_themeModes);
+        }
+        if (data.groups) {
+            const _groups = data.groups.map(group => new Group(group));
+            setAllGroups(_groups);
+        }
+        if (data.tokens) {
+            const _tokens = data.tokens.map(token => new Token(token));
+            setAllTokens(_tokens);
+        }
+        if (data.properties) {
+            const _properties = data.properties.map(property => {
+                return new Properties[property._type](property);
+            });
+            setAllProperties(_properties);
+        }
         //done
         // $(document).on(`${BrowserEvents.CLICK} ${BrowserEvents.MOUSE_OVER} ${BrowserEvents.MOUSE_OUT}`, '#design-tokens-container .token-item, #assigned-tokens-node-list .token-item, #design-tokens-container .group-item',
         //   $.debounce(20, function ({ type, target }) {
@@ -233,7 +201,7 @@ const Tokens = ({ data = {
         //     }
         //   })
         // );
-        $(document).on(BrowserEvents.CLICK, '.delete-token:not(".disabled"), .clone-token, .unassign-token', function (e) {
+        $(document).on(BrowserEvents.CLICK, '.unassign-token', function (e) {
             const $this = $(this);
             const { group, token } = $this.closest('.token-item, .panel-heading, .group-item').data();
             const _token = null; //getToken(token);
@@ -310,7 +278,15 @@ const Tokens = ({ data = {
             //   });
             // }
         });
+        return removePostMessageListener;
     }, []);
+    useEffect(() => {
+        addPostMessageListener();
+        if (themeModes.length > 0) {
+            fetchCurrentMode();
+        }
+        return removePostMessageListener;
+    }, [themeModes]);
     return (React.createElement(React.Fragment, null,
         React.createElement("ul", { id: "desigin-system-tabs", className: "nav nav-tabs", role: "tablist" },
             React.createElement("li", { role: "presentation", className: "active" },

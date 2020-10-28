@@ -5,7 +5,7 @@ enum MessageTypes {
   GET_VERSIONS = "Get Versions",
   GET_MODES = 'Get Modes',
   GET_CURRENT_THEME_MODE = 'Get Current Theme Mode',
-  GET_INIT_THEME_MODE = 'Get Init Theme Mode',
+  FETCH_CURRENT_THEME_MODE = 'Fetch Current Theme Mode',
   SET_CURRENT_THEME_MODE = 'Set Current Theme Mode',
   SET_MODES = 'Set Modes',
   SET_VERSION = 'Set Version',

@@ -228,7 +228,6 @@ const onMessageReceived = (event) => {
 }
 window.addEventListener("message", onMessageReceived, false);
 
-const getCurrentThemeMode = () => currentThemeMode;
 const getVersion = function (id?) { return arguments.length ? versionMap[id] : versions; }
 
 const removeThemeMode = mode => {
@@ -236,13 +235,13 @@ const removeThemeMode = mode => {
   const index = themeModes.findIndex((_mode: ThemeMode) => _mode.id === mode.id);
   themeModes.splice(index, 1);
 }
-const setCurrentThemeMode = themeMode => {
-  currentThemeMode = themeMode;
-  sendMessage(
-    MessageTypes.SET_CURRENT_THEME_MODE,
-    themeMode
-  );
-}
+// const setCurrentThemeMode = themeMode => {
+//   currentThemeMode = themeMode;
+//   sendMessage(
+//     MessageTypes.SET_CURRENT_THEME_MODE,
+//     themeMode
+//   );
+// }
 const setProperty = property => propertiesMap[property.id] = property;
 const save = () => {
   sendMessage(
@@ -325,7 +324,6 @@ export {
   fetchInitial,
   getVersion,
   // getThemeMode,
-  getCurrentThemeMode,
   getFonts,
   // getGroup,
   // getToken,
@@ -333,7 +331,7 @@ export {
   // setAPI,
   setVersion,
   // setThemeMode,
-  setCurrentThemeMode,
+  // setCurrentThemeMode,
   removeThemeMode,
   // setGroup,
   // setToken,

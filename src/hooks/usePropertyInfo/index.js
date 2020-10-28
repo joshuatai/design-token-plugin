@@ -25,21 +25,20 @@ const useTraversingUsedToken = () => {
     };
 };
 const usePropertyInfo = (property, fromTokenList = false) => {
-    const { themeModes, defaultMode, getThemeMode } = useThemeModes();
+    const { themeModes, defaultMode, currentMode, getThemeMode } = useThemeModes();
     const { traversing } = useTraversingUsedToken();
     const { getToken } = useTokens();
     let css, value, title, secondValue, thridValue, applyThemeMode;
     css = value = title = secondValue = thridValue = applyThemeMode = '';
     if (fromTokenList && property instanceof Array) {
-        // const currentThemeMode = getCurrentThemeMode();
-        const currentThemeMode = defaultMode;
+        const currentThemeMode = currentMode || defaultMode;
         const currentThemeProperties = property.filter(prop => prop.themeMode === currentThemeMode.id);
         const defaultThmeeProperties = property.filter(prop => prop.themeMode = defaultMode.id);
         if (currentThemeProperties.length > 0) {
-            property = currentThemeProperties.pop(); // not completed 
+            property = currentThemeProperties.pop();
         }
         else {
-            property = defaultThmeeProperties.pop(); // not completed 
+            property = defaultThmeeProperties.pop();
         }
     }
     if (property.type === PropertyTypes.FILL_COLOR) {
