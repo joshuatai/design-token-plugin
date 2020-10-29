@@ -31,9 +31,9 @@ const PropertyIcon = ({
   fromTokenList = false
 }) => {
   const _property = options.length === 1 ? _cloneDeep(options[0]) : _cloneDeep(options);
-  const { type, title } = usePropertyInfo(_property, fromTokenList);
+  const { type, title, style } = usePropertyInfo(_property, fromTokenList);
 
-  return <Icon type={type} title={title}></Icon> // .attr('data-role', 'token-icon');
+  return <Icon type={type} title={title} style={style}></Icon> // .attr('data-role', 'token-icon');
 }
 
 export default PropertyIcon;

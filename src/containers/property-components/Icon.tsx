@@ -5,7 +5,7 @@ const _Icons = {
   [PropertyTypes.CORNER_RADIUS]: ({ title }) => <span className="corner-radius-icon" title={title}></span>,
   [PropertyTypes.STROKE_WIDTH_ALIGN]: ({ title }) => <span className="stroke-width-icon" title={title}></span>,
   [PropertyTypes.STROKE_FILL]: ({ title }) => <div className="stroke-fill-icon" title={title}></div>,
-  [PropertyTypes.FILL_COLOR]: ({ title }) => <div className="fill-color-icon" title={title}><div className="color-icon-opacity"></div></div>,
+  [PropertyTypes.FILL_COLOR]: ({ title, style }) => <div className="fill-color-icon" title={title} style={{ background: style.background }}><div className="color-icon-opacity" style={{ opacity: style.opacity, width: style.width }}></div></div>,
   [PropertyTypes.OPACITY]: ({ title }) => <div className="opacity-icon color-icon-opacity" title={title}></div>,
   [PropertyTypes.FONT]: ({ title }) => <div className="font-icon" title={title}>A</div>,
   [PropertyTypes.SPACING]: ({ title }) => 
@@ -22,15 +22,17 @@ const _Icons = {
 
 type T_Icon = {
   type,
-  title
+  title,
+  style
 };
 const Icon: FC<T_Icon> = ({
   type,
-  title
+  title,
+  style
 }: T_Icon): ReactElement => {
   const PropertyIcon = _Icons[type];
 
-  return <PropertyIcon title={title}></PropertyIcon>
+  return <PropertyIcon title={title} style={style}></PropertyIcon>
 };
 
 export default Icon;

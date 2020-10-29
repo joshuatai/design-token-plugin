@@ -1,3 +1,4 @@
+import Color from 'color';
 import useThemeModes from 'hooks/useThemeModes';
 import useTokens from 'hooks/useTokens';
 import PropertyTypes from 'enums/PropertyTypes';
@@ -28,8 +29,9 @@ const usePropertyInfo = (property, fromTokenList = false) => {
     const { themeModes, defaultMode, currentMode, getThemeMode } = useThemeModes();
     const { traversing } = useTraversingUsedToken();
     const { getToken } = useTokens();
-    let css, value, title, secondValue, thridValue, applyThemeMode;
-    css = value = title = secondValue = thridValue = applyThemeMode = '';
+    let style, value, title, secondValue, thridValue;
+    value = title = secondValue = thridValue = '';
+    style = {};
     if (fromTokenList && property instanceof Array) {
         const currentThemeMode = currentMode || defaultMode;
         const currentThemeProperties = property.filter(prop => prop.themeMode === currentThemeMode.id);
@@ -40,39 +42,6 @@ const usePropertyInfo = (property, fromTokenList = false) => {
         else {
             property = defaultThmeeProperties.pop();
         }
-    }
-    if (property.type === PropertyTypes.FILL_COLOR) {
-        //     const isUseToken = property.useToken;
-        //     // $icon.addClass('token-icon');
-        //     if (themeModes.length > 1) {
-        //       applyThemeMode = property.themeMode;
-        //       thridValue = getThemeMode(applyThemeMode).name;
-        //     }
-        //     value = property.color;
-        //     secondValue = `${Math.floor(property.opacity * 100)}%`;
-        //     if (isUseToken) {
-        //       const useToken = getToken(property.useToken);
-        //       value = useToken.name;
-        //       secondValue = '';
-        //       property = traversingUseToken(useToken);
-        //     }
-        //     if (property.color === 'transparent' || property.color === 'null') {
-        //       title = `Fill Color: transparent`;
-        //       $icon
-        //         .css('background', 'transparent')
-        //         .children()
-        //         .css({ opacity: 1, width: '14px' });
-        //     } else {
-        //       title = `Fill Color: #${property.color.toUpperCase()}; Opacity: ${Math.floor(property.opacity * 100)}%;`;
-        //       const color = Color(`#${property.color}`);
-        //       $icon
-        //         .css({
-        //           background: color,
-        //           borderColor: color.isLight() ? '#dddddd' : '#FFFFFF'
-        //         })
-        //         .children()
-        //         .css("opacity", (100 - Math.floor(property.opacity * 100)) / 100);
-        //     } 
     }
     //   if (property.type === PropertyTypes.STROKE_FILL) {
     //     const isUseToken = property.useToken;
@@ -128,6 +97,33 @@ const usePropertyInfo = (property, fromTokenList = false) => {
         }
         title = `Opacity: ${property.opacity}%`;
     }
+    if (property.type === PropertyTypes.FILL_COLOR) {
+        const applyThemeMode = getThemeMode(property.themeMode);
+        if (themeModes.length > 1) {
+            applyThemeMode ? thridValue = applyThemeMode.name : thridValue = defaultMode.name;
+        }
+        value = property.color;
+        secondValue = `${property.opacity}%`;
+        if (property.useToken) {
+            const useToken = getToken(property.useToken);
+            value = useToken.name;
+            secondValue = '';
+            property = traversing(useToken, applyThemeMode);
+        }
+        if (property.color === 'transparent') {
+            title = `Fill Color: transparent`;
+            style.background = 'transparent';
+            style.opacity = 1;
+            style.width = '14px';
+        }
+        else {
+            title = `Fill Color: #${property.color.toUpperCase()}; Opacity: ${property.opacity}%;`;
+            const color = Color(`#${property.color}`);
+            style.background = color;
+            style.borderColor = color.isLight() ? '#dddddd' : '#FFFFFF';
+            style.opacity = (100 - property.opacity) / 100;
+        }
+    }
     //   if (property.type === PropertyTypes.FONT) {
     //     value = property.fontName.family;
     //     secondValue = property.fontSize;
@@ -146,7 +142,8 @@ const usePropertyInfo = (property, fromTokenList = false) => {
         value,
         title,
         secondValue,
-        thridValue
+        thridValue,
+        style
     };
 };
 export default usePropertyInfo;

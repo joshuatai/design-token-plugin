@@ -9,7 +9,7 @@ class FillColor {
   parent: string = '';
   fillType: string = FillTypes.SOLID;
   color: string = 'C4C4C4';
-  opacity: number = 1;
+  opacity: number = 100;
   visible: Boolean = true;
   blendMode: string = BlendModes.NORMAL;
   themeMode: string = "";

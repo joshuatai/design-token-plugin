@@ -54,6 +54,7 @@ const Opacity: FC<T_Opacity> = ({
     const $valContainer = $target.closest('.val-container');
     const $opacity = $opacityRef.current as HTMLSpanElement;
     $opacity.textContent = $opacity.textContent.replace('%', '');
+
     valChange
       .call($opacity, opacity, (val) => {
         let _opacity = val;

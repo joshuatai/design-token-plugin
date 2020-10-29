@@ -4,8 +4,8 @@ const _Icons = {
     [PropertyTypes.CORNER_RADIUS]: ({ title }) => React.createElement("span", { className: "corner-radius-icon", title: title }),
     [PropertyTypes.STROKE_WIDTH_ALIGN]: ({ title }) => React.createElement("span", { className: "stroke-width-icon", title: title }),
     [PropertyTypes.STROKE_FILL]: ({ title }) => React.createElement("div", { className: "stroke-fill-icon", title: title }),
-    [PropertyTypes.FILL_COLOR]: ({ title }) => React.createElement("div", { className: "fill-color-icon", title: title },
-        React.createElement("div", { className: "color-icon-opacity" })),
+    [PropertyTypes.FILL_COLOR]: ({ title, style }) => React.createElement("div", { className: "fill-color-icon", title: title, style: { background: style.background } },
+        React.createElement("div", { className: "color-icon-opacity", style: { opacity: style.opacity, width: style.width } })),
     [PropertyTypes.OPACITY]: ({ title }) => React.createElement("div", { className: "opacity-icon color-icon-opacity", title: title }),
     [PropertyTypes.FONT]: ({ title }) => React.createElement("div", { className: "font-icon", title: title }, "A"),
     [PropertyTypes.SPACING]: ({ title }) => React.createElement("div", { className: "spacing-icon", title: title },
@@ -16,8 +16,8 @@ const _Icons = {
             React.createElement("line", { x1: "0.5", y1: "2.45985e-08", x2: "0.499999", y2: "16", stroke: "black" }),
             React.createElement("line", { x1: "15.5", y1: "2.63555e-08", x2: "15.5", y2: "16", stroke: "black" })))
 };
-const Icon = ({ type, title }) => {
+const Icon = ({ type, title, style }) => {
     const PropertyIcon = _Icons[type];
-    return React.createElement(PropertyIcon, { title: title });
+    return React.createElement(PropertyIcon, { title: title, style: style });
 };
 export default Icon;

@@ -1,6 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import Color from 'color';
-import { validateHTMLColorHex } from "validate-color";
 import PropertyIcon from './PropertyIcon';
 import ThemeModes from './ThemeModes';
 import PureTokens from "./PureTokens";
@@ -90,83 +89,36 @@ const FillColor: FC<T_FillColor> = ({
   }
 
   const blurHandler = (e) => {
+    const $target = e.target;
+    const $valContainer = $target.closest('.val-container');
+    const propType = $target.getAttribute('prop-type');
+    const orginVal = setting[propType];
     
-    // const $this = $(this);
-    // const options: FillColor = hostData.options;
-    // let value =  $this.text().replace('#', '');
-    // if ($this.is('.color-val')) {
-    //   if (!validateHTMLColorHex(`#${value}`) && value.toLowerCase() !== 'transparent' && value.toLowerCase() !== 'null') {
-    //     value = options.color;
-    //   }
-    //   if (value.toLowerCase() === 'transparent' || value.toLowerCase() === 'null') {
-    //     value = value.toLowerCase();
-    //   } else {
-    //     value = Color(`#${value}`).hex().replace('#', '');
-    //   }
-    //   options.color = value;
-    //   $this.text(value);
-    // } else {
-    //   value = value.replace('%', '');
-    //   if (!validator.isInt(value)) value = Math.floor(options.opacity * 100);
-    //   value = Math.min(Math.max(0, value), 100);
-    //   options.opacity = value / 100;
-    //   $this.text(`${value}%`);
-    // }
-    // hostData.setIcon();
-    // $(document).trigger('property-preview', [options]);
-
-
-    // const $opacity = $opacityRef.current as HTMLSpanElement;
-    // $opacity.textContent = $opacity.textContent.replace('%', '');
-
-
-
-    // const $target = e.target;
-    // const $valContainer = $target.closest('.val-container');
-    // const propType = $target.getAttribute('prop-type');
-    // const orginVal = setting[propType];
-
-
-    // valChange
-    //   .call($target, orginVal, (val) => {
-    //     let _val = val;
-    //     _val = Math.max(0, _val);
-    //     if (_val === orginVal) return { status: InputStatus.NO_CHANGE };
-    //     return { status: InputStatus.VALID, value: _val};
-    //   })
-    //   .then(res => {
-    //     const value = res.value;
-    //     if (res.status === InputStatus.VALID) {
-    //       if (propType === 'radius') {
-    //         if (Validator.int(value)) {
-    //           setting.radius = value;
-    //           setting.topLeft = value;
-    //           setting.topRight = value;
-    //           setting.bottomRight = value;
-    //           setting.bottomLeft = value;
-    //         }
-    //       } else {
-    //         if (Validator.int(value)) {
-    //           setting[propType] = value;
-    //           const uniqueValues = [...new Set(
-    //             [
-    //               setting.topLeft,
-    //               setting.topRight,
-    //               setting.bottomRight,
-    //               setting.bottomLeft
-    //             ]
-    //           )];
-    //           uniqueValues.length === 1 ? setting.radius = value : setting.radius = Mixed;
-    //         }
-    //       }
-    //       setSetting(new Model(setting));
-    //     }
-    //   })
-    //   .catch(res => {
-    //     if (res.status === InputStatus.NO_CHANGE) {}
-    //   });
+    $target.textContent = $target.textContent.replace(propType === 'color' ? '#' : '%', '');
+    
+    valChange
+      .call($target, orginVal, (val) => {
+        if (propType === 'opacity') {
+          let _opacity = val;
+          _opacity = Math.min(Math.max(0, _opacity), 100);
+          if (_opacity === orginVal) return { status: InputStatus.NO_CHANGE };
+          return { status: InputStatus.VALID, value: _opacity};
+        }
+        return val;
+      })
+      .then(res => {
+        if (res.status === InputStatus.VALID) {
+          propType === 'color' ? setting.color = Color(`#${res.value}`).hex().replace('#', '') : setting.opacity = res.value;
+          setSetting(new Model(setting));
+        }
+      })
+      .catch(res => {
+        if (res.status === InputStatus.NO_CHANGE && propType === 'opacity') {
+          $target.textContent = `${$target.textContent}%`;
+        }
+      });
       
-    //   if ($valContainer) $valContainer.classList.remove('focus');
+      if ($valContainer) $valContainer.classList.remove('focus');
   }
 
   const useThemeHandler = (mode) => {
@@ -230,8 +182,8 @@ const FillColor: FC<T_FillColor> = ({
     <div className="custom-val">
       <div className="val-container">
         <PropertyIcon options={[setting]}></PropertyIcon>
-        <span ref={$colorRef} prop-type="color" data-type="hex" className='color-val' title={colorValue} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{colorValue}</span>
-        <span ref={$opacityRef} prop-type="opacity" data-type="int" className={pureTokens.length ? 'opacity-val hasReferenceToken' : 'opacity-val' } title={colorValue} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{`${Math.floor(opacityValue * 100)}%`}</span>        
+        <span ref={$colorRef} prop-type="color" data-type="hex,transparent" className='color-val' title={colorValue} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{colorValue}</span>
+        <span ref={$opacityRef} prop-type="opacity" data-type="int" className={pureTokens.length ? 'opacity-val hasReferenceToken' : 'opacity-val' } title={colorValue} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{`${opacityValue}%`}</span>        
         <ThemeModes property={setting} useThemeHandler={useThemeHandler}></ThemeModes>
         <PureTokens property={setting} pureTokens={pureTokens} useTokenHandler={useTokenHandler} detachTokenHandler={detachTokenHandler}></PureTokens>
       </div>

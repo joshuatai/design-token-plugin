@@ -1,4 +1,5 @@
 import validator from 'validator';
+import { validateHTMLColorHex } from "validate-color";
 import SelectText from 'utils/SelectText';
 import InputStatus from 'enums/InputStatus';
 import { Mixed } from 'symbols/index';
@@ -12,7 +13,9 @@ SelectText(jQuery);
 
 const Validator = {
   int: (val) => validator.isInt(val.toString()),
-  mixed: (val, org) => val === 'Mixed' && val === org
+  hex: (val) => validateHTMLColorHex(`#${val}`),
+  mixed: (val: string, org) => val === 'Mixed' && val === org,
+  transparent: (val) => val.toLowerCase() === 'transparent'
 }
 const inputCheck = function (e) {
   const $target = this;
@@ -25,7 +28,6 @@ const inputCheck = function (e) {
   })
 
   if (e.key === 'Enter') {
-
     $target.blur();
     return;
   }
