@@ -291,15 +291,6 @@ body {
 
 
 #token-setting {
-  .turn-back-btn {
-    width: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 32px;
-    margin-right: 8px;
-    cursor: pointer;
-  }
   h6 {
     flex: 1;
     font-size: 12px;
@@ -622,7 +613,15 @@ body {
     }
   }
 }
-
+.turn-back-btn {
+  width: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  margin-right: 8px;
+  cursor: pointer;
+}
 .detach-token,
 .use-token,
 .themem-mode-list,

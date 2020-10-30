@@ -17,7 +17,7 @@ class Picker {
     constructor(options) {
         this.mode = PickerMode.SOLID;
         this.color = 0xC4C4C4;
-        this.opacity = 1;
+        this.opacity = 100;
         this.format = ColorFormat.HEX;
         if (options.mode)
             this.mode = options.mode;
@@ -124,7 +124,7 @@ export default function ($) {
         const color = Color().hex(this.options.color);
         this.setFormat(ColorFormat.HEX);
         this.setColor(color);
-        this.setOpacity(Math.floor(this.options.opacity * 100));
+        this.setOpacity(this.options.opacity);
         this.setVal();
         this.setHandler();
     };
@@ -135,7 +135,7 @@ export default function ($) {
     };
     ColorPicker.prototype.setOpacity = function (value) {
         this.opacity = value;
-        this.options.opacity = value / 100;
+        this.options.opacity = value;
         this.setVal();
     };
     ColorPicker.prototype.position = function (x, y, event) {

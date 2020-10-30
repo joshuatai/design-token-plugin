@@ -33,7 +33,7 @@ const FillColor = ({ value = null, propType }) => {
     const $opacityRef = useRef();
     const _useToken = getToken(useToken);
     const colorValue = _useToken ? _useToken.name : color;
-    const opacityValue = opacity;
+    const opacityValue = opacity.toString();
     function traversingUseToken(token) {
         const existCurrentMode = token.properties.find(prop => prop.themeMode === currentMode.id);
         const useDefaultMode = token.properties.find(prop => prop.themeMode === defaultMode.id);
@@ -72,11 +72,11 @@ const FillColor = ({ value = null, propType }) => {
                     return { status: InputStatus.NO_CHANGE };
                 return { status: InputStatus.VALID, value: _opacity };
             }
-            return val;
+            return { status: InputStatus.VALID, value: val };
         })
             .then(res => {
             if (res.status === InputStatus.VALID) {
-                propType === 'color' ? setting.color = Color(`#${res.value}`).hex().replace('#', '') : setting.opacity = res.value;
+                propType === 'color' ? setting.color = res.value === 'transparent' ? 'transparent' : setting.color = Color(`#${res.value}`).hex().replace('#', '') : setting.opacity = res.value;
                 setSetting(new Model(setting));
             }
         })
@@ -122,28 +122,30 @@ const FillColor = ({ value = null, propType }) => {
         }
     }
     function colorPickerChange(event, picker) {
-        setting.color = picker.color;
-        setting.opacity = picker.opacity * 100;
-        setSetting(setting);
+        setting.color = picker.color.replace('#', '');
+        setting.opacity = picker.opacity;
+        setSetting(new Model(setting));
     }
     const addPicker = () => {
+        console.log('addPicker');
         $(document).on(BrowserEvents.CLICK, `.fill-color-icon, .stroke-fill-icon`, colorPicker);
         $(document).on('color-picker-change', colorPickerChange);
     };
     const removePicker = () => {
+        console.log('removePicker');
         $(document).off(BrowserEvents.CLICK, `.fill-color-icon, .stroke-fill-icon`, colorPicker);
         $(document).off('color-picker-change');
     };
     useEffect(() => {
         addPicker();
-        return removePicker();
+        return removePicker;
     }, [setting]);
     return setting ? React.createElement("div", { className: themeModes.length > 1 ? 'property-setting-section hasThemeMode' : 'property-setting-section' },
         React.createElement("div", { className: "custom-val" },
             React.createElement("div", { className: "val-container" },
                 React.createElement(PropertyIcon, { options: [setting] }),
                 React.createElement("span", { ref: $colorRef, "prop-type": "color", "data-type": "hex,transparent", className: 'color-val', title: colorValue, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, colorValue),
-                React.createElement("span", { ref: $opacityRef, "prop-type": "opacity", "data-type": "int", className: pureTokens.length ? 'opacity-val hasReferenceToken' : 'opacity-val', title: colorValue, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, `${opacityValue}%`),
+                React.createElement("span", { ref: $opacityRef, "prop-type": "opacity", "data-type": "int", className: pureTokens.length ? 'opacity-val hasReferenceToken' : 'opacity-val', title: `${opacityValue}%`, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, `${opacityValue}%`),
                 React.createElement(ThemeModes, { property: setting, useThemeHandler: useThemeHandler }),
                 React.createElement(PureTokens, { property: setting, pureTokens: pureTokens, useTokenHandler: useTokenHandler, detachTokenHandler: detachTokenHandler })))) : React.createElement(React.Fragment, null);
 };

@@ -110,6 +110,7 @@ const usePropertyInfo = (property, fromTokenList = false) => {
       if (themeModes.length > 1) {
         applyThemeMode ? thridValue = applyThemeMode.name : thridValue = defaultMode.name;
       }
+      console.log(property);
       value = property.color;
       secondValue = `${property.opacity}%`;
       if (property.useToken) {

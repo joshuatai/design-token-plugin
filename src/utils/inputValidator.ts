@@ -57,7 +57,7 @@ function valCheck ($editable, orgVal, customValidator, resolve, reject) {
     });
     return;
   }
-
+  
   if (newVal) {
     if (dataType) {
       const _dataTypes = dataType.split(',');

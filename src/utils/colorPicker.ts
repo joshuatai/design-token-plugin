@@ -16,7 +16,7 @@ enum PickerMode {
 class Picker {
   mode: PickerMode = PickerMode.SOLID;
   color: number = 0xC4C4C4;
-  opacity: number = 1;
+  opacity: number = 100;
   format: string = ColorFormat.HEX;
   constructor(options?: any) {
     if (options.mode) this.mode = options.mode;
@@ -154,7 +154,7 @@ export default function ($) {
     const color = Color().hex(this.options.color);
     this.setFormat(ColorFormat.HEX);
     this.setColor(color);
-    this.setOpacity(Math.floor(this.options.opacity * 100));
+    this.setOpacity(this.options.opacity);
     this.setVal();
     this.setHandler();
   }
@@ -166,7 +166,7 @@ export default function ($) {
   }
   ColorPicker.prototype.setOpacity = function (value: number) {
     this.opacity = value;
-    this.options.opacity = value / 100;
+    this.options.opacity = value;
     this.setVal();
   }
   ColorPicker.prototype.position = function (x, y, event?) {
