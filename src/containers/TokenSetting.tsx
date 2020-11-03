@@ -15,6 +15,7 @@ import InputStatus from "enums/InputStatus";
 import { Mixed } from "symbols/index";
 import { inputCheck, valChange } from "utils/inputValidator";
 import SelectText from "utils/SelectText";
+import Properties from "model/Properties";
 
 declare var $: any;
 SelectText(jQuery);
@@ -101,8 +102,8 @@ const TokenSetting: FC = (): ReactElement => {
   } = usePropertySetting();
   const { saveTokensProperties } = useData();
   const { addGroup } = useGroups();
-  const { addToken } = useTokens();
-  const { addProperties } = useProperties();
+  const { addToken, getToken } = useTokens();
+  const { addProperties, referedProperties, getProperty } = useProperties();
   const [showPropertySetting, setShowPropertySetting] = useState(false);
   const [creatable, setCreatable] = useState(
     token && token.name ? true : false
@@ -150,9 +151,24 @@ const TokenSetting: FC = (): ReactElement => {
     setPropertiesSetting([]);
     setTokenSetting(Object.assign({}, initialSetting));
   };
+  const traversingUpdate = (id: string) => {
+    referedProperties(id).forEach(property => {
+      const referProp = propertiesSetting.filter(prop => prop.themeMode === property.themeMode).pop();
+      const referPropSetting = Object.assign({}, referProp);
+      delete referPropSetting.id;
+      delete referPropSetting.parent;
+      delete referPropSetting.themeMode;
+      delete referPropSetting.useToken;
+      Object.assign(property, referPropSetting);
+      traversingUpdate(property.parent);
+    });
+  }
   const saveTokenHandler = (e) => {
     const exist = group.tokens.find((_token: string) => _token === token.id);
     if (!exist) group.tokens.push(token.id);
+    
+    traversingUpdate(token.id);
+    
     saveTokensProperties(
       addGroup(group),
       addToken(token),

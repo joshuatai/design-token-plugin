@@ -19,9 +19,9 @@ import colorPicker from 'utils/colorPicker';
 SelectText(jQuery);
 colorPicker(jQuery);
 const FillColor = ({ value = null, propType }) => {
-    const { defaultMode, themeModes, currentMode } = useThemeModes();
+    const { defaultMode, themeModes, getThemeMode } = useThemeModes();
     const { getToken, getPureTokensByProperty } = useTokens();
-    const { getProperty } = useProperties();
+    const { traversing } = useProperties();
     const { setting: tokenSetting } = useTokenSetting();
     const { setPropertySetting } = usePropertySetting();
     const newOption = { parent: tokenSetting.token.id, themeMode: defaultMode.id };
@@ -34,17 +34,6 @@ const FillColor = ({ value = null, propType }) => {
     const _useToken = getToken(useToken);
     const colorValue = _useToken ? _useToken.name : color;
     const opacityValue = opacity.toString();
-    function traversingUseToken(token) {
-        const existCurrentMode = token.properties.find(prop => prop.themeMode === currentMode.id);
-        const useDefaultMode = token.properties.find(prop => prop.themeMode === defaultMode.id);
-        const property = existCurrentMode ? existCurrentMode : useDefaultMode;
-        if (property.useToken) {
-            return traversingUseToken(getToken(property.useToken));
-        }
-        else {
-            return property;
-        }
-    }
     const focusHandler = (e) => {
         if (_useToken)
             return;
@@ -93,7 +82,7 @@ const FillColor = ({ value = null, propType }) => {
         setSetting(new Model(setting));
     };
     const useTokenHandler = (usedToken) => {
-        const usedProperty = propType === PropertyTypes.FILL_COLOR ? traversingUseToken(usedToken) : traversingUseToken(usedToken);
+        const usedProperty = propType === PropertyTypes.FILL_COLOR ? traversing(usedToken, getThemeMode(setting.themeMode)) : traversing(usedToken, getThemeMode(setting.themeMode));
         setting.useToken = usedToken.id;
         setting.color = usedProperty.color;
         setting.opacity = usedProperty.opacity;
@@ -103,17 +92,15 @@ const FillColor = ({ value = null, propType }) => {
         setSetting(new Model(setting));
     };
     const detachTokenHandler = () => {
-        const usedProperties = traversingUseToken(getToken(setting.useToken));
+        const usedProperties = traversing(getToken(setting.useToken), getThemeMode(setting.themeMode));
         setting.useToken = '';
-        if (usedProperties.length === 1) {
-            setSetting(new Model(setting));
+        if (usedProperties instanceof Array) {
         }
-        else {
-        }
+        setSetting(new Model(setting));
     };
     function colorPicker(e) {
         const $icon = $(this);
-        if (!$icon.is('[disabled]')) {
+        if (!$icon.is('[data-disabled=true')) {
             $icon.colorPicker({
                 container: '#react-page',
                 color: `#${setting.color}`,
@@ -127,25 +114,24 @@ const FillColor = ({ value = null, propType }) => {
         setSetting(new Model(setting));
     }
     const addPicker = () => {
-        console.log('addPicker');
         $(document).on(BrowserEvents.CLICK, `.fill-color-icon, .stroke-fill-icon`, colorPicker);
         $(document).on('color-picker-change', colorPickerChange);
     };
     const removePicker = () => {
-        console.log('removePicker');
         $(document).off(BrowserEvents.CLICK, `.fill-color-icon, .stroke-fill-icon`, colorPicker);
         $(document).off('color-picker-change');
     };
     useEffect(() => {
         addPicker();
+        setPropertySetting(setting);
         return removePicker;
     }, [setting]);
     return setting ? React.createElement("div", { className: themeModes.length > 1 ? 'property-setting-section hasThemeMode' : 'property-setting-section' },
         React.createElement("div", { className: "custom-val" },
-            React.createElement("div", { className: "val-container" },
-                React.createElement(PropertyIcon, { options: [setting] }),
-                React.createElement("span", { ref: $colorRef, "prop-type": "color", "data-type": "hex,transparent", className: 'color-val', title: colorValue, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, colorValue),
-                React.createElement("span", { ref: $opacityRef, "prop-type": "opacity", "data-type": "int", className: pureTokens.length ? 'opacity-val hasReferenceToken' : 'opacity-val', title: `${opacityValue}%`, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, `${opacityValue}%`),
+            React.createElement("div", { className: setting.useToken ? 'val-container use-token' : 'val-container' },
+                React.createElement(PropertyIcon, { options: [setting], disabled: setting.color === 'transparent' || setting.useToken !== '' }),
+                React.createElement("span", { ref: $colorRef, "prop-type": "color", "data-type": "hex,transparent", className: 'color-val', title: colorValue, "is-required": "true", placeholder: "Hex/transparent", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, colorValue),
+                colorValue !== 'transparent' && React.createElement("span", { ref: $opacityRef, "prop-type": "opacity", "data-type": "int", className: pureTokens.length ? 'opacity-val hasReferenceToken' : 'opacity-val', title: `${opacityValue}%`, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, `${opacityValue}%`),
                 React.createElement(ThemeModes, { property: setting, useThemeHandler: useThemeHandler }),
                 React.createElement(PureTokens, { property: setting, pureTokens: pureTokens, useTokenHandler: useTokenHandler, detachTokenHandler: detachTokenHandler })))) : React.createElement(React.Fragment, null);
 };

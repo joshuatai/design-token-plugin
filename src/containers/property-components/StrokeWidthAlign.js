@@ -1,124 +1,97 @@
-import validator from 'validator';
-import StrokeWidthAlign from 'model/StrokeWidthAlign';
-import BrowserEvents from 'enums/BrowserEvents';
+import React, { useEffect, useRef, useState } from "react";
+import PropertyIcon from './PropertyIcon';
+import PureTokens from "./PureTokens";
+import useTokenSetting from 'hooks/useTokenSetting';
+import usePropertySetting from 'hooks/usePropertySetting';
+import useThemeModes from 'hooks/useThemeModes';
+import useTokens from "hooks/useTokens";
+import useProperties from 'hooks/useProperties';
+import Model from 'model/StrokeWidthAlign';
 import StrokeAligns from 'enums/StrokeAligns';
-// import CommonSettings from './CommonSettings.tss';
-let hostData;
-const NAME = 'stroke';
-export default function ($) {
-    var Stroke = function (element, options) {
-        const useToken = null; //getToken(options.useToken);
-        let strokeValue;
-        hostData = this;
-        this.options = new StrokeWidthAlign(options);
-        this.$element = $(element).attr('property-component', NAME);
-        this.$customVal = $('<div class="custom-val"></div>');
-        this.$valContainer = $('<div class="val-container"></div>');
-        this.$stokeValue = $('<span class="stroke-val"></span>').attr('contenteditable', !useToken);
-        this.$align = $('<div class="stroke-align btn-group" />');
-        this.$alignDropdownBtn = $(`
-      <button type="button" class="btn btn-border dropdown-toggle" data-toggle="dropdown">
-        <span class="tmicon tmicon-caret-down"></span>
-
-      </button>
-    `);
-        this.$alignDropdownBtnVal = $(`<span>${this.options.align}</span>`);
-        this.$alignDropdowns = $(`<ul class="dropdown-menu dropdown-menu-multi-select pull-right" />`);
-        this.$alignOptions = Object.keys(StrokeAligns).reduce((calc, key) => calc.add($(`<li><a href="#">${key}</a></li>`)), $());
-        const commonSetting = { $token: null }; //CommonSettings(this);
-        this.$token = commonSetting.$token;
-        useToken ? strokeValue = useToken.name : strokeValue = this.options.width;
-        this.$element
-            .append(this.$customVal
-            .append(this.$valContainer
-            .append(this.$icon)
-            .append(this.$stokeValue.text(strokeValue).attr('title', strokeValue).addClass(this.tokenList.length ? 'hasReferenceToken' : ''))
-            .append(this.$token))
-            .append(this.$align[useToken ? 'hide' : 'show']()
-            .append(this.$alignDropdownBtn.append(this.$alignDropdownBtnVal))
-            .append(this.$alignDropdowns.append(this.$alignOptions))));
-        useToken ? this.$detachToken.data('token', useToken).show() : this.$detachToken.hide();
-        this.setAlign(this.options.align);
-        $(document).trigger('property-preview', [this.options]);
-    };
-    Stroke.prototype.useToken = function (token) {
-        const { width, align } = token.properties[0];
-        Object.assign(this.options, { width, align });
-        this.$stokeValue.text(token.name)
-            .attr('contenteditable', false)
-            .attr('title', token.name)
-            .removeAttr('title');
-        this.$alignDropdownBtnVal.text(align);
-        this.$align.hide();
-    };
-    Stroke.prototype.detachToken = function (token) {
-        const usedProperty = token.properties[0];
-        this.$stokeValue.text(usedProperty.width).attr('contenteditable', true);
-        this.$align.show();
-        this.$alignDropdowns
-            .children()
-            .removeClass('selected')
-            .children()
-            .filter((index, item) => item.textContent === usedProperty.align)
-            .parent()
-            .addClass('selected');
-    };
-    Stroke.prototype.setAlign = function (align, isPreview = false) {
-        this.options.align = align;
-        this.$alignDropdownBtnVal.text(align);
-        this.$alignDropdowns
-            .children()
-            .removeClass('selected')
-            .children()
-            .filter((index, item) => item.textContent === align)
-            .parent()
-            .addClass('selected');
-        if (isPreview)
-            $(document).trigger('property-preview', [this.options]);
-    };
-    Stroke.prototype.destroy = function () {
-        return this.$element.removeAttr('property-component').empty().removeData().hide();
-    };
-    function Plugin(option) {
-        return this.each(function () {
-            var $this = $(this);
-            var data = $this.data(NAME);
-            var options = typeof option == 'object' && option;
-            if (data)
-                data.destroy(), data = undefined;
-            if (!data)
-                $this.data(NAME, (data = new Stroke(this, options)));
-        });
-    }
-    var old = $.fn[NAME];
-    $.fn[NAME] = Plugin;
-    $.fn[NAME].Constructor = Stroke;
-    $.fn[NAME].noConflict = function () {
-        $.fn[NAME] = old;
-        return this;
-    };
-    $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .stroke-val[contenteditable="true"]`, function (event) {
-        if (event.type === BrowserEvents.KEY_UP) {
-            if (event.key === 'Enter')
-                $('.btn-primary').trigger('focus');
+import InputStatus from "enums/InputStatus";
+import SelectText from 'utils/SelectText';
+import { inputCheck, valChange } from 'utils/inputValidator';
+SelectText(jQuery);
+const StrokeWidthAlign = ({ value = null }) => {
+    const { defaultMode, themeModes } = useThemeModes();
+    const { getToken, getPureTokensByProperty } = useTokens();
+    const { getProperty } = useProperties();
+    const { setting: tokenSetting } = useTokenSetting();
+    const { setPropertySetting } = usePropertySetting();
+    const [setting, setSetting] = useState(value || new Model({ parent: tokenSetting.token.id, themeMode: defaultMode.id }));
+    const { width, align, useToken } = setting;
+    const pureTokens = getPureTokensByProperty(setting);
+    const $widthRef = useRef();
+    const _useToken = getToken(useToken);
+    const widthValue = _useToken ? _useToken.name : width.toString();
+    const focusHandler = (e) => {
+        if (_useToken)
             return;
-        }
-        const $this = $(this);
-        const options = hostData.options;
-        const value = $this.text();
-        const oldVal = options.width;
-        if (validator.isInt(value)) {
-            options.width = Number(value);
-            hostData.$stokeValue.text(value);
-        }
-        else {
-            $this.text(oldVal);
-        }
-        $(document).trigger('property-preview', [options]);
-    });
-    $(document).on(BrowserEvents.CLICK, '.stroke-align .dropdown-menu li a', function (event) {
-        hostData.setAlign(this.textContent, true);
-    });
-    return NAME;
-}
-(jQuery);
+        const $target = e.target;
+        const $valContainer = $target.closest('.val-container');
+        $($target).selectText();
+        if ($valContainer)
+            $valContainer.classList.add('focus');
+    };
+    const keyUpHandler = (e) => {
+        inputCheck.call(e.target, e);
+    };
+    const blurHandler = (e) => {
+        const $target = e.target;
+        const $valContainer = $target.closest('.val-container');
+        const $width = $widthRef.current;
+        valChange
+            .call($width, width, (val) => {
+            let _width = val;
+            _width = Math.max(0, _width);
+            if (_width === width)
+                return { status: InputStatus.NO_CHANGE };
+            return { status: InputStatus.VALID, value: _width };
+        })
+            .then(res => {
+            if (res.status === InputStatus.VALID) {
+                setting.width = res.value;
+                setSetting(new Model(setting));
+            }
+        })
+            .catch(res => {
+            if (res.status === InputStatus.NO_CHANGE) {
+            }
+        });
+        if ($valContainer)
+            $valContainer.classList.remove('focus');
+    };
+    const selectAlign = (align, isPreview = false) => (e) => {
+        setting.align = align;
+        setSetting(new Model(setting));
+        // if (isPreview) $(document).trigger('property-preview', [this.options]);
+    };
+    const useTokenHandler = (token) => {
+        const usedToken = getToken(token.id);
+        const usedProperty = getProperty(usedToken.properties[0]);
+        setting.useToken = token.id;
+        setting.width = usedProperty.width;
+        setting.align = usedProperty.align;
+        setSetting(new Model(setting));
+    };
+    const detachTokenHandler = () => {
+        setting.useToken = '';
+        setSetting(new Model(setting));
+    };
+    useEffect(() => {
+        setPropertySetting(setting);
+    }, [setting]);
+    return setting ? React.createElement("div", { className: themeModes.length > 1 ? 'property-setting-section hasThemeMode' : 'property-setting-section' },
+        React.createElement("div", { className: "custom-val" },
+            React.createElement("div", { className: "val-container" },
+                React.createElement(PropertyIcon, { options: [setting] }),
+                React.createElement("span", { ref: $widthRef, "data-type": "int", className: pureTokens.length ? 'stroke-val hasReferenceToken' : 'stroke-val', title: widthValue, "is-required": "true", contentEditable: false, suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: keyUpHandler, onBlur: blurHandler }, widthValue)),
+            !setting.useToken && React.createElement("div", { className: "stroke-align btn-group" },
+                React.createElement("button", { type: "button", className: "btn btn-border dropdown-toggle", "data-toggle": "dropdown" },
+                    React.createElement("span", { className: "tmicon tmicon-caret-down" }),
+                    React.createElement("span", null, align)),
+                React.createElement("ul", { className: "dropdown-menu dropdown-menu-multi-select pull-right" }, Object.keys(StrokeAligns).map(item => React.createElement("li", { key: item, className: item === align ? 'selected' : '', onClick: selectAlign(item, true) },
+                    React.createElement("a", { href: "#" }, item))))),
+            React.createElement(PureTokens, { property: setting, pureTokens: pureTokens, useTokenHandler: useTokenHandler, detachTokenHandler: detachTokenHandler }))) : React.createElement(React.Fragment, null);
+};
+export default StrokeWidthAlign;

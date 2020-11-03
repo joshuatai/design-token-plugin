@@ -3,9 +3,9 @@ import _cloneDeep from 'lodash/cloneDeep';
 // import { getToken, getThemeMode, getCurrentThemeMode } from 'model/DataManager';
 import usePropertyInfo from 'hooks/usePropertyInfo';
 import Icon from './Icon';
-const PropertyIcon = ({ options, fromTokenList = false }) => {
+const PropertyIcon = ({ options, disabled = false, fromTokenList = false }) => {
     const _property = options.length === 1 ? _cloneDeep(options[0]) : _cloneDeep(options);
     const { type, title, style } = usePropertyInfo(_property, fromTokenList);
-    return React.createElement(Icon, { type: type, title: title, style: style }); // .attr('data-role', 'token-icon');
+    return React.createElement(Icon, { type: type, title: title, style: style, disabled: disabled }); // .attr('data-role', 'token-icon');
 };
 export default PropertyIcon;

@@ -12,6 +12,7 @@ class CornerRadius {
         this.bottomRight = 0;
         this.bottomLeft = 0;
         this.useToken = '';
+        this.themeMode = '';
         if (!options)
             return;
         if (options.id)
@@ -30,6 +31,8 @@ class CornerRadius {
             this.bottomRight = options.bottomRight;
         if (options.bottomLeft != null)
             this.bottomLeft = options.bottomLeft;
+        if (options.themeMode)
+            this.themeMode = options.themeMode;
     }
     get type() {
         return this._type;

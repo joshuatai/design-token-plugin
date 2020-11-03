@@ -7,6 +7,7 @@ class Spacing {
   parent: string = '';
   value: number = 4;
   useToken: string = '';
+  themeMode: string = '';
 
   constructor(options?: any) {
     if (!options) return;
@@ -14,6 +15,7 @@ class Spacing {
     if (options.parent) this.parent = options.parent;
     if (options.useToken) this.useToken = options.useToken;
     if (options.value != null) this.value = options.value;
+    if (options.themeMode) this.themeMode = options.themeMode;
   }
   get type (): string {
     return this._type;

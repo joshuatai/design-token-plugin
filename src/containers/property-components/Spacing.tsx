@@ -1,6 +1,7 @@
 import React, { FC, useEffect, useRef, useState } from "react";
 import PropertyIcon from './PropertyIcon';
 import PureTokens from "./PureTokens";
+import useThemeModes from 'hooks/useThemeModes';
 import useTokenSetting from 'hooks/useTokenSetting';
 import usePropertySetting from 'hooks/usePropertySetting';
 import useTokens from "hooks/useTokens";
@@ -13,7 +14,6 @@ import { inputCheck, valChange } from 'utils/inputValidator';
 
 declare var $: any;
 SelectText(jQuery);
-//     $(document).trigger('property-preview', [this.options]);
 //   }
 //   $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .spacing-val[contenteditable="true"]`, function (event) {
 //     $(document).trigger('property-preview', [options]);
@@ -26,11 +26,12 @@ type T_Spacing = {
 const Spacing: FC<T_Spacing> = ({
   value = null
 }: T_Spacing) => {
+  const { defaultMode } = useThemeModes();
   const { getToken, getPureTokensByProperty } = useTokens();
   const { getProperty } = useProperties();
   const { setting: tokenSetting } = useTokenSetting();
   const { setPropertySetting } = usePropertySetting();
-  const [ setting, setSetting ] = useState(value || new Model({ parent: tokenSetting.token.id }));
+  const [ setting, setSetting ] = useState(value || new Model({ parent: tokenSetting.token.id, themeMode: defaultMode.id }));
   const { value: spacing, useToken } = setting;
   const pureTokens: Array<Token> = getPureTokensByProperty(setting);
   const $spacingRef = useRef();

@@ -79,8 +79,8 @@ const TokenSetting = () => {
     const { propertiesSetting, setPropertiesSetting, setPropertyEdit, } = usePropertySetting();
     const { saveTokensProperties } = useData();
     const { addGroup } = useGroups();
-    const { addToken } = useTokens();
-    const { addProperties } = useProperties();
+    const { addToken, getToken } = useTokens();
+    const { addProperties, referedProperties, getProperty } = useProperties();
     const [showPropertySetting, setShowPropertySetting] = useState(false);
     const [creatable, setCreatable] = useState(token && token.name ? true : false);
     const $name = useRef();
@@ -129,10 +129,23 @@ const TokenSetting = () => {
         setPropertiesSetting([]);
         setTokenSetting(Object.assign({}, initialSetting));
     };
+    const traversingUpdate = (id) => {
+        referedProperties(id).forEach(property => {
+            const referProp = propertiesSetting.filter(prop => prop.themeMode === property.themeMode).pop();
+            const referPropSetting = Object.assign({}, referProp);
+            delete referPropSetting.id;
+            delete referPropSetting.parent;
+            delete referPropSetting.themeMode;
+            delete referPropSetting.useToken;
+            Object.assign(property, referPropSetting);
+            traversingUpdate(property.parent);
+        });
+    };
     const saveTokenHandler = (e) => {
         const exist = group.tokens.find((_token) => _token === token.id);
         if (!exist)
             group.tokens.push(token.id);
+        traversingUpdate(token.id);
         saveTokensProperties(addGroup(group), addToken(token), addProperties(propertiesSetting)).then((res) => {
             if (res.success) {
                 $backButton.current.click();

@@ -9,6 +9,7 @@ class StrokeWidthAlign {
         this.width = 1;
         this.align = StrokeAligns.INSIDE;
         this.useToken = '';
+        this.themeMode = '';
         if (options.id)
             this.id = options.id;
         if (options.parent)
@@ -19,6 +20,8 @@ class StrokeWidthAlign {
             this.width = options.width;
         if (options.align != null)
             this.align = options.align;
+        if (options.themeMode)
+            this.themeMode = options.themeMode;
     }
     get type() {
         return this._type;

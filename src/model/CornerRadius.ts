@@ -11,6 +11,7 @@ interface I_CornerRadius {
   bottomRight: number,
   bottomLeft: number,
   useToken: string,
+  themeMode: string
 }
 class CornerRadius implements I_CornerRadius {
   private _type: string = PropertyType.CORNER_RADIUS;
@@ -22,6 +23,7 @@ class CornerRadius implements I_CornerRadius {
   bottomRight: number = 0;
   bottomLeft: number = 0;
   useToken: string = '';
+  themeMode: string = '';
 
   constructor(options?: any) {
     if (!options) return;
@@ -33,6 +35,7 @@ class CornerRadius implements I_CornerRadius {
     if (options.topRight != null) this.topRight = options.topRight;
     if (options.bottomRight != null) this.bottomRight = options.bottomRight;
     if (options.bottomLeft != null) this.bottomLeft = options.bottomLeft;
+    if (options.themeMode) this.themeMode = options.themeMode;
   }
   get type (): string {
     return this._type;

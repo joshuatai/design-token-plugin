@@ -1,12 +1,15 @@
 import { useContext } from 'react';
 import { propertiesContext, propertiesSetterContext } from '../PropertyProvider';
 import useAPI from 'hooks/useAPI';
+import useThemeModes from 'hooks/useThemeModes';
 import useTokens from 'hooks/useTokens';
 const useProperties = () => {
     const { api } = useAPI();
+    const { defaultMode } = useThemeModes();
     const { getToken } = useTokens();
     const properties = useContext(propertiesContext);
     const { setProperties } = useContext(propertiesSetterContext);
+    const _referedProperties = (id) => properties.filter(property => property.useToken === id);
     const _referedTokens = (id) => properties
         .filter(property => property.useToken === id)
         .map((property) => property.parent)
@@ -32,13 +35,28 @@ const useProperties = () => {
     const _setAllProperties = (properties = []) => {
         setProperties(properties);
     };
+    const _traversing = (token, applyMode) => {
+        // const useThemeMode = formTokenList ? getCurrentThemeMode() : applyModes;
+        const useThemeMode = applyMode ? applyMode : defaultMode;
+        const existCurrentModePropId = token.properties.find(id => _getProperty(id).themeMode === useThemeMode.id);
+        const defaultModePropId = token.properties.find(id => _getProperty(id).themeMode === defaultMode.id);
+        const property = existCurrentModePropId ? _getProperty(existCurrentModePropId) : _getProperty(defaultModePropId);
+        if (property.useToken) {
+            return _traversing(getToken(property.useToken), useThemeMode);
+        }
+        else {
+            return property;
+        }
+    };
     return {
         properties,
+        referedProperties: _referedProperties,
         referedTokens: _referedTokens,
         getProperty: _getProperty,
         removeProperty: _removeProperty,
         addProperties: _addProperties,
-        setAllProperties: _setAllProperties
+        setAllProperties: _setAllProperties,
+        traversing: _traversing
     };
 };
 export default useProperties;

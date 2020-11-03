@@ -22,24 +22,6 @@ declare var $: any;
 SelectText(jQuery);
 colorPicker(jQuery);
 
-// function Fill () {
-//   var Fill = function (element, options) {
-//     $(document).trigger('property-preview', [this.options]);
-//   }
-//   Fill.prototype.setIcon = function () {
-//     // const newIcon = PropertyIcon([this.options]).$icon;
-//     // hostData.$icon.replaceWith(newIcon);
-//     // hostData.$icon = newIcon;
-//     // if (this.options.useToken || this.options.color === 'transparent' || this.options.color === 'null') {
-//     //   this.$colorOpacity.hide();
-//     //   this.$icon.attr('disabled', true);
-//     // } else {
-//     //   this.$colorOpacity.show();
-//     //   this.$icon.attr('disabled', false);
-//     // }
-//   }
-// };
-
 type T_FillColor = {
   value: FillColorModel | StrokeColorModel,
   propType: PropertyTypes
@@ -48,9 +30,9 @@ const FillColor: FC<T_FillColor> = ({
   value = null,
   propType
 }: T_FillColor) => {
-  const { defaultMode, themeModes, currentMode } = useThemeModes();
+  const { defaultMode, themeModes, getThemeMode } = useThemeModes();
   const { getToken, getPureTokensByProperty } = useTokens();
-  const { getProperty } = useProperties();
+  const { traversing } = useProperties();
   const { setting: tokenSetting } = useTokenSetting();
   const { setPropertySetting } = usePropertySetting();
   const newOption = { parent: tokenSetting.token.id, themeMode: defaultMode.id };
@@ -63,17 +45,6 @@ const FillColor: FC<T_FillColor> = ({
   const _useToken = getToken(useToken) as Token;
   const colorValue: string = _useToken ? _useToken.name : color;
   const opacityValue: string = opacity.toString();
-  
-  function traversingUseToken (token) {
-    const existCurrentMode = token.properties.find(prop => prop.themeMode === currentMode.id);
-    const useDefaultMode = token.properties.find(prop => prop.themeMode === defaultMode.id);
-    const property = existCurrentMode ? existCurrentMode : useDefaultMode;
-    if (property.useToken) {
-      return traversingUseToken(getToken(property.useToken));
-    } else {
-      return property;
-    }
-  }
 
   const focusHandler = (e) => {
     if (_useToken) return;
@@ -125,7 +96,7 @@ const FillColor: FC<T_FillColor> = ({
   }
 
   const useTokenHandler = (usedToken) => {
-    const usedProperty = propType === PropertyTypes.FILL_COLOR ? traversingUseToken(usedToken) as FillColorModel : traversingUseToken(usedToken) as StrokeColorModel;
+    const usedProperty = propType === PropertyTypes.FILL_COLOR ? traversing(usedToken, getThemeMode(setting.themeMode)) as FillColorModel : traversing(usedToken, getThemeMode(setting.themeMode)) as StrokeColorModel;
     setting.useToken = usedToken.id;
     setting.color = usedProperty.color;
     setting.opacity = usedProperty.opacity;
@@ -136,19 +107,17 @@ const FillColor: FC<T_FillColor> = ({
   }
 
   const detachTokenHandler = () => {
-    const usedProperties = traversingUseToken(getToken(setting.useToken));
+    const usedProperties = traversing(getToken(setting.useToken), getThemeMode(setting.themeMode));
     setting.useToken = '';
-    
-    if (usedProperties.length === 1) {
-      setSetting(new Model(setting));
-    } else {
-
+    if (usedProperties instanceof Array) {
+      
     }
+    setSetting(new Model(setting));
   }
 
   function colorPicker (e) {
     const $icon = $(this);
-    if (!$icon.is('[disabled]')) {
+    if (!$icon.is('[data-disabled=true')) {
       $icon.colorPicker({
         container: '#react-page',
         color: `#${setting.color}`,
@@ -163,26 +132,28 @@ const FillColor: FC<T_FillColor> = ({
   }
 
   const addPicker = () => {
-    console.log('addPicker');
     $(document).on(BrowserEvents.CLICK, `.fill-color-icon, .stroke-fill-icon`, colorPicker);
     $(document).on('color-picker-change', colorPickerChange);
   }
   const removePicker = () => {
-    console.log('removePicker');
     $(document).off(BrowserEvents.CLICK, `.fill-color-icon, .stroke-fill-icon`, colorPicker);
     $(document).off('color-picker-change')
   }
+
   useEffect(() => {
     addPicker();
+    setPropertySetting(setting);
     return removePicker;
   }, [setting]);
 
   return setting ? <div className={themeModes.length > 1 ? 'property-setting-section hasThemeMode' : 'property-setting-section'}>
     <div className="custom-val">
-      <div className="val-container">
-        <PropertyIcon options={[setting]}></PropertyIcon>
-        <span ref={$colorRef} prop-type="color" data-type="hex,transparent" className='color-val' title={colorValue} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{colorValue}</span>
-        <span ref={$opacityRef} prop-type="opacity" data-type="int" className={pureTokens.length ? 'opacity-val hasReferenceToken' : 'opacity-val' } title={`${opacityValue}%`} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{`${opacityValue}%`}</span>        
+      <div className={setting.useToken ? 'val-container use-token' : 'val-container'}>
+        <PropertyIcon options={[setting]} disabled={setting.color === 'transparent' || setting.useToken !== '' }></PropertyIcon>
+        <span ref={$colorRef} prop-type="color" data-type="hex,transparent" className='color-val' title={colorValue} is-required="true" placeholder="Hex/transparent" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{colorValue}</span>
+        {
+          colorValue !== 'transparent' && <span ref={$opacityRef} prop-type="opacity" data-type="int" className={pureTokens.length ? 'opacity-val hasReferenceToken' : 'opacity-val' } title={`${opacityValue}%`} is-required="true" contentEditable={false} suppressContentEditableWarning={true} onClick={focusHandler} onKeyUp={keyUpHandler} onBlur={blurHandler}>{`${opacityValue}%`}</span>        
+        }
         <ThemeModes property={setting} useThemeHandler={useThemeHandler}></ThemeModes>
         <PureTokens property={setting} pureTokens={pureTokens} useTokenHandler={useTokenHandler} detachTokenHandler={detachTokenHandler}></PureTokens>
       </div>

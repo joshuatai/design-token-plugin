@@ -5,6 +5,7 @@ type Property = {
   id: string,
   parent: string,
   useToken: string,
+  themeMode: string,
   [x: string]: any
 }
 

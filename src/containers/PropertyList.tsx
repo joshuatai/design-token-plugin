@@ -11,6 +11,7 @@ const PropertyList: FC = (): ReactElement => {
   const $itemContainerRef = useRef(null);
 
   useEffect(() => {
+    // console.log(propertiesSetting);
     if (propertiesSetting.length > 1) {
       const $container = $($itemContainerRef.current);
       const sortable = $container.sortable('instance');

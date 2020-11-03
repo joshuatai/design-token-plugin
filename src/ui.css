@@ -77,7 +77,6 @@
   margin: 0;
   overflow: hidden;
   white-space: nowrap;
-  width: 10px;
   text-overflow: ellipsis;
 }
 .stroke-val + .opacity-val[contenteditable="true"],

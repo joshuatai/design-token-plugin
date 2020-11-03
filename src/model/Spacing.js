@@ -7,6 +7,7 @@ class Spacing {
         this.parent = '';
         this.value = 4;
         this.useToken = '';
+        this.themeMode = '';
         if (!options)
             return;
         if (options.id)
@@ -17,6 +18,8 @@ class Spacing {
             this.useToken = options.useToken;
         if (options.value != null)
             this.value = options.value;
+        if (options.themeMode)
+            this.themeMode = options.themeMode;
     }
     get type() {
         return this._type;

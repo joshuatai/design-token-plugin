@@ -2,14 +2,14 @@ import React, { FC, ReactElement } from "react";
 import PropertyTypes from 'enums/PropertyTypes';
 
 const _Icons = {
-  [PropertyTypes.CORNER_RADIUS]: ({ title }) => <span className="corner-radius-icon" title={title}></span>,
-  [PropertyTypes.STROKE_WIDTH_ALIGN]: ({ title }) => <span className="stroke-width-icon" title={title}></span>,
-  [PropertyTypes.STROKE_FILL]: ({ title }) => <div className="stroke-fill-icon" title={title}></div>,
-  [PropertyTypes.FILL_COLOR]: ({ title, style }) => <div className="fill-color-icon" title={title} style={{ background: style.background }}><div className="color-icon-opacity" style={{ opacity: style.opacity, width: style.width }}></div></div>,
-  [PropertyTypes.OPACITY]: ({ title }) => <div className="opacity-icon color-icon-opacity" title={title}></div>,
-  [PropertyTypes.FONT]: ({ title }) => <div className="font-icon" title={title}>A</div>,
-  [PropertyTypes.SPACING]: ({ title }) => 
-    <div className="spacing-icon" title={title}>
+  [PropertyTypes.CORNER_RADIUS]: ({ title, disabled }) => <span className="corner-radius-icon" title={title} data-disabled={disabled}></span>,
+  [PropertyTypes.STROKE_WIDTH_ALIGN]: ({ title, disabled }) => <span className="stroke-width-icon" title={title} data-disabled={disabled}></span>,
+  [PropertyTypes.STROKE_FILL]: ({ title, style, disabled }) => <div className="stroke-fill-icon" title={title} style={style} data-disabled={disabled}></div>,
+  [PropertyTypes.FILL_COLOR]: ({ title, style, disabled }) => <div className="fill-color-icon" title={title} style={{ background: style.background }} data-disabled={disabled}><div className="color-icon-opacity" style={{ opacity: style.opacity, width: style.width }}></div></div>,
+  [PropertyTypes.OPACITY]: ({ title, disabled }) => <div className="opacity-icon color-icon-opacity" title={title} data-disabled={disabled}></div>,
+  [PropertyTypes.FONT]: ({ title, disabled }) => <div className="font-icon" title={title} data-disabled={disabled}>A</div>,
+  [PropertyTypes.SPACING]: ({ title, disabled }) => 
+    <div className="spacing-icon" title={title} data-disabled={disabled}>
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
       <path d="M1 8.38237L3.71667 5.45318L3.71667 11.3116L1 8.38237Z" fill="black"/>
       <path d="M3 8.5L13 8.5" stroke="black"/>
@@ -23,16 +23,18 @@ const _Icons = {
 type T_Icon = {
   type,
   title,
+  disabled,
   style
 };
 const Icon: FC<T_Icon> = ({
   type,
   title,
+  disabled,
   style
 }: T_Icon): ReactElement => {
   const PropertyIcon = _Icons[type];
 
-  return <PropertyIcon title={title} style={style}></PropertyIcon>
+  return <PropertyIcon title={title} style={style} disabled={disabled}></PropertyIcon>
 };
 
 export default Icon;

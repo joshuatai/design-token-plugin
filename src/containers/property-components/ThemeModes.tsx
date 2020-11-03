@@ -1,8 +1,11 @@
 import React, { FC, ReactElement } from "react";
 import useThemeModes from 'hooks/useThemeModes';
+import useTokens from 'hooks/useTokens';
+import useProperties from 'hooks/useProperties';
 import PropertyTypes from 'enums/PropertyTypes';
 import Property from 'model/Property';
 import ThemeMode from 'model/ThemeMode';
+import Token from 'model/Token';
 
 type T_ThemeModeIcon = {
   title: string
@@ -23,20 +26,35 @@ const ThemeModes: FC<T_ThemeModes> = ({
   property = null,
   useThemeHandler = null
 }: T_ThemeModes): ReactElement => {
-  const { themeModes } = useThemeModes();
+  const { themeModes, defaultMode } = useThemeModes();
+  const { getToken } = useTokens();
+  const { getProperty } = useProperties();
   const { type, themeMode } = property;
   let title = 'Change a theme mode';
 
   const selectHandler = (mode: ThemeMode) => (e) => {
-    useThemeHandler(mode);
+    e.target.closest('li').classList.contains('disabled') ? '' : useThemeHandler(mode);
   }
   const ThemeModeItems = themeModes.map((mode: ThemeMode) => {
     let selected = false;
+    let className = ['mode-item'];
+
     if ((!themeMode && mode.isDefault) || themeMode === mode.id) {
       selected = true;
       title = mode.name;
+      className.push('selected');
     }
-    return <li key={`mode-id-${mode.id}`} className={ selected ? 'mode-item selected' : 'mode-item' }>
+    if (property.useToken) {
+      const availibleTheme = (getToken(property.useToken) as Token).properties.find(propId => {
+        const propertyTheme = (getProperty(propId) as Property).themeMode;
+        return propertyTheme === defaultMode.id || propertyTheme === mode.id;
+      });
+      if (!availibleTheme) className.push('disabled');
+    }
+    return <li 
+      key={`mode-id-${mode.id}`}
+      className={className.join(' ')}
+    >
       <a href="#" onClick={selectHandler(mode)}>{mode.name}{mode.isDefault ? ' (Default)' : ''}</a>
     </li>
   });

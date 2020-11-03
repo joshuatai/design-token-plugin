@@ -24,16 +24,18 @@ import Property from "model/Property";
 //   }
 type T_PropertyIcon = {
   options: Array<Property>,
+  disabled: boolean,
   fromTokenList: boolean
 };
 const PropertyIcon = ({
   options,
+  disabled = false,
   fromTokenList = false
 }) => {
   const _property = options.length === 1 ? _cloneDeep(options[0]) : _cloneDeep(options);
   const { type, title, style } = usePropertyInfo(_property, fromTokenList);
 
-  return <Icon type={type} title={title} style={style}></Icon> // .attr('data-role', 'token-icon');
+  return <Icon type={type} title={title} style={style} disabled={disabled}></Icon> // .attr('data-role', 'token-icon');
 }
 
 export default PropertyIcon;

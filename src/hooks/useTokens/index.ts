@@ -12,7 +12,7 @@ const useTokens = () => {
   const { setTokens } = useContext(tokensSetterContext);
   const pureTokens = useContext(purePropertyTokensContext);
   const { setPureTokens } = useContext(purePropertyTokensSetterContext);
-  
+
   const _getPureTokensByProperty = (property: Property) => {
     const types = property.type === PropertyTypes.STROKE_FILL ? [PropertyTypes.FILL_COLOR, PropertyTypes.STROKE_FILL] : [property.type];
 

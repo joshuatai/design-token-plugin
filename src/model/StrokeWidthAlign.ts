@@ -9,6 +9,7 @@ class StrokeWidthAlign {
   width: number = 1;
   align: string = StrokeAligns.INSIDE;
   useToken: string = '';
+  themeMode: string ='';
 
   constructor(options?: any) {
     if (options.id) this.id = options.id;
@@ -16,6 +17,7 @@ class StrokeWidthAlign {
     if (options.useToken) this.useToken = options.useToken;
     if (options.width != null) this.width = options.width;
     if (options.align != null) this.align = options.align;
+    if (options.themeMode) this.themeMode = options.themeMode;
   }
   get type (): string {
     return this._type;
