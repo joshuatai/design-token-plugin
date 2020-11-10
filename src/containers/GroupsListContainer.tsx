@@ -36,7 +36,7 @@ const GroupsContainer: FC = () => {
   return <div id="design-tokens-container" className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic">
     <GroupsList creatable={setCreateEnable}></GroupsList>
     {
-      admin && <button id="group-creator" type="button" onClick={createGroupHandler} disabled={!createEnable}>Add a new group</button>
+      admin && <button id="group-creator" type="button" onClick={createGroupHandler} disabled={!createEnable}>Create A Group</button>
     }
   </div>
 };

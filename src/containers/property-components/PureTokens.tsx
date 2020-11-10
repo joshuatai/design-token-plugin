@@ -68,7 +68,7 @@ const PureTokens: FC<T_PureTokens> = ({
       {property.useToken ? (
         <div
           className="detach-token"
-          title="Detach the linked token"
+          title="Detach Linked Token"
           onClick={detachTokenHandler}
         >
           <svg

@@ -3,42 +3,50 @@ import NodeTypes from 'enums/NodeTypes';
 import MessageTypes from 'enums/MessageTypes';
 import PropertyTypes from 'enums/PropertyTypes';
 import FillTypes from 'enums/FillTypes';
+import ThemeMode from 'model/ThemeMode';
 import { hasCornerNode, hasMixedCornerNode, hasStrokeNode, hasFillsNode, hasOpacityNode, hasFontNode } from 'utils/hasNodeType';
 
 let themeModes = [];
 let versions = [];
-let groups;
 let tokens = [];
 let tokensMap = {};
-let allProperties = [];
-// function clone(val) {
-//   const type = typeof val
-//   if (val === null) {
-//     return null
-//   } else if (type === 'undefined' || type === 'number' ||
-//              type === 'string' || type === 'boolean') {
-//     return val
-//   } else if (type === 'object') {
-//     if (val instanceof Array) {
-//       return val.map(x => clone(x))
-//     } else if (val instanceof Uint8Array) {
-//       return new Uint8Array(val)
-//     } else {
-//       let o = {}
-//       for (const key in val) {
-//         o[key] = clone(val[key])
-//       }
-//       return o
-//     }
-//   }
-//   throw 'unknown'
-// }
+let properties = [];
+//Done
 function postMessage (type: string, message: string | Object): void {
   figma.ui.postMessage({ type, message });
 }
+//Done
+function selectionchange () {
+  const selections = figma.currentPage.selection.map(node => {
+    const useTokens = node.getPluginData('useTokens');
+    return {
+      id: node.id,
+      name: node.name,
+      useTokens: useTokens ? JSON.parse(useTokens) : []
+    };
+  });
+  // console.log(MessageTypes.SELECTION_CHANGE, selections);
+  postMessage(MessageTypes.SELECTION_CHANGE, selections);
+}
+//Done
 function getCurrentThemeMode () {
   return figma.currentPage.getPluginData('themeMode');
 }
+//Done
+function setTokens (_tokens) {
+  tokens = _tokens;
+  tokensMap = {};
+  _tokens.forEach(token => tokensMap[token.id] = token);
+}
+//Done
+function setProperties (_properties) {
+  // console.log(_properties);
+  properties = _properties;
+}
+
+
+
+
 function setCurrentThemeMode (message) {
   figma.currentPage.setPluginData('themeMode', message);
 }
@@ -52,7 +60,7 @@ function propertyMaps (properties) {
     if (
       property._type === PropertyTypes.CORNER_RADIUS ||
       property._type === PropertyTypes.STROKE_WIDTH_ALIGN ||
-      property._type === PropertyTypes.FONT
+      property._type === PropertyTypes.FONT_FAMILY_STYLE
     ) {
       calc[property._type] = property;
     } else if (
@@ -92,7 +100,7 @@ async function assignProperty (properties, node, setNodeUseTheme = true) {
   const strokeFill = properties[PropertyTypes.STROKE_FILL];
   const fillColor = properties[PropertyTypes.FILL_COLOR];
   const opacity = properties[PropertyTypes.OPACITY];
-  const text = properties[PropertyTypes.FONT];
+  const text = properties[PropertyTypes.FONT_FAMILY_STYLE];
   
   node.type === NodeTypes.GROUP && node.children.forEach(child => {
     assignProperty(properties, child);
@@ -190,33 +198,17 @@ async function assignProperty (properties, node, setNodeUseTheme = true) {
     node.fontSize = size;
   }
 }
-function setTokens (groups) {
-  tokens = [];
-  tokensMap = {};
-  allProperties = [];
-  groups.forEach(group => {
-    group.tokens.length && 
-    (tokens = tokens.concat(
-        group.tokens.map(token => { 
-          tokensMap[token.id] = token;
-          allProperties.push(...token.properties);
-          return token;
-        })
-      )
-    )
-  });
-}
+
+
 function getUsedTokens (properties, token: string) {
   const usedTokens = properties
     .filter(prop => prop.useToken && prop.useToken === token)
     .map(prop => prop.parent);
   return usedTokens.concat(...usedTokens.map(token => getUsedTokens(properties, token)));
 }
-
-
-
 function syncCurrentThemeMode (node) {
   const currentThemeMode = getCurrentThemeMode();
+  // console.log(node, 'currentThemeMode', currentThemeMode);
   function traverse(node) {
     if (node instanceof Array) {
       node.forEach(nodeItem => {
@@ -226,76 +218,68 @@ function syncCurrentThemeMode (node) {
     }
     
     let data = node.getPluginData('useTokens');
+    console.log(data);
     const instanceNodes = node.id.split(';');
     // console.log(node, data, '=================================');
-    if (instanceNodes.length > 1) {
-      const masterNode = instanceNodes.reduce((calc, id) => {
-        let matchNode;
-        if (calc) {
-          if (id[0] === 'I') {
-            matchNode = calc.findOne(_node => _node.id === id.substr(1));
-            matchNode = matchNode.masterComponent;
-            // console.log(node ,matchNode);
-          } else {
-            matchNode = calc.findOne(node => node.id.indexOf(id) > -1);
-            // console.log(node ,matchNode, matchNode.getPluginData('useTokens'));
-          }
-        }
-        return matchNode;
-      }, figma.currentPage);
-      // console.log(node ,masterNode, masterNode.getPluginData('useTokens'));
-      const _data = masterNode.getPluginData('useTokens');
-      if (_data) {
-        node.setPluginData('useTokens', _data);
-        data = _data;
-      }
-    } else if (!data && node.type === 'INSTANCE') {
-      const masterNode = node.masterComponent;
-      const _data = masterNode.getPluginData('useTokens');
-      if (_data) {
-        node.setPluginData('useTokens', _data);
-        data = _data;
-      }
-    }
+    // if (instanceNodes.length > 1) {
+    //   const masterNode = instanceNodes.reduce((calc, id) => {
+    //     let matchNode;
+    //     if (calc) {
+    //       if (id[0] === 'I') {
+    //         matchNode = calc.findOne(_node => _node.id === id.substr(1));
+    //         matchNode = matchNode.masterComponent;
+    //         // console.log(node ,matchNode);
+    //       } else {
+    //         matchNode = calc.findOne(node => node.id.indexOf(id) > -1);
+    //         // console.log(node ,matchNode, matchNode.getPluginData('useTokens'));
+    //       }
+    //     }
+    //     return matchNode;
+    //   }, figma.currentPage);
+    //   // console.log(node ,masterNode, masterNode.getPluginData('useTokens'));
+    //   const _data = masterNode.getPluginData('useTokens');
+    //   if (_data) {
+    //     node.setPluginData('useTokens', _data);
+    //     data = _data;
+    //   }
+    // } else if (!data && node.type === 'INSTANCE') {
+    //   const masterNode = node.masterComponent;
+    //   const _data = masterNode.getPluginData('useTokens');
+    //   if (_data) {
+    //     node.setPluginData('useTokens', _data);
+    //     data = _data;
+    //   }
+    // }
     if ("children" in node) {
       for (const child of node.children) {
         traverse(child);
       }
     }
     
-    const tokens = data ? JSON.parse(data) : [];
-    const length = tokens.length;
-    let removedTokens = [];
-    tokens.forEach(token => {
-      if (tokensMap[token]) {
-        assignProperty(propertyMaps(tokensMap[token].properties), node);
-      } else {
-        removedTokens.push(token);
-      }
-    });
-    removedTokens.forEach(remove => {
-      const index = tokens.findIndex((token) => token === remove);
-      if (index > -1) tokens.splice(index, 1);
-    });
+    // const tokens = data ? JSON.parse(data) : [];
+    // const length = tokens.length;
+    // let removedTokens = [];
+    // tokens.forEach(token => {
+    //   if (tokensMap[token]) {
+    //     assignProperty(propertyMaps(tokensMap[token].properties), node);
+    //   } else {
+    //     removedTokens.push(token);
+    //   }
+    // });
+    // removedTokens.forEach(remove => {
+    //   const index = tokens.findIndex((token) => token === remove);
+    //   if (index > -1) tokens.splice(index, 1);
+    // });
     // if (tokens.length !== length) node.setPluginData('useTokens', JSON.stringify(tokens));
   }
   traverse(node);
 }
-function selectionchange () {
-  const selections = figma.currentPage.selection.map(node => {
-    const useTokens = node.getPluginData('useTokens');
-    return {
-      id: node.id,
-      name: node.name,
-      useTokens: useTokens ? JSON.parse(useTokens) : []
-    };
-  });
-  postMessage(MessageTypes.SELECTION_CHANGE, selections);
-}
+
 figma.showUI(__html__, { visible: true, width: 274, height: 600 });
 
 figma.ui.onmessage = async (msg) => {
   const { type, message } = msg;
+  //Done
   if (type === MessageTypes.GET_API) {
     const apiKey = await figma.clientStorage.getAsync('api-key');
     const tokensID = await figma.clientStorage.getAsync('tokens-id');
@@ -305,6 +289,7 @@ figma.ui.onmessage = async (msg) => {
     const admin = await figma.clientStorage.getAsync('admin');
     postMessage(MessageTypes.GET_API, { 'api-key': apiKey, 'tokens-id': tokensID, /*'collection-id': collectionID,*/ 'versions-id': versionsID, 'admin-id': adminID, admin });
   }
+  //Done
   if (type === MessageTypes.SET_API) {
     const settings = JSON.parse(message);
     figma.clientStorage.setAsync('api-key', settings['api-key']);
@@ -314,6 +299,7 @@ figma.ui.onmessage = async (msg) => {
     figma.clientStorage.setAsync('admin-id', settings['admin-id']);
     figma.clientStorage.setAsync('admin', settings['admin']);
   }
+  //Done
   if (type === MessageTypes.GET_FONTS) {
     const fontList = await figma.listAvailableFontsAsync();
     const fonts = fontList.reduce((calc, font) => {
@@ -323,10 +309,40 @@ figma.ui.onmessage = async (msg) => {
     }, {});
     postMessage(MessageTypes.GET_FONTS, fonts);
   }
+  //Done
+  if (type === MessageTypes.SET_MODES) {
+    themeModes = JSON.parse(message);
+    const currentTheme = figma.currentPage.getPluginData('themeMode');
+    const defaultMode: ThemeMode = themeModes.find((mode: ThemeMode) => mode.isDefault);
+    if (!currentTheme || !themeModes.some(mode => mode.id === currentTheme)) {
+      figma.currentPage.setPluginData('themeMode', defaultMode.id);
+    }
+  }
+  //Done
+  if (type === MessageTypes.SET_TOKENS) {
+    const tokens = JSON.parse(message);
+    setTokens(tokens);
+  }
+  //Done
+  if (type === MessageTypes.SET_PROPERTIES) {
+    const properties = JSON.parse(message);
+    setProperties(properties);
+  }
+  //Done
   if (type === MessageTypes.FETCH_CURRENT_THEME_MODE) {
+    // console.log(MessageTypes.FETCH_CURRENT_THEME_MODE, getCurrentThemeMode())
     postMessage(MessageTypes.FETCH_CURRENT_THEME_MODE, getCurrentThemeMode());
     // setTimeout(selectionchange, 1000);
+    syncCurrentThemeMode(figma.currentPage);
   }
+  //Done
+  if (type === MessageTypes.SYNC_CURRENT_THEME_MODE) {
+    syncCurrentThemeMode(figma.currentPage);
+  }
+
+
+
+  
   if (type === MessageTypes.SET_CURRENT_THEME_MODE) {
     setCurrentThemeMode(message);
   }
@@ -336,65 +352,31 @@ figma.ui.onmessage = async (msg) => {
 
 
 
-
-
-  if (type === MessageTypes.SET_MODES) {
-    themeModes = JSON.parse(message);
-    const currentTheme = figma.currentPage.getPluginData('themeMode');
-    if (!currentTheme || !themeModes.find(mode => mode.id === currentTheme)) {
-      // figma.currentPage.setPluginData('themeMode', themeModes[0].id);
-    }
-  }
-  
-
-  
   if (type === MessageTypes.GET_VERSIONS) {
     const versionData = figma.root.getPluginData('versions');
     versions = versionData ? JSON.parse(versionData) : [];
     postMessage(type, versions);
   }
-  
-
-  
-  
-  
   if (type === MessageTypes.SET_VERSION) {
     figma.root.setPluginData('versions', message);
   }
   if (type === MessageTypes.RESTRORE_VERSION) {
 
   }
-  //Done
-  if (type === MessageTypes.GET_TOKENS) {
-    groups = figma.root.getPluginData('Tokens');
-
-    if (groups) {
-      groups = JSON.parse(groups);
-    } else {
-      groups = [];
-    }
-    setTokens(groups);
-    postMessage(type, groups);
-  }
-  //Done
-  if (type === MessageTypes.SET_TOKENS) {
-    groups = JSON.parse(message);
-    setTokens(groups);
-    figma.root.setPluginData('Tokens', message);
-  }
   if (type === MessageTypes.ASSIGN_TOKEN) {
-    const { id, properties } = JSON.parse(message);
-    const selection = figma.currentPage.selection.slice();
-    selection.forEach((node: any) => {
-      const data = node.getPluginData('useTokens');
-      const usedTokens = data ? JSON.parse(data) : [];
-      const existIndex = usedTokens.findIndex(tokenId => tokenId === id);
-      if (existIndex > -1) usedTokens.splice(existIndex, 1);
-      usedTokens.push(id);
-      node.setPluginData('useTokens', JSON.stringify(usedTokens));
-      assignProperty(propertyMaps(properties), node);
-    });
-    selectionchange();
+    // console.log(JSON.parse(message));
+    // const { id, properties } = JSON.parse(message);
+    // const selection = figma.currentPage.selection.slice();
+    // selection.forEach((node: any) => {
+    //   const data = node.getPluginData('useTokens');
+    //   const usedTokens = data ? JSON.parse(data) : [];
+    //   const existIndex = usedTokens.findIndex(tokenId => tokenId === id);
+    //   if (existIndex > -1) usedTokens.splice(existIndex, 1);
+    //   usedTokens.push(id);
+    //   node.setPluginData('useTokens', JSON.stringify(usedTokens));
+    //   assignProperty(propertyMaps(properties), node);
+    // });
+    // selectionchange();
   }
   if (type === MessageTypes.UNASSIGN_TOKEN) {
     const { nodeId, tokenId } = JSON.parse(message);
@@ -420,7 +402,7 @@ figma.ui.onmessage = async (msg) => {
   }
   if (type === MessageTypes.SYNC_NODES) {
     const token = JSON.parse(message);
-    const usedTokens = getUsedTokens(allProperties, token.id);
+    const usedTokens = getUsedTokens(properties, token.id);
     usedTokens.push(token.id);
     function traverse(node) {
       if ("children" in node) {
@@ -440,15 +422,14 @@ figma.ui.onmessage = async (msg) => {
     }
     traverse(figma.currentPage);
   }
-  if (type === MessageTypes.SYNC_CURRENT_THEME_MODE) {
-    syncCurrentThemeMode(figma.currentPage);
-  }
+
 };
 figma.on('currentpagechange', () => {
   sendCurrentThemeMode();
   selectionchange();
 });
 figma.on("selectionchange", () => {
-  syncCurrentThemeMode(figma.currentPage.selection);
+  console.log('selectionchange');
+  // syncCurrentThemeMode(figma.currentPage.selection);
   selectionchange();
 });

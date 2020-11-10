@@ -1,8 +1,11 @@
 import { useContext } from 'react';
 import { propertiesContext, propertiesSetterContext } from '../PropertyProvider';
 import useAPI from 'hooks/useAPI';
+import { toSaveProperties } from 'hooks/useData';
 import useThemeModes from 'hooks/useThemeModes';
 import useTokens from 'hooks/useTokens';
+import { sendMessage } from 'model/DataManager';
+import MessageTypes from 'enums/MessageTypes';
 const useProperties = () => {
     const { api } = useAPI();
     const { defaultMode } = useThemeModes();
@@ -34,6 +37,7 @@ const useProperties = () => {
     };
     const _setAllProperties = (properties = []) => {
         setProperties(properties);
+        sendMessage(MessageTypes.SET_PROPERTIES, toSaveProperties(properties));
     };
     const _traversing = (token, applyMode) => {
         // const useThemeMode = formTokenList ? getCurrentThemeMode() : applyModes;

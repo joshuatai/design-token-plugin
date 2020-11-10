@@ -28,14 +28,6 @@ SelectText(jQuery);
 //     if (this.token.properties.length > 0) {
 //       this.$propertyView.propertyView(this.token.properties);
 //     }
-// TokenSetting.prototype.propertyEdit = function (editable: Boolean, property?: any) {
-//   if (property) {
-//     const properties = [];
-//     if (!property.length) properties.push(property);
-//      else properties.push(...property);
-//     this.choosePropertyType(properties);
-//   }
-// };
 //   TokenSetting.prototype.choosePropertyType = function (param) {
 //     let type = param;
 //     let settings;
@@ -130,6 +122,7 @@ const TokenSetting = () => {
         setTokenSetting(Object.assign({}, initialSetting));
     };
     const traversingUpdate = (id) => {
+        // console.log(propertiesSetting, token);//need to check default theme
         referedProperties(id).forEach(property => {
             const referProp = propertiesSetting.filter(prop => prop.themeMode === property.themeMode).pop();
             const referPropSetting = Object.assign({}, referProp);
@@ -190,10 +183,10 @@ const TokenSetting = () => {
         React.createElement("div", { className: "setting-row" },
             React.createElement("span", { ref: $name, className: "token-name", "prop-type": "name", placeholder: "Token Name", "is-required": "true", contentEditable: "false", suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: inputHandler, onBlur: blurHandler }, token.name)),
         React.createElement("div", { className: "setting-row" },
-            React.createElement("span", { ref: $description, className: "token-description", "prop-type": "description", placeholder: "Add Description", contentEditable: "false", suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: inputHandler, onBlur: blurHandler }, token.description)),
+            React.createElement("span", { ref: $description, className: "token-description", "prop-type": "description", placeholder: "Description", contentEditable: "false", suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: inputHandler, onBlur: blurHandler }, token.description)),
         React.createElement("div", { id: "property-view", className: "setting-row" }),
         React.createElement(PropertyList, null),
-        React.createElement("div", { className: "setting-row" }, token && !showPropertySetting && (React.createElement("button", { id: "add-property", type: "button", disabled: !creatable, onClick: showPropertySettingHandler }, "Create a new property"))),
+        React.createElement("div", { className: "setting-row" }, token && !showPropertySetting && (React.createElement("button", { id: "add-property", type: "button", disabled: !creatable, onClick: showPropertySettingHandler }, "Create A Property"))),
         showPropertySetting && (React.createElement(PropertySetting, { token: token, hidePropertySetting: hidePropertySettingHandler })),
         propertiesSetting.length > 0 && (React.createElement("div", { className: "setting-row" },
             React.createElement("button", { id: "save-button-container", type: "button", className: "btn btn-sm btn-primary", disabled: token.name === "", onClick: saveTokenHandler }, "Save"))))));

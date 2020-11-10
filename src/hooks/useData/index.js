@@ -1,6 +1,4 @@
 import { useContext } from 'react';
-import { sendMessage } from 'model/DataManager';
-import MessageTypes from 'enums/MessageTypes';
 import useAPI from 'hooks/useAPI';
 import { ThemeModesContext } from '../ThemeModeProvider';
 import { groupsContext } from '../GroupProvider';
@@ -11,7 +9,7 @@ import Properties from 'model/Properties';
 import PropertyTypes from 'enums/PropertyTypes';
 import { Mixed } from 'symbols/index';
 export const JSONBIN_URL = `https://api.jsonbin.io`;
-const toSaveTokens = (tokens) => {
+export const toSaveTokens = (tokens) => {
     const _tokens = tokens.map((token) => {
         const _token = new Token(token);
         if (_token.propertyType === Mixed)
@@ -20,7 +18,7 @@ const toSaveTokens = (tokens) => {
     });
     return _tokens;
 };
-const toSaveProperties = (properties) => {
+export const toSaveProperties = (properties) => {
     const _properties = properties.map((prop) => {
         const _prop = new Properties[prop.type](prop);
         if (_prop.type === PropertyTypes.CORNER_RADIUS && _prop.radius === Mixed)
@@ -195,11 +193,7 @@ const useData = () => {
                 properties: toSaveProperties(properties)
             }
         });
-        return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
-            .then(res => {
-            sendMessage(MessageTypes.SET_MODES, _themeModes);
-            return res.json();
-        });
+        return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options).then(res => res.json());
     };
     const saveGroups = (_groups) => {
         if (!api.admin)

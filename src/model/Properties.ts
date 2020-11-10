@@ -4,7 +4,7 @@ import StrokeWidthAlign from "./StrokeWidthAlign";
 import FillColor from "./FillColor";
 import StrokeFill from "./StrokeFill";
 import Opacity from "./Opacity";
-import Font from "./Font";
+import FamilyStyle from "./FamilyStyle";
 import Spacing from "./Spacing";
 
 export default {
@@ -13,6 +13,6 @@ export default {
   [PropertyTypes.OPACITY]: Opacity,
   [PropertyTypes.STROKE_FILL]: StrokeFill,
   [PropertyTypes.STROKE_WIDTH_ALIGN]: StrokeWidthAlign,
-  [PropertyTypes.FONT]: Font,
+  [PropertyTypes.FONT_FAMILY_STYLE]: FamilyStyle,
   [PropertyTypes.SPACING]: Spacing,
 };

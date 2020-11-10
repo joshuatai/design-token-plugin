@@ -59,10 +59,6 @@ const Root:FC = () => {
     // if (msg.type === MessageTypes.GET_CURRENT_THEME_MODE) {
     //   updateCurrentThemeMode();
     // }
-    // if (msg.type === MessageTypes.GET_TOKENS) {
-    //   // console.log(JSON.stringify(msg.message));
-    //   init(msg.message);
-    // }
     // if (msg.type === MessageTypes.SELECTION_CHANGE) {
     //   Renderer.tokensAssigned(msg.message.filter(selection => selection.useTokens.length));
     //   $('#design-tokens-container').trigger('click');

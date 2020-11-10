@@ -83,7 +83,7 @@ export default (properties) => {
                 }
             }
         }
-        if (property.type === PropertyTypes.FONT) {
+        if (property.type === PropertyTypes.FONT_FAMILY_STYLE) {
             calc["font-family"] = property.fontName.family;
             calc["font-size"] = property.fontSize;
             calc["font-weight"] = FontStyles[property.fontName.style];

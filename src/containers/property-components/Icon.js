@@ -7,7 +7,7 @@ const _Icons = {
     [PropertyTypes.FILL_COLOR]: ({ title, style, disabled }) => React.createElement("div", { className: "fill-color-icon", title: title, style: { background: style.background }, "data-disabled": disabled },
         React.createElement("div", { className: "color-icon-opacity", style: { opacity: style.opacity, width: style.width } })),
     [PropertyTypes.OPACITY]: ({ title, disabled }) => React.createElement("div", { className: "opacity-icon color-icon-opacity", title: title, "data-disabled": disabled }),
-    [PropertyTypes.FONT]: ({ title, disabled }) => React.createElement("div", { className: "font-icon", title: title, "data-disabled": disabled }, "A"),
+    [PropertyTypes.FONT_FAMILY_STYLE]: ({ title, disabled }) => React.createElement("div", { className: "font-icon", title: title, "data-disabled": disabled }, "A"),
     [PropertyTypes.SPACING]: ({ title, disabled }) => React.createElement("div", { className: "spacing-icon", title: title, "data-disabled": disabled },
         React.createElement("svg", { width: "16", height: "16", viewBox: "0 0 16 16", fill: "none", xmlns: "http://www.w3.org/2000/svg" },
             React.createElement("path", { d: "M1 8.38237L3.71667 5.45318L3.71667 11.3116L1 8.38237Z", fill: "black" }),

@@ -17,6 +17,6 @@ const ThemeModesContainer = () => {
     };
     return React.createElement("div", { id: "mode-setting", className: "plugin-panel" },
         React.createElement(ThemeModeList, { creatable: setCreateEnable }),
-        admin && React.createElement("button", { id: "mode-creator", onClick: createModeHandler, disabled: !createEnable }, "Add a new theme mode"));
+        admin && React.createElement("button", { id: "mode-creator", onClick: createModeHandler, disabled: !createEnable }, "Create A Theme Mode"));
 };
 export default ThemeModesContainer;

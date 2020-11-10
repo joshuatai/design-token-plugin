@@ -85,13 +85,6 @@
   margin-left: -1px;
 }
 
-
-
-.font-family-val {
-  border-top-left-radius: 3px;
-  border-bottom-left-radius: 3px;
-}
-
 .opacity-icon {
   opacity: 1;
   width: 16px;
@@ -116,13 +109,7 @@
   left: 3px;
   position: absolute;
 }
-.val-container .input-group-btn .style-dropdown-toggle {
-  width: 100px;
-  text-align: left;
-}
-.val-container .input-group-btn .style-dropdown-toggle i {
-  float: right;
-}
+
 
 .themem-mode-list,
 #export {

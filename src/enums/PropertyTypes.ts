@@ -6,7 +6,7 @@ enum PropertyTypes {
     STROKE_FILL = 'Stroke Fill',
     // STROKE_DASH = 'Stroke Dash Pattern',
     STROKE_WIDTH_ALIGN = 'Stroke Width/Align',
-    FONT = 'Font',
+    FONT_FAMILY_STYLE = 'Font Family/Style',
     SPACING = 'Spacing',
     WIDTH_HEIGHT = 'Width/Height'
     // MIXED = 'Mixed'

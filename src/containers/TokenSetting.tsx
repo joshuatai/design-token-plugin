@@ -36,14 +36,6 @@ SelectText(jQuery);
 //     }
 
 
-// TokenSetting.prototype.propertyEdit = function (editable: Boolean, property?: any) {
-//   if (property) {
-//     const properties = [];
-//     if (!property.length) properties.push(property);
-//      else properties.push(...property);
-//     this.choosePropertyType(properties);
-//   }
-// };
 //   TokenSetting.prototype.choosePropertyType = function (param) {
 //     let type = param;
 //     let settings;
@@ -152,6 +144,7 @@ const TokenSetting: FC = (): ReactElement => {
     setTokenSetting(Object.assign({}, initialSetting));
   };
   const traversingUpdate = (id: string) => {
+    // console.log(propertiesSetting, token);//need to check default theme
     referedProperties(id).forEach(property => {
       const referProp = propertiesSetting.filter(prop => prop.themeMode === property.themeMode).pop();
       const referPropSetting = Object.assign({}, referProp);
@@ -241,7 +234,7 @@ const TokenSetting: FC = (): ReactElement => {
             ref={$description}
             className="token-description"
             prop-type="description"
-            placeholder="Add Description"
+            placeholder="Description"
             contentEditable="false"
             suppressContentEditableWarning={true}
             onClick={focusHandler}
@@ -261,7 +254,7 @@ const TokenSetting: FC = (): ReactElement => {
               disabled={!creatable}
               onClick={showPropertySettingHandler}
             >
-              Create a new property
+              Create A Property
             </button>
           )}
         </div>

@@ -111,11 +111,11 @@ const usePropertyInfo = (property, fromTokenList = false) => {
         }
         title = `Stroke Width: ${_property.width} and Stroke Align: ${_property.align}`;
     }
-    //   if (property.type === PropertyTypes.FONT) {
-    //     value = property.fontName.family;
-    //     secondValue = property.fontSize;
-    //     title = `Font Family: ${property.fontName.family}, Font Size: ${property.fontSize}`;
-    //   }
+    if (property.type === PropertyTypes.FONT_FAMILY_STYLE) {
+        value = property.family;
+        secondValue = property.style;
+        title = `Font Family: ${property.family}, Font Style: ${property.style}`;
+    }
     if (_property.type === PropertyTypes.SPACING) {
         value = _property.value;
         title = `Spacing: ${value}`;

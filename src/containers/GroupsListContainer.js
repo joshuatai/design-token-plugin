@@ -32,6 +32,6 @@ const GroupsContainer = () => {
     }, []);
     return React.createElement("div", { id: "design-tokens-container", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic" },
         React.createElement(GroupsList, { creatable: setCreateEnable }),
-        admin && React.createElement("button", { id: "group-creator", type: "button", onClick: createGroupHandler, disabled: !createEnable }, "Add a new group"));
+        admin && React.createElement("button", { id: "group-creator", type: "button", onClick: createGroupHandler, disabled: !createEnable }, "Create A Group"));
 };
 export default GroupsContainer;

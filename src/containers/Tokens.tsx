@@ -1,4 +1,4 @@
-import React, { useEffect, FC, useContext } from 'react';
+import React, { useEffect, FC, useContext, useState } from 'react';
 import hash from 'hash.js';
 import _cloneDeep from 'lodash/cloneDeep';
 
@@ -16,7 +16,7 @@ import ThemeModesSetter from './ThemeModesSetter';
 
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
-import {getVersion, sendMessage, syncPageThemeMode, setVersion, restore } from 'model/DataManager';
+import {getVersion, sendMessage, setVersion, restore } from 'model/DataManager';
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
 import Group from 'model/Group';
@@ -57,6 +57,8 @@ const Tokens:FC<Props> = ({
   const tokenSetting: T_TokenSetting = useContext(tokenSettingContext);
   let $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $themeModeList, $versionCreator, $versionList;
 
+  const [ assignTokenNodes, setAssignTokenNodes ] = useState([]);
+
   const Renderer = {
     version: function (version) {
       let $version, $name, $remove, $load;
@@ -94,11 +96,11 @@ const Tokens:FC<Props> = ({
         nodes.forEach(node => {
           let { id, name, useTokens } = node;
           const _id = id.replace(':', '-');
-          const $node = $(`<div id="${_id}" class="selected-node panel panel-default panel-collapse-shown"></div>`).data('id', id);
-          const $heading = $('<div class="panel-heading node-item" data-toggle="collapse" aria-expanded="true"></div>').attr('data-target', `#node-${_id}`);
-          const $title = $('<h6 class="panel-title"></h6>');
-          const $expend = $('<span class="tmicon tmicon-caret-right tmicon-hoverable"></span>');
-          const $name = $('<span class="node-name"></span>').text(name);
+          const $node = $(``).data('id', id);
+          const $heading = $('');
+          const $title = $('');
+          const $expend = $('');
+          const $name = $('').text(name);
           const $tokenListPanel = $('<div class="panel-collapse collapse in" aria-expanded="true"></div>').attr('id', `node-${_id}`);
           const $tokenList = $('<ul class="token-list"></ul>');
           $assignedTokensNodeList.append(
@@ -162,9 +164,9 @@ const Tokens:FC<Props> = ({
     setVersion(data);
   }
   function updateCurrentThemeMode () {
-    Renderer.updateThemeMode();
-    $tokenSetting.TokenSetting('changeThemeMode');
-    syncPageThemeMode();
+    // Renderer.updateThemeMode();// change token icon
+    // $tokenSetting.TokenSetting('changeThemeMode'); //change preview
+    sendMessage(MessageTypes.SYNC_CURRENT_THEME_MODE);
   }
 
   const onMessageReceived = (event) => {
@@ -173,9 +175,6 @@ const Tokens:FC<Props> = ({
     if (msg.type === MessageTypes.GET_VERSIONS) {
       initVersion(msg.message);
     }
-    // if (msg.type === MessageTypes.GET_MODES) {
-    //   initThemeMode(msg.message);
-    // }
     
     if (msg.type === MessageTypes.FETCH_CURRENT_THEME_MODE) {
       const themeId = msg.message;
@@ -186,13 +185,11 @@ const Tokens:FC<Props> = ({
     if (msg.type === MessageTypes.GET_CURRENT_THEME_MODE) {
       updateCurrentThemeMode();
     }
-    if (msg.type === MessageTypes.GET_TOKENS) {
-      // console.log(JSON.stringify(msg.message));
-      // init(msg.message);
-    }
     if (msg.type === MessageTypes.SELECTION_CHANGE) {
-      Renderer.tokensAssigned(msg.message.filter(selection => selection.useTokens.length));
-      $('#design-tokens-container').trigger('click');
+      const assignTokenNodes = msg.message.filter(selection => selection.useTokens.length);
+      setAssignTokenNodes(assignTokenNodes);
+      // Renderer.tokensAssigned();
+      // $('#design-tokens-container').trigger('click');
     }
   }
   const addPostMessageListener = () => {
@@ -336,7 +333,6 @@ const Tokens:FC<Props> = ({
     }
     return removePostMessageListener;
   }, [themeModes]);
-  
   return (
     <>
       <ul id="desigin-system-tabs" className="nav nav-tabs" role="tablist">
@@ -359,7 +355,23 @@ const Tokens:FC<Props> = ({
           }
         </div>
         <div role="tabpanel" className="tab-pane" id="tokens-assigned">
-          <div id="assigned-tokens-node-list" className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic"></div>     
+          <div id="assigned-tokens-node-list" className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic">
+            {
+              assignTokenNodes.map(node => {
+                let { id, name, useTokens } = node;
+                const _id = id.replace(':', '-');
+
+                return <div key={_id} id={_id} className="selected-node panel panel-default panel-collapse-shown">
+                  <div className="panel-heading node-item" data-toggle="collapse" aria-expanded="true" data-target={`#node-${_id}`}>
+                    <h6 className="panel-title">
+                      <span className="tmicon tmicon-caret-right tmicon-hoverable"></span>
+                      <span className="node-name">{name}</span>
+                    </h6>
+                  </div>
+                </div>
+              })
+            }
+          </div>     
         </div>
         <div role="tabpanel" className="tab-pane" id="modes">
           <ThemeModesContainer></ThemeModesContainer>

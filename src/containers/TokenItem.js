@@ -1,8 +1,10 @@
 import React, { useState } from "react";
 import TokenAction from './TokenAction';
 import PropertyIcon from './property-components/PropertyIcon';
+import { sendMessage } from 'model/DataManager';
 import useAPI from 'hooks/useAPI';
 import useProperties from 'hooks/useProperties';
+import MessageTypes from 'enums/MessageTypes';
 const TokenItem = ({ token, }) => {
     const { api: { admin } } = useAPI();
     const { id, name, properties } = token;
@@ -19,7 +21,10 @@ const TokenItem = ({ token, }) => {
             return;
         setContextmenu(false);
     };
-    return (React.createElement("li", { id: id, className: "token-item", onContextMenu: contextMenuHandler, onMouseLeave: mouseLeaveHandler },
+    const assignTokenHandler = (e) => {
+        sendMessage(MessageTypes.ASSIGN_TOKEN, token);
+    };
+    return (React.createElement("li", { id: id, className: "token-item", onContextMenu: contextMenuHandler, onMouseLeave: mouseLeaveHandler, onClick: assignTokenHandler },
         React.createElement("span", { className: "sortable-handler" }),
         React.createElement(PropertyIcon, { options: propertyIconOptions, fromTokenList: true }),
         React.createElement("span", { className: "token-key" }, name),

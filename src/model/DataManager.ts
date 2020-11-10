@@ -29,11 +29,8 @@ const pureToken = Object.keys(PropertyTypes).reduce((calc, type) => (calc[Proper
 const getFonts = () => fonts;
 const fetchInitial = () => {
   
-  // sendMessage(MessageTypes.GET_FONTS);
   // sendMessage(MessageTypes.GET_VERSIONS);
-  // sendMessage(MessageTypes.GET_MODES);
   // sendMessage(MessageTypes.GET_INIT_THEME_MODE);
-  // sendMessage(MessageTypes.GET_TOKENS);
 };
 
 
@@ -41,36 +38,11 @@ const initialize = function (data) {
   // console.log(data);
   // console.log(APIKey, collectionID, tokensBinID, VersionsBinID, isAdmin);
 
-  // initThemeMode(data.themeMode);
+  
   
   // useThemeModes();
-  // sendMessage(
-  //   MessageTypes.SET_API,
-  //   {
-  //     'api-key': APIKey,
-  //     'collection-id': collectionID,
-  //     'tokens-bin-id': tokensBinID,
-  //     'versions-bin-id': VersionsBinID,
-  //     'admin': isAdmin
-  //   }
-  // );
 }
-function initThemeMode (modes: Array<ThemeMode> | undefined) {
-  // let hasDefault = true;
-  // if (!modes) {
-  //   hasDefault = false;
-  //   modes = [new ThemeMode()];
-  // }
-  // modes.forEach((mode: ThemeMode) => {
-  //   // const $themeMode = Renderer.themeMode();
-  //   // const { data } = $themeMode.data();
-  //   setThemeMode(new ThemeMode(mode));
-  // });
-  // if (!hasDefault) {
-  //   saveThemeMode();
-  // }
-  // Renderer.themeModes();
-}
+
 
 const getAPI = function () { 
   // return {
@@ -82,140 +54,7 @@ const getAPI = function () {
   //   'admin': isAdmin
   // }
 };
-// const setAPI = async (key, binID, password?) => {
-//   const options = {
-//     method: 'GET',
-//     headers: {
-//       'secret-key': null
-//     },
-//     body: null
-//   };
-//   let response;
 
-//   if (key) {
-//     APIKey = key;
-//     options.headers['secret-key'] = key;
-//     if (binID) {
-//       let data;
-//       response = fetch(`${JSONBIN_URL}/b/${binID}`, options)
-//         .then(res => res.json())
-//         .then(res => {
-//           if (res.message === undefined) {
-//             data = res.data;
-//             tokensBinID = binID;
-//             collectionID = res['collection-id'];
-//             VersionsBinID = res['versions-bin-id'];
-//           } else {
-//             return Promise.reject({
-//               message: res.message,
-//             });
-//           }
-//           if (password) {
-//             return fetch(`${JSONBIN_URL}/b/${res['admin-id']}`, options)
-//               .then(res => res.json())
-//               .then(res => {
-//                 if (res.password === password) {
-//                   isAdmin = true;
-//                   initialize(data);
-//                   return Promise.resolve({
-//                     id: binID,
-//                     admin: true,
-//                     success: true
-//                   });
-//                 } 
-//                 return Promise.reject({
-//                   message: 'Invalid password'
-//                 });
-//               });
-//           } else {
-//             if (password === '') isAdmin = false;
-//             if (isAdmin) {
-//               initialize(data);
-//               return Promise.resolve({
-//                 id: binID,
-//                 admin: true,
-//                 success: true
-//               });
-//             } else {
-//               return fetch(`${JSONBIN_URL}/b/${VersionsBinID}`, options)
-//                 .then(res => res.json())
-//                 .then(res => {
-//                   if (res['last-version'] === 0) {
-//                     data = {};
-//                     initialize(data);
-//                     return Promise.resolve({
-//                       id: binID,
-//                       admin: false,
-//                       success: true
-//                     });
-//                   }
-//                 });
-//             }
-//           }
-//         });
-//     } else {
-//       // Create Collection
-//       options.headers['Content-Type'] = 'application/json';
-//       options.method = 'POST';
-//       options.body = JSON.stringify({ name: 'Tonic Design Tokens (Collection)' })
-//       response = fetch(`${JSONBIN_URL}/c`, options)
-//         .then(res => res.json())
-//         .then(res => {
-//           if (res.success) {
-//             collectionID = res.id;
-//             options.headers['private'] = 'true';
-//             options.headers['name'] = 'Tonic Design Tokens (Versions)';
-//             options.headers['collection-id'] = res.id;
-//             options.body = JSON.stringify({ 'last-version': 0, versions: {} });
-//             const versions = fetch(`${JSONBIN_URL}/b`, options);
-
-//             options.headers['name'] = 'Tonic Design Tokens (Admin)';
-//             options.body = JSON.stringify({ password });
-//             const admin = fetch(`${JSONBIN_URL}/b`, options);
-//             return Promise.all([versions, admin]);
-//           }
-//           return Promise.reject({ message: res.message });
-//         })
-//         .then(([versions, admin]) => Promise.all([versions.json(), admin.json()]))
-//         .then(([versions, admin]) => {
-//           if (versions.success, admin.success) {
-//             VersionsBinID = versions.id;
-//             options.headers['name'] = 'Tonic Design Tokens';
-//             options.body = JSON.stringify({
-//               'collection-id': collectionID,
-//               'admin-id': admin.id, //remove it once the collection api is back!!
-//               'last-version': 0,
-//               'versions-bin-id': versions.id,
-//               'data': {}
-//             });
-//             return fetch(`${JSONBIN_URL}/b`, options)
-//               .then(res => res.json())
-//               .then(res => {
-//                 if (res.success) {
-//                   tokensBinID = res.id;
-//                   isAdmin = true;
-//                   initialize(res.data.data);
-//                   return Promise.resolve({
-//                     id: res.id,
-//                     admin: true,
-//                     success: res.success
-//                   });
-//                 }
-//                 return Promise.reject(false);
-//               })
-//           }
-//           return Promise.reject(false);
-//         });
-//     }
-//   }
-//   return response;
-// }
-const saveThemeMode = () => {
-  sendMessage(
-    MessageTypes.SET_MODES,
-    themeModes
-  );
-}
 const onMessageReceived = (event) => {
   // const msg = event.data.pluginMessage;
   // if (msg.type === MessageTypes.GET_API) {
@@ -243,12 +82,7 @@ const removeThemeMode = mode => {
 //   );
 // }
 const setProperty = property => propertiesMap[property.id] = property;
-const save = () => {
-  sendMessage(
-    MessageTypes.SET_TOKENS,
-    _cloneDeep(groups)
-  );
-};
+
 const setVersion = (version: Version) => {
   versions.push(version);
   versionMap[version.id] = version;
@@ -258,38 +92,6 @@ const saveVersion = () => {
   //   MessageTypes.SET_VERSION,
   //   versions
   // );
-}
-const syncToken = (token: Token) => {
-  const refer: any = token.properties[0];
-  // getProperty().forEach((property: any) => {
-  //   const hostToken = getToken(property.parent);
-  //   if (property.useToken === token.id) {
-  //     if (property.type === PropertyTypes.CORNER_RADIUS) {
-  //       property.topLeft = refer.topLeft;
-  //       property.topRight = refer.topRight;
-  //       property.bottomRight = refer.bottomRight;
-  //       property.bottomLeft = refer.bottomLeft;
-  //       property.radius = refer.radius;
-  //     }
-  //     if (property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
-  //       property.align = refer.align;
-  //       property.width = refer.width;
-  //     }
-  //     if (property.type === PropertyTypes.FILL_COLOR) {
-  //       property.blendMode = refer.blendMode;
-  //       property.color = refer.color;
-  //       property.fillType = refer.fillType;
-  //       property.opacity = refer.opacity;
-  //       property.visible = refer.visible;
-  //     } 
-  //     if (hostToken.properties.length === 1) syncToken(hostToken);
-  //   }
-  // });
-};
-const syncPageThemeMode = () => {
-  sendMessage(
-    MessageTypes.SYNC_CURRENT_THEME_MODE
-  );
 }
 const restore = (id) => {
   
@@ -328,7 +130,6 @@ export {
   // getGroup,
   // getToken,
 
-  // setAPI,
   setVersion,
   // setThemeMode,
   // setCurrentThemeMode,
@@ -336,12 +137,8 @@ export {
   // setGroup,
   // setToken,
   setProperty,
-  save,
-  saveThemeMode,
   saveVersion,
-  syncToken,
   // syncNode,
-  syncPageThemeMode,
   restore,
   referByToken,
   sendMessage

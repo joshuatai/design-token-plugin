@@ -121,7 +121,7 @@ const GroupItem = ({ data, creatable }) => {
                 _tokens.length > 0 && React.createElement("span", { className: "tmicon tmicon-caret-right tmicon-hoverable" }),
                 React.createElement("span", { "data-id": id, ref: groupNameRef, className: "group-name", "is-required": "true", contentEditable: "false", suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: inputHandler, onBlur: blurHandler }, name)),
             admin &&
-                React.createElement("button", { onClick: addTokenHandler, type: "button", className: "add-token", title: "Create a token" },
+                React.createElement("button", { onClick: addTokenHandler, type: "button", className: "add-token", title: "Create A Token" },
                     React.createElement("svg", { className: "svg", width: "12", height: "12", viewBox: "0 0 12 12", xmlns: "http://www.w3.org/2000/svg" },
                         React.createElement("path", { d: "M5.5 5.5v-5h1v5h5v1h-5v5h-1v-5h-5v-1h5z", fillRule: "nonzero", fillOpacity: "1", fill: "#000", stroke: "none" }))),
             admin &&

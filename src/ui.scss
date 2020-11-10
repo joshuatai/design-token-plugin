@@ -134,6 +134,7 @@ body {
   }
   &[invalid=true] {
     border-color: #E52630 !important;
+    z-index: 4;
   }
   br {
     display:none !important;
@@ -481,6 +482,17 @@ body {
     flex: 1;
     height: 32px;
 
+    &.font-style-container {
+      border: 0;
+      .input-group-btn {
+        margin-left: 0;
+        margin-right: 0;
+
+        .btn {
+          margin-left: 0;
+        }
+      }
+    }
     + .val-container {
       margin-top: 4px;
       flex-basis: 100%;
@@ -494,15 +506,15 @@ body {
       }
     }
     .dropdown-menu {
-      right: -1px;
+      right: 0;
     }
     .input-group {
-      width: 100%;
+      flex: 1;
     }
     .input-group-btn {
       margin-left: -1px;
       margin-right: -1px;
-
+      
       button {
         border-color: transparent;
         text-align: center;
@@ -512,11 +524,21 @@ body {
           margin: 0 auto;
         }
       }
+      &:first-child:last-child {
+        flex: 1;
+      }
       &:first-child button {
         border-top-left-radius: 3px;
         border-bottom-left-radius: 3px;
       }
-
+      .style-dropdown-toggle {
+        text-align: left;
+        border-radius: 3px;
+        width: 100%;
+        i {
+          float: right;
+        }
+      }
       .style-dropdown {
         left: -1px;
         right: auto;
@@ -554,6 +576,7 @@ body {
     &.focus {
       .dropdown-menu {
         max-height: 195px;
+        max-width: 228px;
         overflow: hidden;
         overflow-y: auto;
 
@@ -582,6 +605,9 @@ body {
 
   .font-family-val.hasReferenceToken,
   .hasReferenceToken + .dropdown .themem-mode-list {
+    border-radius: 0;
+  }
+  .hasReferenceToken + .input-group-btn button.dropdown-toggle {
     border-radius: 0;
   }
 
@@ -966,6 +992,10 @@ body {
 .property-second-value,
 .property-third-value {
   padding-left: 5px;
+  max-width: 60px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 #add-property,
 #group-creator,

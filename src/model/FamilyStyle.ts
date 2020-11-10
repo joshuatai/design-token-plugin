@@ -1,27 +1,26 @@
 import { v4 } from 'uuid';
 import PropertyType from 'enums/PropertyTypes';
 
-class Font {
-  _type: string = PropertyType.FONT;
+class FamilyStyle {
+  _type: string = PropertyType.FONT_FAMILY_STYLE;
   id: string = v4();
   parent: string = '';
   useToken: string = '';
-  fontName = {
-    family: "Segoe UI",
-    style: "Regular"
-  };
-  fontSize = 14;
+  family: string = 'Segoe UI';
+  style: string = 'Regular';
+  themeMode = '';
 
   constructor(options?: any) {
     if (options.id) this.id = options.id;
     if (options.parent) this.parent = options.parent;
+    if (options.family) this.family = options.family;
+    if (options.style) this.style = options.style;
+    if (options.themeMode) this.themeMode = options.themeMode;
     if (options.useToken) this.useToken = options.useToken;
-    if (options.fontName) this.fontName = options.fontName;
-    if (options.fontSize) this.fontSize = options.fontSize;
   }
   get type (): string {
     return this._type;
   }
 }
 
-export default Font;
+export default FamilyStyle;

@@ -1,9 +1,12 @@
 import { useContext } from 'react';
 import { tokensContext, tokensSetterContext, purePropertyTokensContext, purePropertyTokensSetterContext } from '../TokenProvider';
 import useAPI from 'hooks/useAPI';
+import { toSaveTokens } from 'hooks/useData';
 import Token from 'model/Token';
 import { Mixed } from 'symbols/index';
 import PropertyTypes from 'enums/PropertyTypes';
+import MessageTypes from 'enums/MessageTypes';
+import { sendMessage } from 'model/DataManager';
 const useTokens = () => {
     const { api } = useAPI();
     const tokens = useContext(tokensContext);
@@ -50,6 +53,7 @@ const useTokens = () => {
             }
         });
         setPureTokens(_pureTokens);
+        sendMessage(MessageTypes.SET_TOKENS, toSaveTokens(_tokens));
     };
     return {
         tokens,

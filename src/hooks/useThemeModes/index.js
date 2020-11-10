@@ -32,6 +32,7 @@ const useThemeModes = () => {
     const _setAllThemeModes = (modes = []) => {
         setDefaultMode(modes.find(mode => mode.isDefault));
         setThemeModes(modes);
+        sendMessage(MessageTypes.SET_MODES, modes);
     };
     const _fetchCurrentMode = () => {
         sendMessage(MessageTypes.FETCH_CURRENT_THEME_MODE);

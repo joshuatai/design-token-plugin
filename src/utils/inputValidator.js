@@ -23,6 +23,8 @@ const inputCheck = function (e) {
     });
     if (e.key === 'Enter') {
         $target.blur();
+        const selection = window.getSelection();
+        selection.removeAllRanges();
         return;
     }
     if (isRequired && !newVal) {
@@ -94,7 +96,7 @@ function valCheck($editable, orgVal, customValidator, resolve, reject) {
     }
     else if (!newVal && isRequired) {
         if (_orgVal) {
-            $editable.innerHTML = _orgVal;
+            $editable.textContent = _orgVal;
             $editable.setAttribute("contenteditable", "false");
             // if (!(data instanceof Version)) return;
             // newVal = orgVal;
@@ -119,11 +121,8 @@ function valCheck($editable, orgVal, customValidator, resolve, reject) {
         status: InputStatus.VALID
     });
     // if (data instanceof ThemeMode) {
-    //   // saveThemeMode();
     // } else if (data instanceof Version) {
     //   saveVersion();
-    // } else {
-    //   // save();
     // }
     return;
 }

@@ -7,7 +7,7 @@ const _Icons = {
   [PropertyTypes.STROKE_FILL]: ({ title, style, disabled }) => <div className="stroke-fill-icon" title={title} style={style} data-disabled={disabled}></div>,
   [PropertyTypes.FILL_COLOR]: ({ title, style, disabled }) => <div className="fill-color-icon" title={title} style={{ background: style.background }} data-disabled={disabled}><div className="color-icon-opacity" style={{ opacity: style.opacity, width: style.width }}></div></div>,
   [PropertyTypes.OPACITY]: ({ title, disabled }) => <div className="opacity-icon color-icon-opacity" title={title} data-disabled={disabled}></div>,
-  [PropertyTypes.FONT]: ({ title, disabled }) => <div className="font-icon" title={title} data-disabled={disabled}>A</div>,
+  [PropertyTypes.FONT_FAMILY_STYLE]: ({ title, disabled }) => <div className="font-icon" title={title} data-disabled={disabled}>A</div>,
   [PropertyTypes.SPACING]: ({ title, disabled }) => 
     <div className="spacing-icon" title={title} data-disabled={disabled}>
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">

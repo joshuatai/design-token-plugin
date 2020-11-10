@@ -87,10 +87,10 @@ const PropertyItem: FC<T_PropertyItem> = ({
           {value}
         </span>
         {secondValue && (
-          <span className="property-second-value">{secondValue}</span>
+          <span className="property-second-value" title={title}>{secondValue}</span>
         )}
         {thridValue && (
-          <span className="property-third-value">{thridValue}</span>
+          <span className="property-third-value" title={title}>{thridValue}</span>
         )}
         <RemoveIcon
           referedTokens={refereds}

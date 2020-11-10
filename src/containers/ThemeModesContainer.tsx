@@ -19,7 +19,7 @@ const ThemeModesContainer: FC = () => {
   return <div id="mode-setting" className="plugin-panel">
     <ThemeModeList creatable={setCreateEnable}></ThemeModeList>
     {
-      admin && <button id="mode-creator" onClick={createModeHandler} disabled={!createEnable}>Add a new theme mode</button>
+      admin && <button id="mode-creator" onClick={createModeHandler} disabled={!createEnable}>Create A Theme Mode</button>
     }
   </div>
 };

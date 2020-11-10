@@ -44,8 +44,8 @@ const PropertyItem = ({ property, }) => {
             React.createElement("span", { className: "property-name" }, property.type),
             React.createElement(PropertyIcon, { options: property }),
             React.createElement("span", { className: "property-value", title: title }, value),
-            secondValue && (React.createElement("span", { className: "property-second-value" }, secondValue)),
-            thridValue && (React.createElement("span", { className: "property-third-value" }, thridValue)),
+            secondValue && (React.createElement("span", { className: "property-second-value", title: title }, secondValue)),
+            thridValue && (React.createElement("span", { className: "property-third-value", title: title }, thridValue)),
             React.createElement(RemoveIcon, { referedTokens: refereds, removeHandler: removeHandler })),
         propertyEdit && propertyEdit.id === property.id && (React.createElement(PropertySetting, { token: token, property: propertyEdit, hidePropertySetting: hidePropertySetting }))));
 };

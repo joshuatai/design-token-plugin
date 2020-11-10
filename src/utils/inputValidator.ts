@@ -6,7 +6,7 @@ import { Mixed } from 'symbols/index';
 import { trim } from 'jquery';
 // import ThemeMode from 'model/ThemeMode';
 // import Version from 'model/Version';
-// import { getAPI, getVersion, getThemeMode, getGroup, getToken, save, saveThemeMode, saveVersion } from '../model/DataManager';
+// import { getAPI, getVersion, getThemeMode, getGroup, getToken, save, saveVersion } from '../model/DataManager';
 
 declare var $: any;
 SelectText(jQuery);
@@ -29,6 +29,8 @@ const inputCheck = function (e) {
 
   if (e.key === 'Enter') {
     $target.blur();
+    const selection = window.getSelection();
+    selection.removeAllRanges();
     return;
   }
   if (isRequired && !newVal) {
@@ -57,11 +59,11 @@ function valCheck ($editable, orgVal, customValidator, resolve, reject) {
     });
     return;
   }
-  
   if (newVal) {
     if (dataType) {
       const _dataTypes = dataType.split(',');
       const validType = _dataTypes.find(type => Validator[trim(type)](newVal, _orgVal));
+      
       if (!validType) {
         $editable.innerHTML = _orgVal || '';
         $editable.setAttribute("contenteditable", "false");
@@ -103,7 +105,7 @@ function valCheck ($editable, orgVal, customValidator, resolve, reject) {
     // }
   } else if (!newVal && isRequired) {
     if (_orgVal) {
-      $editable.innerHTML = _orgVal;
+      $editable.textContent = _orgVal;
       $editable.setAttribute("contenteditable", "false");
       // if (!(data instanceof Version)) return;
       // newVal = orgVal;
@@ -129,12 +131,9 @@ function valCheck ($editable, orgVal, customValidator, resolve, reject) {
   });
   
   // if (data instanceof ThemeMode) {
-  //   // saveThemeMode();
+
   // } else if (data instanceof Version) {
   //   saveVersion();
-  // } else {
-    
-  //   // save();
   // }
   return;
 }
