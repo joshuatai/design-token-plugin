@@ -192,7 +192,7 @@ const Tokens = ({ data = {
         //       if (!editBtn.length && $item.is('#design-tokens-container .token-item') &&  type === BrowserEvents.CLICK) {
         //         $('.token-item-selected').removeClass('token-item-selected');
         //         $item.addClass('token-item-selected');
-        //         // sendMessage(MessageTypes.ASSIGN_TOKEN ,getToken($item.data('token')));
+        //         // 
         //       }
         //     }
         //   })
