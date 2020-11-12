@@ -10,6 +10,7 @@ import GroupsListContainer from './GroupsListContainer';
 import TokenSetting from './TokenSetting';
 import ThemeModesContainer from './ThemeModesContainer';
 import ThemeModesSetter from './ThemeModesSetter';
+import AssignedTokenNodes from './AssignedTokenNodes';
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
 import { sendMessage, setVersion, restore } from 'model/DataManager';
@@ -33,8 +34,8 @@ const Tokens = ({ data = {
     const { api: { admin } } = useAPI();
     const { fetchCurrentMode, setCurrentMode, themeModes, getThemeMode, defaultMode } = useThemeModes();
     const { setAllGroups } = useGroups();
-    const { setAllTokens } = useTokens();
-    const { setAllProperties } = useProperties();
+    const { getToken, setAllTokens } = useTokens();
+    const { getProperties, setAllProperties } = useProperties();
     const { setAllThemeModes } = useThemeModes();
     const tokenSetting = useContext(tokenSettingContext);
     let $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $themeModeList, $versionCreator, $versionList;
@@ -71,37 +72,15 @@ const Tokens = ({ data = {
                     const $title = $('');
                     const $expend = $('');
                     const $name = $('').text(name);
-                    const $tokenListPanel = $('<div class="panel-collapse collapse in" aria-expanded="true"></div>').attr('id', `node-${_id}`);
-                    const $tokenList = $('<ul class="token-list"></ul>');
+                    const $tokenListPanel = $('').attr('id', `node-${_id}`);
+                    const $tokenList = $('');
                     $assignedTokensNodeList.append($node
                         .append($heading.append($title.append($expend).append($name)))
-                        .append($tokenListPanel.append($tokenList
-                        .addClass('sortable')
-                        .sortable({
-                        // containment: "parent",
-                        placeholder: 'ui-sortable-placeholder',
-                        handle: '.ui-sortable-handle',
-                        axis: "y"
-                    })
-                        .append(useTokens.map(_token => {
-                        const token = []; //getToken(_token);
-                        let $icon;
-                        // if (token.propertyType !== Mixed) {
-                        // $icon = PropertyIcon(token.properties, true).$icon;
-                        // }
-                        return $(`<li class="token-item"></li>`)
-                            // .data({
-                            //   'group': token.parent,
-                            //   'token': token.id
-                            // })
-                            .append($(`<span class="ui-sortable-handle"></span>`))
-                            .append($icon ? $icon : null);
-                        // .append($('<span class="token-key"></span>').text(token.name));
-                    })))));
+                        .append());
                 });
             }
             else {
-                $assignedTokensNodeList.append(`<div class="no-node-selected">Please select a node that has assigned at least one token.</div>`);
+                $assignedTokensNodeList.append(``);
             }
         },
         updateThemeMode: function () {
@@ -301,15 +280,8 @@ const Tokens = ({ data = {
                 React.createElement(TokenSetting, null) :
                 React.createElement(GroupsListContainer, null)),
             React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "tokens-assigned" },
-                React.createElement("div", { id: "assigned-tokens-node-list", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic" }, assignTokenNodes.map(node => {
-                    let { id, name, useTokens } = node;
-                    const _id = id.replace(':', '-');
-                    return React.createElement("div", { key: _id, id: _id, className: "selected-node panel panel-default panel-collapse-shown" },
-                        React.createElement("div", { className: "panel-heading node-item", "data-toggle": "collapse", "aria-expanded": "true", "data-target": `#node-${_id}` },
-                            React.createElement("h6", { className: "panel-title" },
-                                React.createElement("span", { className: "tmicon tmicon-caret-right tmicon-hoverable" }),
-                                React.createElement("span", { className: "node-name" }, name))));
-                }))),
+                React.createElement("div", { id: "assigned-tokens-node-list", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic" },
+                    React.createElement(AssignedTokenNodes, { data: assignTokenNodes }))),
             React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "modes" },
                 React.createElement(ThemeModesContainer, null)),
             admin && (React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "io" },

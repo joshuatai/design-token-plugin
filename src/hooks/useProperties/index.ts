@@ -28,6 +28,12 @@ const useProperties = () => {
   const _getProperty = function (id?: string): Property | Array<Property> {
     return arguments.length ? properties.slice().find(_property => _property.id === id) : properties.slice();
   };
+
+  const _getProperties = (_properties) => {
+    return properties.filter(property => {
+      return _properties.some(_propId => property.id === _propId);
+    })
+  }
   const _removeProperty = (property: Property) => {
     const nextProperties = properties.slice().filter(_property => _property.id != property.id);
     _setAllProperties(nextProperties);
@@ -64,6 +70,7 @@ const useProperties = () => {
     referedProperties: _referedProperties,
     referedTokens: _referedTokens,
     getProperty: _getProperty,
+    getProperties: _getProperties,
     removeProperty: _removeProperty,
     addProperties: _addProperties,
     setAllProperties: _setAllProperties,

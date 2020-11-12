@@ -78,20 +78,12 @@ function propertyMaps(_properties) {
         return calc;
     }, {});
 }
-function setCurrentThemeMode(message) {
-    figma.currentPage.setPluginData('themeMode', message);
-}
-function sendCurrentThemeMode() {
-    // postMessage(MessageTypes.FETCH_CURRENT_THEME_MODE, figma.currentPage.getPluginData('themeMode'));
-}
+//Done
 function traversingUseToken(token) {
-    const _themeModes = figma.root.getPluginData('ThemeModes');
-    const themeModes = _themeModes ? JSON.parse(_themeModes) : [];
-    const defaultThemeMode = themeModes.find(mode => mode.isDefault).id;
     const useThemeMode = figma.currentPage.getPluginData('themeMode');
-    const existCurrentMode = token.properties.find(prop => prop.themeMode === useThemeMode);
-    const defaultMode = token.properties.find(prop => prop.themeMode === defaultThemeMode);
-    const property = existCurrentMode ? existCurrentMode : defaultMode;
+    const existCurrentModeProperty = token.properties.find(propId => propertiesMap[propId].themeMode === useThemeMode);
+    const defaultModeProperty = token.properties.find(propId => propertiesMap[propId].themeMode === defaultThemeMode.id);
+    const property = existCurrentModeProperty ? propertiesMap[existCurrentModeProperty] : propertiesMap[defaultModeProperty];
     if (property.useToken) {
         return traversingUseToken(tokensMap[property.useToken]);
     }
@@ -99,6 +91,7 @@ function traversingUseToken(token) {
         return property;
     }
 }
+//Done
 function assignProperty(properties, node, setNodeUseTheme = true) {
     return __awaiter(this, void 0, void 0, function* () {
         const defaultMode = defaultThemeMode.id;
@@ -108,14 +101,14 @@ function assignProperty(properties, node, setNodeUseTheme = true) {
         const strokeFill = properties[PropertyTypes.STROKE_FILL];
         const fillColor = properties[PropertyTypes.FILL_COLOR];
         const opacity = properties[PropertyTypes.OPACITY];
-        const text = properties[PropertyTypes.FONT_FAMILY_STYLE];
+        const familyStyle = properties[PropertyTypes.FONT_FAMILY_STYLE];
         node.type === NodeTypes.GROUP && node.children.forEach(child => {
             assignProperty(properties, child);
         });
         if (cornerRadius) {
             const { radius, topLeft, topRight, bottomRight, bottomLeft } = cornerRadius;
             if (radius !== Mixed && hasCornerNode(node)) {
-                node.cornerRadius = radius;
+                node.cornerRadius = Number(radius);
             }
             else if (hasMixedCornerNode(node)) {
                 node.topLeftRadius = topLeft;
@@ -134,7 +127,7 @@ function assignProperty(properties, node, setNodeUseTheme = true) {
             strokeFill.forEach(fill => {
                 let { fillType, themeMode, useToken } = fill;
                 let prop = fill;
-                if (((!existCurrentMode && defaultThemeMode === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
+                if (((!existCurrentMode && defaultMode === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
                     if (useToken) {
                         prop = traversingUseToken(tokensMap[useToken]);
                     }
@@ -145,7 +138,7 @@ function assignProperty(properties, node, setNodeUseTheme = true) {
                         color: { r: r / 255, g: g / 255, b: b / 255 },
                         visible,
                         opacity: opacity / 100,
-                        blendMode
+                        blendMode: blendMode
                     };
                     node.strokes = [solidPaint];
                 }
@@ -156,12 +149,12 @@ function assignProperty(properties, node, setNodeUseTheme = true) {
             fillColor.forEach(fill => {
                 let { fillType, themeMode, useToken } = fill;
                 let prop = fill;
-                if (((!existCurrentMode && defaultThemeMode === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
+                if (((!existCurrentMode && defaultMode === themeMode) || themeMode === useThemeMode) && fillType === FillTypes.SOLID) {
                     if (useToken) {
                         prop = traversingUseToken(tokensMap[useToken]);
                     }
                     let { color, visible, opacity, blendMode } = prop;
-                    if (color === 'transparent' || color === 'null') {
+                    if (color === 'transparent') {
                         node.fills = [];
                     }
                     else {
@@ -170,8 +163,8 @@ function assignProperty(properties, node, setNodeUseTheme = true) {
                             type: FillTypes.SOLID,
                             color: { r: r / 255, g: g / 255, b: b / 255 },
                             visible,
-                            opacity,
-                            blendMode
+                            opacity: opacity / 100,
+                            blendMode: blendMode
                         };
                         node.fills = [solidPaint];
                     }
@@ -183,7 +176,7 @@ function assignProperty(properties, node, setNodeUseTheme = true) {
             opacity.forEach(_opacity => {
                 let { themeMode, useToken } = _opacity;
                 let prop = _opacity;
-                if (((!existCurrentMode && defaultThemeMode === themeMode) || themeMode === useThemeMode)) {
+                if (((!existCurrentMode && defaultMode === themeMode) || themeMode === useThemeMode)) {
                     if (useToken) {
                         prop = traversingUseToken(tokensMap[useToken]);
                     }
@@ -191,14 +184,18 @@ function assignProperty(properties, node, setNodeUseTheme = true) {
                 }
             });
         }
-        if (text && hasFontNode(node)) {
-            const { fontName, fontSize: size } = text;
-            let len = node.characters.length;
-            yield figma.loadFontAsync(fontName);
-            node.fontName = fontName;
-            node.fontSize = size;
+        if (familyStyle && hasFontNode(node)) {
+            const { family, style } = familyStyle;
+            yield figma.loadFontAsync({ family, style });
+            node.fontName = { family, style };
         }
     });
+}
+function setCurrentThemeMode(message) {
+    figma.currentPage.setPluginData('themeMode', message);
+}
+function sendCurrentThemeMode() {
+    // postMessage(MessageTypes.FETCH_CURRENT_THEME_MODE, figma.currentPage.getPluginData('themeMode'));
 }
 function getUsedTokens(properties, token) {
     const usedTokens = properties
@@ -327,12 +324,26 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
     }
     //Done
     if (type === MessageTypes.FETCH_CURRENT_THEME_MODE) {
-        // console.log(MessageTypes.FETCH_CURRENT_THEME_MODE, getCurrentThemeMode())
         postMessage(MessageTypes.FETCH_CURRENT_THEME_MODE, getCurrentThemeMode());
-        // setTimeout(selectionchange, 1000);
-        syncCurrentThemeMode(figma.currentPage);
+        // syncCurrentThemeMode(figma.currentPage);
+        selectionchange();
     }
     //Done
+    if (type === MessageTypes.ASSIGN_TOKEN) {
+        const { id, properties: _properties } = JSON.parse(message);
+        const selection = figma.currentPage.selection.slice();
+        selection.forEach((node) => {
+            const data = node.getPluginData('useTokens');
+            const usedTokens = data ? JSON.parse(data) : [];
+            const existIndex = usedTokens.findIndex(tokenId => tokenId === id);
+            if (existIndex > -1)
+                usedTokens.splice(existIndex, 1);
+            usedTokens.push(id);
+            node.setPluginData('useTokens', JSON.stringify(usedTokens));
+            assignProperty(propertyMaps(_properties), node);
+        });
+        selectionchange();
+    }
     if (type === MessageTypes.SYNC_CURRENT_THEME_MODE) {
         syncCurrentThemeMode(figma.currentPage);
     }
@@ -351,21 +362,6 @@ figma.ui.onmessage = (msg) => __awaiter(void 0, void 0, void 0, function* () {
         figma.root.setPluginData('versions', message);
     }
     if (type === MessageTypes.RESTRORE_VERSION) {
-    }
-    if (type === MessageTypes.ASSIGN_TOKEN) {
-        const { id, properties: _properties } = JSON.parse(message);
-        const selection = figma.currentPage.selection.slice();
-        selection.forEach((node) => {
-            const data = node.getPluginData('useTokens');
-            const usedTokens = data ? JSON.parse(data) : [];
-            const existIndex = usedTokens.findIndex(tokenId => tokenId === id);
-            if (existIndex > -1)
-                usedTokens.splice(existIndex, 1);
-            usedTokens.push(id);
-            node.setPluginData('useTokens', JSON.stringify(usedTokens));
-            assignProperty(propertyMaps(_properties), node);
-        });
-        // selectionchange();
     }
     if (type === MessageTypes.UNASSIGN_TOKEN) {
         const { nodeId, tokenId } = JSON.parse(message);
@@ -418,7 +414,6 @@ figma.on('currentpagechange', () => {
     selectionchange();
 });
 figma.on("selectionchange", () => {
-    console.log('selectionchange');
     // syncCurrentThemeMode(figma.currentPage.selection);
     selectionchange();
 });

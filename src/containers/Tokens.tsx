@@ -13,7 +13,7 @@ import GroupsListContainer from './GroupsListContainer';
 import TokenSetting from './TokenSetting';
 import ThemeModesContainer from './ThemeModesContainer';
 import ThemeModesSetter from './ThemeModesSetter';
-
+import AssignedTokenNodes from './AssignedTokenNodes';
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
 import {getVersion, sendMessage, setVersion, restore } from 'model/DataManager';
@@ -51,8 +51,8 @@ const Tokens:FC<Props> = ({
   const { api: { admin }} = useAPI();
   const { fetchCurrentMode, setCurrentMode, themeModes, getThemeMode, defaultMode } = useThemeModes();
   const { setAllGroups } = useGroups();
-  const { setAllTokens } = useTokens();
-  const { setAllProperties } = useProperties();
+  const { getToken, setAllTokens } = useTokens();
+  const { getProperties, setAllProperties } = useProperties();
   const { setAllThemeModes } = useThemeModes();
   const tokenSetting: T_TokenSetting = useContext(tokenSettingContext);
   let $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $themeModeList, $versionCreator, $versionList;
@@ -101,44 +101,18 @@ const Tokens:FC<Props> = ({
           const $title = $('');
           const $expend = $('');
           const $name = $('').text(name);
-          const $tokenListPanel = $('<div class="panel-collapse collapse in" aria-expanded="true"></div>').attr('id', `node-${_id}`);
-          const $tokenList = $('<ul class="token-list"></ul>');
+          const $tokenListPanel = $('').attr('id', `node-${_id}`);
+          const $tokenList = $('');
           $assignedTokensNodeList.append(
             $node
               .append($heading.append($title.append($expend).append($name)))
               .append(
-                $tokenListPanel.append(
-                  $tokenList
-                    .addClass('sortable')
-                    .sortable({
-                      // containment: "parent",
-                      placeholder: 'ui-sortable-placeholder',
-                      handle: '.ui-sortable-handle',
-                      axis: "y"
-                    })
-                    .append(
-                      useTokens.map(_token => {
-                        const token = []//getToken(_token);
-                        let $icon;
-                        // if (token.propertyType !== Mixed) {
-                          // $icon = PropertyIcon(token.properties, true).$icon;
-                        // }
-                        return $(`<li class="token-item"></li>`)
-                          // .data({
-                          //   'group': token.parent,
-                          //   'token': token.id
-                          // })
-                          .append($(`<span class="ui-sortable-handle"></span>`))
-                          .append($icon ? $icon : null)
-                          // .append($('<span class="token-key"></span>').text(token.name));
-                      })
-                    )
-                )
+
               )
           )
         });
       } else {
-        $assignedTokensNodeList.append(`<div class="no-node-selected">Please select a node that has assigned at least one token.</div>`)
+        $assignedTokensNodeList.append(``)
       }
     },
     updateThemeMode: function () {
@@ -356,21 +330,7 @@ const Tokens:FC<Props> = ({
         </div>
         <div role="tabpanel" className="tab-pane" id="tokens-assigned">
           <div id="assigned-tokens-node-list" className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic">
-            {
-              assignTokenNodes.map(node => {
-                let { id, name, useTokens } = node;
-                const _id = id.replace(':', '-');
-
-                return <div key={_id} id={_id} className="selected-node panel panel-default panel-collapse-shown">
-                  <div className="panel-heading node-item" data-toggle="collapse" aria-expanded="true" data-target={`#node-${_id}`}>
-                    <h6 className="panel-title">
-                      <span className="tmicon tmicon-caret-right tmicon-hoverable"></span>
-                      <span className="node-name">{name}</span>
-                    </h6>
-                  </div>
-                </div>
-              })
-            }
+            <AssignedTokenNodes data={assignTokenNodes}></AssignedTokenNodes>
           </div>     
         </div>
         <div role="tabpanel" className="tab-pane" id="modes">

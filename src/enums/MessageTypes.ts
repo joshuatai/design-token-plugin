@@ -8,8 +8,6 @@ enum MessageTypes {
   SELECTION_CHANGE = 'Selection Change',
   FETCH_CURRENT_THEME_MODE = 'Fetch Current Theme Mode',
 
-
-
   
   GET_VERSIONS = "Get Versions",
   GET_CURRENT_THEME_MODE = 'Get Current Theme Mode',

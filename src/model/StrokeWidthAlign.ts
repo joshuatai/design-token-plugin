@@ -7,7 +7,7 @@ class StrokeWidthAlign {
   id: string = '';
   parent: string = '';
   width: number = 1;
-  align: string = StrokeAligns.INSIDE;
+  align: StrokeAligns = StrokeAligns.INSIDE;
   useToken: string = '';
   themeMode: string ='';
 

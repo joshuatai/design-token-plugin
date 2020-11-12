@@ -10,8 +10,8 @@ class FillColor {
   fillType: string = FillTypes.SOLID;
   color: string = 'C4C4C4';
   opacity: number = 100;
-  visible: Boolean = true;
-  blendMode: string = BlendModes.NORMAL;
+  visible: boolean = true;
+  blendMode: BlendModes = BlendModes.NORMAL;
   themeMode: string = "";
   useToken: string = '';
 
