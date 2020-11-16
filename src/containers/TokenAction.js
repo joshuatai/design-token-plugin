@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef } from "react";
 import Token from "model/Token";
 import Properties from "model/Properties";
 import useAPI from "hooks/useAPI";
@@ -10,14 +10,15 @@ import useTokenSetting from "hooks/useTokenSetting";
 import usePropertySetting from "hooks/usePropertySetting";
 import preventEvent from "utils/preventEvent";
 import TokenActionEntry from "enums/TokenActionEntry";
-const TokenAction = ({ token, showDropdown = false, setShowDropdown = null, }) => {
+import { sendMessage } from 'model/DataManager';
+import MessageTypes from 'enums/MessageTypes';
+const TokenAction = ({ token, showDropdown = false, setShowDropdown = null, from = TokenActionEntry.TOKEN_LIST, }) => {
     const { api: { admin }, } = useAPI();
     const { saveTokensProperties } = useData();
     const { setTokenSetting } = useTokenSetting();
     const { setPropertiesSetting } = usePropertySetting();
     const { getGroup, addGroup } = useGroups();
     const { removeToken, addToken } = useTokens();
-    const [entry, setEntry] = useState(TokenActionEntry.GROUP_LIST);
     const { properties, getProperty, addProperties, referedTokens, setAllProperties, } = useProperties();
     const $tokenActionRef = useRef();
     const tokenLinks = referedTokens(token.id).flat();
@@ -33,7 +34,7 @@ const TokenAction = ({ token, showDropdown = false, setShowDropdown = null, }) =
         });
         preventEvent(e);
     };
-    const removeHandler = () => {
+    const removeHandler = (e) => {
         if (!admin)
             return;
         const _group = getGroup(token.parent);
@@ -52,7 +53,7 @@ const TokenAction = ({ token, showDropdown = false, setShowDropdown = null, }) =
         setAllProperties(_properties);
         saveTokensProperties(_groups, _tokens, _properties);
     };
-    const cloneHandler = () => {
+    const cloneHandler = (e) => {
         const { key, name, description, parent, properties, propertyType } = token;
         const group = getGroup(parent);
         const newProperties = properties.map((_propId) => {
@@ -74,6 +75,15 @@ const TokenAction = ({ token, showDropdown = false, setShowDropdown = null, }) =
             .then((res) => { })
             .catch();
     };
+    const unassignHandler = (e) => {
+        if (!admin)
+            return;
+        const nodeId = e.target.closest('.assignedTokenNode').dataset['id'].replace('-', ':');
+        sendMessage(MessageTypes.UNASSIGN_TOKEN, {
+            nodeId,
+            tokenId: token.id
+        });
+    };
     const deleteTokenProps = {
         className: "delete-token",
         onClick: removeHandler,
@@ -87,21 +97,17 @@ const TokenAction = ({ token, showDropdown = false, setShowDropdown = null, }) =
                 .join(", ")}`,
         });
     }
-    useEffect(() => {
-        const container = $tokenActionRef.current.closest("#design-tokens-container");
-        setEntry(container ? TokenActionEntry.GROUP_LIST : TokenActionEntry.ASSIGNED_LIST);
-    }, []);
     return (React.createElement("div", { ref: $tokenActionRef, className: showDropdown
             ? "token-action-wrapper dropdown open"
             : "token-action-wrapper dropdown" },
         React.createElement("button", { type: "button", className: "token-edit-btn", onClick: editHandler },
             React.createElement("svg", { className: "svg", width: "12", height: "14", viewBox: "0 0 12 14", xmlns: "http://www.w3.org/2000/svg" },
                 React.createElement("path", { d: "M2 7.05V0h1v7.05c1.141.232 2 1.24 2 2.45 0 1.21-.859 2.218-2 2.45V14H2v-2.05c-1.141-.232-2-1.24-2-2.45 0-1.21.859-2.218 2-2.45zM4 9.5c0 .828-.672 1.5-1.5 1.5-.828 0-1.5-.672-1.5-1.5C1 8.672 1.672 8 2.5 8 3.328 8 4 8.672 4 9.5zM9 14h1V6.95c1.141-.232 2-1.24 2-2.45 0-1.21-.859-2.218-2-2.45V0H9v2.05c-1.141.232-2 1.24-2 2.45 0 1.21.859 2.218 2 2.45V14zm2-9.5c0-.828-.672-1.5-1.5-1.5C8.672 3 8 3.672 8 4.5 8 5.328 8.672 6 9.5 6c.828 0 1.5-.672 1.5-1.5z", fillRule: "evenodd", fillOpacity: "1", fill: "#000", stroke: "none" }))),
-        React.createElement("ul", { className: "dropdown-menu pull-right " }, entry === TokenActionEntry.GROUP_LIST ? (React.createElement(React.Fragment, null,
+        React.createElement("ul", { className: "dropdown-menu pull-right " }, from === TokenActionEntry.TOKEN_LIST ? (React.createElement(React.Fragment, null,
             React.createElement("li", { className: "clone-token", onClick: cloneHandler },
                 React.createElement("a", { href: "#" }, "Clone token")),
             React.createElement("li", Object.assign({}, deleteTokenProps),
-                React.createElement("a", { href: "#" }, "Delete Token")))) : (React.createElement("li", { className: "unassign-token" },
+                React.createElement("a", { href: "#" }, "Delete Token")))) : (React.createElement("li", { className: "unassign-token", onClick: unassignHandler },
             React.createElement("a", { href: "#" }, "Unassign token"))))));
 };
 export default TokenAction;

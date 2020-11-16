@@ -1,5 +1,5 @@
 enum TokenActionEntry {
-  GROUP_LIST,
+  TOKEN_LIST,
   ASSIGNED_LIST
 }
 

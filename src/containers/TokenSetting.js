@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import useAPI from "hooks/useAPI";
+import useTabs from 'hooks/useTabs';
 import useTokenSetting from "hooks/useTokenSetting";
 import usePropertySetting from "hooks/usePropertySetting";
 import useData from "hooks/useData";
@@ -14,6 +15,7 @@ import InputStatus from "enums/InputStatus";
 import { Mixed } from "symbols/index";
 import { inputCheck, valChange } from "utils/inputValidator";
 import SelectText from "utils/SelectText";
+import Tabs from 'enums/Tabs';
 SelectText(jQuery);
 // import _cloneDeep from 'lodash/cloneDeep';
 // import _findIndex from 'lodash/findIndex';
@@ -66,6 +68,7 @@ SelectText(jQuery);
 // }(jQuery);
 const TokenSetting = () => {
     const { api: { admin }, } = useAPI();
+    const { tab } = useTabs();
     const { initialSetting, setting, setToken, setTokenSetting, } = useTokenSetting();
     const { group, token } = setting;
     const { propertiesSetting, setPropertiesSetting, setPropertyEdit, } = usePropertySetting();
@@ -79,18 +82,18 @@ const TokenSetting = () => {
     const $description = useRef();
     const $backButton = useRef();
     const focusHandler = (e) => {
-        if (!admin)
+        if (!admin || tab !== Tabs.TOKENS)
             return;
         setCreatable(false);
         $(e.target).selectText();
     };
     const inputHandler = (e) => {
-        if (!admin)
+        if (!admin || tab !== Tabs.TOKENS)
             return;
         inputCheck.call(e.target, e);
     };
     const blurHandler = (e) => {
-        if (!admin)
+        if (!admin || tab !== Tabs.TOKENS)
             return;
         const $target = e.target;
         const type = $target.getAttribute("prop-type");
@@ -135,6 +138,8 @@ const TokenSetting = () => {
         });
     };
     const saveTokenHandler = (e) => {
+        if (!admin || tab !== Tabs.TOKENS)
+            return;
         const exist = group.tokens.find((_token) => _token === token.id);
         if (!exist)
             group.tokens.push(token.id);
@@ -146,6 +151,8 @@ const TokenSetting = () => {
         });
     };
     useEffect(() => {
+        if (!admin || tab !== Tabs.TOKENS)
+            return;
         if (!token) {
             const newToken = new Token({ parent: group.id });
             setTokenSetting({
@@ -158,6 +165,8 @@ const TokenSetting = () => {
         }
     }, [token]);
     useEffect(() => {
+        if (!admin || tab !== Tabs.TOKENS)
+            return;
         if (token) {
             const properties = [];
             if (propertiesSetting.length > 0) {
@@ -186,9 +195,10 @@ const TokenSetting = () => {
             React.createElement("span", { ref: $description, className: "token-description", "prop-type": "description", placeholder: "Description", contentEditable: "false", suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: inputHandler, onBlur: blurHandler }, token.description)),
         React.createElement("div", { id: "property-view", className: "setting-row" }),
         React.createElement(PropertyList, null),
-        React.createElement("div", { className: "setting-row" }, token && !showPropertySetting && (React.createElement("button", { id: "add-property", type: "button", disabled: !creatable, onClick: showPropertySettingHandler }, "Create A Property"))),
+        token && !showPropertySetting && tab === Tabs.TOKENS && (React.createElement("div", { className: "setting-row" },
+            React.createElement("button", { id: "add-property", type: "button", disabled: !creatable, onClick: showPropertySettingHandler }, "Create A Property"))),
         showPropertySetting && (React.createElement(PropertySetting, { token: token, hidePropertySetting: hidePropertySettingHandler })),
-        propertiesSetting.length > 0 && (React.createElement("div", { className: "setting-row" },
+        tab === Tabs.TOKENS && propertiesSetting.length > 0 && (React.createElement("div", { className: "setting-row" },
             React.createElement("button", { id: "save-button-container", type: "button", className: "btn btn-sm btn-primary", disabled: token.name === "", onClick: saveTokenHandler }, "Save"))))));
 };
 export default TokenSetting;

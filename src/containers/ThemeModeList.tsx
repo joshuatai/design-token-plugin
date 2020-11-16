@@ -31,8 +31,11 @@ const ThemeModeItem:FC<T_ThemeModeItem> = ({
 
   const removeHandler = (e) => {
     if (!data.isDefault) {
-      removeThemeMode(data as ThemeMode);
-      creatable(true);
+      const themeModes = removeThemeMode(data as ThemeMode);
+      saveThemeModes(themeModes)
+        .then(res => {
+          creatable(true);
+        });
     }
     // updateCurrentThemeMode();
   }

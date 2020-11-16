@@ -12,16 +12,20 @@ import useTokenSetting from "hooks/useTokenSetting";
 import usePropertySetting from "hooks/usePropertySetting";
 import preventEvent from "utils/preventEvent";
 import TokenActionEntry from "enums/TokenActionEntry";
+import { sendMessage } from 'model/DataManager';
+import MessageTypes from 'enums/MessageTypes';
 
 type T_TokenAction = {
   token: Token;
   showDropdown: boolean;
   setShowDropdown;
+  from: TokenActionEntry;
 };
 const TokenAction: FC<T_TokenAction> = ({
   token,
   showDropdown = false,
   setShowDropdown = null,
+  from = TokenActionEntry.TOKEN_LIST,
 }: T_TokenAction): ReactElement => {
   const {
     api: { admin },
@@ -31,7 +35,6 @@ const TokenAction: FC<T_TokenAction> = ({
   const { setPropertiesSetting } = usePropertySetting();
   const { getGroup, addGroup } = useGroups();
   const { removeToken, addToken } = useTokens();
-  const [entry, setEntry] = useState(TokenActionEntry.GROUP_LIST);
   const {
     properties,
     getProperty,
@@ -54,7 +57,7 @@ const TokenAction: FC<T_TokenAction> = ({
     });
     preventEvent(e);
   };
-  const removeHandler = () => {
+  const removeHandler = (e) => {
     if (!admin) return;
     const _group = getGroup(token.parent) as Group;
     const _removeProperties = token.properties;
@@ -72,7 +75,7 @@ const TokenAction: FC<T_TokenAction> = ({
     setAllProperties(_properties);
     saveTokensProperties(_groups, _tokens, _properties);
   };
-  const cloneHandler = () => {
+  const cloneHandler = (e) => {
     const { key, name, description, parent, properties, propertyType } = token;
     const group: Group = getGroup(parent) as Group;
     const newProperties = properties.map((_propId) => {
@@ -98,6 +101,14 @@ const TokenAction: FC<T_TokenAction> = ({
       .then((res) => {})
       .catch();
   };
+  const unassignHandler = (e) => {
+    if (!admin) return;
+    const nodeId = e.target.closest('.assignedTokenNode').dataset['id'].replace('-', ':');
+    sendMessage(MessageTypes.UNASSIGN_TOKEN , {
+      nodeId,
+      tokenId: token.id
+    });
+  }
   const deleteTokenProps = {
     className: "delete-token",
     onClick: removeHandler,
@@ -113,15 +124,6 @@ const TokenAction: FC<T_TokenAction> = ({
         .join(", ")}`,
     });
   }
-
-  useEffect(() => {
-    const container = ($tokenActionRef.current as HTMLElement).closest(
-      "#design-tokens-container"
-    );
-    setEntry(
-      container ? TokenActionEntry.GROUP_LIST : TokenActionEntry.ASSIGNED_LIST
-    );
-  }, []);
 
   return (
     <div
@@ -150,7 +152,7 @@ const TokenAction: FC<T_TokenAction> = ({
         </svg>
       </button>
       <ul className="dropdown-menu pull-right ">
-        {entry === TokenActionEntry.GROUP_LIST ? (
+        {from === TokenActionEntry.TOKEN_LIST ? (
           <>
             <li className="clone-token" onClick={cloneHandler}>
               <a href="#">Clone token</a>
@@ -160,7 +162,7 @@ const TokenAction: FC<T_TokenAction> = ({
             </li>
           </>
         ) : (
-          <li className="unassign-token">
+          <li className="unassign-token" onClick={unassignHandler}>
             <a href="#">Unassign token</a>
           </li>
         )}

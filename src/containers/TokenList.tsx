@@ -18,23 +18,34 @@ const TokenList: FC<T_TokenList> = ({
   const tokens = group.tokens.map((id) => getToken(id));
   const $tokensContainerRef = useRef();
 
+  const setSortable = () => {
+    $($tokensContainerRef.current)
+      .sortable({
+        containment: "parent",
+        placeholder: "ui-sortable-placeholder",
+        handle: ".sortable-handler",
+        axis: "y",
+      })
+      .on("sortupdate", function () {
+        group.tokens = Array.from(
+          ($tokensContainerRef.current as HTMLElement).children
+        ).map((tokenItem: HTMLElement) => tokenItem.id);
+        setTimeout(() => {
+          saveGroups(addGroup(group));
+        }, 500);
+      });
+  }
+  const unsetSortable = () => {
+    if (tokens.length > 1) {
+      $($tokensContainerRef.current).sortable('destroy');
+    }
+  }
   useEffect(() => {
     if (tokens.length > 1) {
-      $($tokensContainerRef.current)
-        .sortable({
-          containment: "parent",
-          placeholder: "ui-sortable-placeholder",
-          handle: ".sortable-handler",
-          axis: "y",
-        })
-        .on("sortupdate", function () {
-          group.tokens = Array.from(
-            ($tokensContainerRef.current as HTMLElement).children
-          ).map((tokenItem: HTMLElement) => tokenItem.id);
-          saveGroups(addGroup(group));
-        });
+      setSortable();
     }
-  });
+    return unsetSortable;
+  }, []);
 
   return (
     <ul ref={$tokensContainerRef} className="token-list">

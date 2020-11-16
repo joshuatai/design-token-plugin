@@ -16,121 +16,135 @@ const usePropertyInfo = (property, fromTokenList = false) => {
     if (fromTokenList && property instanceof Array) {
         const currentThemeMode = currentMode || defaultMode;
         const currentThemeProperties = property.filter(prop => prop.themeMode === currentThemeMode.id);
-        const defaultThmeeProperties = property.filter(prop => prop.themeMode = defaultMode.id);
         if (currentThemeProperties.length > 0) {
-            property = currentThemeProperties.pop();
+            _property = currentThemeProperties.pop();
         }
         else {
-            property = defaultThmeeProperties.pop();
+            const defaultThmeeProperties = property.filter(prop => prop.themeMode === defaultMode.id);
+            if (defaultThmeeProperties.length > 0) {
+                _property = defaultThmeeProperties.pop();
+            }
         }
     }
-    if (_property.type === PropertyTypes.CORNER_RADIUS) {
-        if (_property.radius === Mixed) {
-            value = 'Mixed';
-            title = `top-left: ${_property.topLeft}; top-right: ${_property.topRight}; bottom-right: ${_property.bottomRight}; bottom-left: ${_property.bottomLeft};`;
+    if (_property) {
+        if (_property.type === PropertyTypes.CORNER_RADIUS) {
+            if (_property.radius === Mixed) {
+                value = 'Mixed';
+                title = `top-left: ${_property.topLeft}; top-right: ${_property.topRight}; bottom-right: ${_property.bottomRight}; bottom-left: ${_property.bottomLeft};`;
+            }
+            else {
+                value = _property.radius;
+                title = `Corner Radius: ${value}`;
+            }
         }
-        else {
-            value = _property.radius;
-            title = `Corner Radius: ${value}`;
+        if (_property.type === PropertyTypes.OPACITY) {
+            const applyThemeMode = getThemeMode(_property.themeMode);
+            if (themeModes.length > 1) {
+                applyThemeMode ? thridValue = applyThemeMode.name : thridValue = defaultMode.name;
+            }
+            value = `${_property.opacity}%`;
+            if (_property.useToken) {
+                const useToken = getToken(_property.useToken);
+                value = useToken.name;
+                secondValue = '';
+                _property = traversing(useToken, applyThemeMode);
+            }
+            title = `Opacity: ${_property.opacity}%`;
         }
+        if (_property.type === PropertyTypes.FILL_COLOR) {
+            const applyThemeMode = getThemeMode(_property.themeMode);
+            if (themeModes.length > 1) {
+                applyThemeMode ? thridValue = applyThemeMode.name : thridValue = defaultMode.name;
+            }
+            value = _property.color;
+            secondValue = `${_property.opacity}%`;
+            if (_property.useToken) {
+                const useToken = getToken(_property.useToken);
+                value = useToken.name;
+                secondValue = '';
+                _property = traversing(useToken, applyThemeMode);
+            }
+            if (_property.color === 'transparent') {
+                title = `Fill Color: transparent`;
+                style.background = 'transparent';
+                style.opacity = 1;
+                style.width = '14px';
+            }
+            else {
+                title = `Fill Color: #${_property.color.toUpperCase()}; Opacity: ${_property.opacity}%;`;
+                const color = Color(`#${_property.color}`);
+                style.background = color;
+                style.borderColor = color.isLight() ? '#dddddd' : '#FFFFFF';
+                style.opacity = (100 - _property.opacity) / 100;
+            }
+        }
+        if (_property.type === PropertyTypes.STROKE_FILL) {
+            const applyThemeMode = getThemeMode(_property.themeMode);
+            if (themeModes.length > 1) {
+                applyThemeMode ? thridValue = applyThemeMode.name : thridValue = defaultMode.name;
+            }
+            value = _property.color;
+            secondValue = `${_property.opacity}%`;
+            if (_property.useToken) {
+                const useToken = getToken(_property.useToken);
+                value = useToken.name;
+                secondValue = '';
+                _property = traversing(useToken, applyThemeMode);
+            }
+            if (_property.color === 'transparent') {
+                title = 'Stroke Color: transparent';
+                secondValue = '';
+                style.background = opacityBg;
+            }
+            else {
+                title = `Stroke Color: #${_property.color.toUpperCase()}; Opacity: ${_property.opacity}%;`;
+                const color = Color(`#${_property.color}`).alpha(_property.opacity);
+                style.background = `linear-gradient(${color}, ${color}), ${opacityBg}`;
+                style.borderColor = color.isLight() ? '#dddddd' : '#FFFFFF';
+            }
+        }
+        if (_property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
+            value = _property.width;
+            secondValue = _property.align;
+            if (_property.useToken) {
+                const useToken = getToken(_property.useToken);
+                value = useToken.name;
+                secondValue = '';
+                _property = traversing(useToken);
+            }
+            title = `Stroke Width: ${_property.width} and Stroke Align: ${_property.align}`;
+        }
+        if (property.type === PropertyTypes.FONT_FAMILY_STYLE) {
+            value = property.family;
+            secondValue = property.style;
+            title = `Font Family: ${property.family}, Font Style: ${property.style}`;
+        }
+        if (_property.type === PropertyTypes.SPACING) {
+            value = _property.value;
+            title = `Spacing: ${value}`;
+        }
+        if (property.useToken) {
+            let token = getToken(property.useToken);
+            value = token.name;
+        }
+        return {
+            type: _property.type,
+            value,
+            title,
+            secondValue,
+            thridValue,
+            style
+        };
     }
-    if (_property.type === PropertyTypes.OPACITY) {
-        const applyThemeMode = getThemeMode(_property.themeMode);
-        if (themeModes.length > 1) {
-            applyThemeMode ? thridValue = applyThemeMode.name : thridValue = defaultMode.name;
-        }
-        value = `${_property.opacity}%`;
-        if (_property.useToken) {
-            const useToken = getToken(_property.useToken);
-            value = useToken.name;
-            secondValue = '';
-            _property = traversing(useToken, applyThemeMode);
-        }
-        title = `Opacity: ${_property.opacity}%`;
+    else {
+        return {
+            type: null,
+            value,
+            title,
+            secondValue,
+            thridValue,
+            style
+        };
     }
-    if (_property.type === PropertyTypes.FILL_COLOR) {
-        const applyThemeMode = getThemeMode(_property.themeMode);
-        if (themeModes.length > 1) {
-            applyThemeMode ? thridValue = applyThemeMode.name : thridValue = defaultMode.name;
-        }
-        value = _property.color;
-        secondValue = `${_property.opacity}%`;
-        if (_property.useToken) {
-            const useToken = getToken(_property.useToken);
-            value = useToken.name;
-            secondValue = '';
-            _property = traversing(useToken, applyThemeMode);
-        }
-        if (_property.color === 'transparent') {
-            title = `Fill Color: transparent`;
-            style.background = 'transparent';
-            style.opacity = 1;
-            style.width = '14px';
-        }
-        else {
-            title = `Fill Color: #${_property.color.toUpperCase()}; Opacity: ${_property.opacity}%;`;
-            const color = Color(`#${_property.color}`);
-            style.background = color;
-            style.borderColor = color.isLight() ? '#dddddd' : '#FFFFFF';
-            style.opacity = (100 - _property.opacity) / 100;
-        }
-    }
-    if (_property.type === PropertyTypes.STROKE_FILL) {
-        const applyThemeMode = getThemeMode(_property.themeMode);
-        if (themeModes.length > 1) {
-            applyThemeMode ? thridValue = applyThemeMode.name : thridValue = defaultMode.name;
-        }
-        value = _property.color;
-        secondValue = `${_property.opacity}%`;
-        if (_property.useToken) {
-            const useToken = getToken(_property.useToken);
-            value = useToken.name;
-            secondValue = '';
-            _property = traversing(useToken, applyThemeMode);
-        }
-        if (_property.color === 'transparent') {
-            title = 'Stroke Color: transparent';
-            secondValue = '';
-            style.background = opacityBg;
-        }
-        else {
-            title = `Stroke Color: #${_property.color.toUpperCase()}; Opacity: ${_property.opacity}%;`;
-            const color = Color(`#${_property.color}`).alpha(_property.opacity);
-            style.background = `linear-gradient(${color}, ${color}), ${opacityBg}`;
-            style.borderColor = color.isLight() ? '#dddddd' : '#FFFFFF';
-        }
-    }
-    if (_property.type === PropertyTypes.STROKE_WIDTH_ALIGN) {
-        value = _property.width;
-        secondValue = _property.align;
-        if (_property.useToken) {
-            const useToken = getToken(_property.useToken);
-            value = useToken.name;
-            secondValue = '';
-            _property = traversing(useToken);
-        }
-        title = `Stroke Width: ${_property.width} and Stroke Align: ${_property.align}`;
-    }
-    if (property.type === PropertyTypes.FONT_FAMILY_STYLE) {
-        value = property.family;
-        secondValue = property.style;
-        title = `Font Family: ${property.family}, Font Style: ${property.style}`;
-    }
-    if (_property.type === PropertyTypes.SPACING) {
-        value = _property.value;
-        title = `Spacing: ${value}`;
-    }
-    if (property.useToken) {
-        let token = getToken(property.useToken);
-        value = token.name;
-    }
-    return {
-        type: property.type,
-        value,
-        title,
-        secondValue,
-        thridValue,
-        style
-    };
 };
 export default usePropertyInfo;

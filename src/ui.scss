@@ -91,7 +91,7 @@ body {
   flex: 1;
 
   .node-name {
-    font-family: TMicon;
+    font-family: TMicon, Arial, "Helvetica Neue", Helvetica, sans-serif;
     line-height: 20px !important;
     display: inline-block;
   }
@@ -353,11 +353,14 @@ body {
       display: flex;
       position: relative;
       align-items: center;
-      cursor: pointer;
+      cursor: default;
       padding: 0 8px;
   
       &:hover {
         background: #f4f4f4;
+      }
+      &.editable {
+        cursor: pointer;
       }
       .property-name {
         width: 75px;

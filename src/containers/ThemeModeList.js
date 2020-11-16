@@ -15,8 +15,11 @@ const ThemeModeItem = ({ data, creatable }) => {
     const $modeName = useRef();
     const removeHandler = (e) => {
         if (!data.isDefault) {
-            removeThemeMode(data);
-            creatable(true);
+            const themeModes = removeThemeMode(data);
+            saveThemeModes(themeModes)
+                .then(res => {
+                creatable(true);
+            });
         }
         // updateCurrentThemeMode();
     };

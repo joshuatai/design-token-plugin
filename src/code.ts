@@ -355,6 +355,29 @@ figma.ui.onmessage = async (msg) => {
     });
     selectionchange();
   }
+  //Done
+  if (type === MessageTypes.REORDER_ASSIGN_TOKEN) {
+    const { nodeId, tokens } = JSON.parse(message);
+    const assignNode = figma.currentPage.findOne(node => node.id ===  nodeId);
+    assignNode.setPluginData('useTokens', JSON.stringify(tokens));
+    tokens.forEach(token => {
+      if (tokensMap[token]) assignProperty(propertyMaps(tokensMap[token].properties), assignNode);
+    });
+  }
+  //Done
+  if (type === MessageTypes.UNASSIGN_TOKEN) {
+    const { nodeId, tokenId } = JSON.parse(message);
+    const unassignNode = figma.currentPage.findOne(node => node.id ===  nodeId);
+    const useTokens = unassignNode.getPluginData('useTokens');
+    let tokens = useTokens ? JSON.parse(useTokens) : [];
+    tokens = tokens.filter(token => token !== tokenId);
+    unassignNode.setPluginData('useTokens', JSON.stringify(tokens));
+    tokens.forEach(token => {
+      if (tokensMap[token]) assignProperty(propertyMaps(tokensMap[token].properties), unassignNode);
+    });
+    // selectionchange();
+  }
+
 
 
 
@@ -381,28 +404,8 @@ figma.ui.onmessage = async (msg) => {
 
   }
   
-  if (type === MessageTypes.UNASSIGN_TOKEN) {
-    const { nodeId, tokenId } = JSON.parse(message);
-    const unassignNode = figma.currentPage.findOne(node => node.id ===  nodeId);
-    const useTokens = unassignNode.getPluginData('useTokens');
-    let tokens = useTokens ? JSON.parse(useTokens) : [];
-    tokens = tokens.filter(token => token !== tokenId);
-    unassignNode.setPluginData('useTokens', JSON.stringify(tokens));
-    tokens.forEach(token => {
-      if (tokensMap[token]) assignProperty(propertyMaps(tokensMap[token].properties), unassignNode);
-    });
-    selectionchange();
-  }
-  if (type === MessageTypes.REORDER_ASSIGN_TOKEN) {
-    const { nodeId, tokens } = JSON.parse(message);
-    const unassignNode = figma.currentPage.findOne(node => node.id ===  nodeId);
-    
-    unassignNode.setPluginData('useTokens', JSON.stringify(tokens));
-    tokens.forEach(token => {
-      if (tokensMap[token]) assignProperty(propertyMaps(tokensMap[token].properties), unassignNode);
-    });
-    selectionchange();
-  }
+  
+
   if (type === MessageTypes.SYNC_NODES) {
     const token = JSON.parse(message);
     const usedTokens = getUsedTokens(properties, token.id);

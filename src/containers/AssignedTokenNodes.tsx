@@ -1,9 +1,13 @@
-import React, { useEffect, FC, ReactElement } from "react";
+import React, { useEffect, FC, ReactElement, useRef } from "react";
 import useTokens from "hooks/useTokens";
 import useProperties from "hooks/useProperties";
+import { sendMessage } from 'model/DataManager';
 import Token from "model/Token";
 import { Mixed } from "symbols/index";
 import PropertyIcon from "./property-components/PropertyIcon";
+import TokenItem from './TokenItem';
+import MessageTypes from 'enums/MessageTypes';
+import TokenActionEntry from 'enums/TokenActionEntry';
 
 type T_AssignedTokenNodes = {
   data: Array<any>;
@@ -14,15 +18,35 @@ const AssignedTokenNodes: FC<T_AssignedTokenNodes> = ({
 }: T_AssignedTokenNodes): ReactElement => {
   const { getToken } = useTokens();
   const { getProperties } = useProperties();
-
-  useEffect(() => {
-    $('.assignedTokenNode .sortable').sortable({
-      placeholder: "ui-sortable-placeholder",
-      handle: ".sortable-handler",
-      axis: "y"
-    })
-  });
-
+  const $sortableRef = useRef(null);
+  const setSortable = () => {
+    $sortableRef.current
+      .sortable({
+        placeholder: "ui-sortable-placeholder",
+        handle: ".sortable-handler",
+        axis: "y"
+      })
+      .on("sortupdate", function (e, ui) {
+        const $sortedItem: HTMLElement = ui.item[0];
+        const $sortableContainer = $sortedItem.parentElement;
+        const $node: HTMLElement = $sortableContainer.closest('.assignedTokenNode');
+        const tokens: string[] = Array.from($sortableContainer.children).map(($token: HTMLElement) => $token.getAttribute('id'));
+        sendMessage(MessageTypes.REORDER_ASSIGN_TOKEN , {
+          nodeId: $node.dataset['id'].replace("-", ":"),
+          tokens
+        });
+      });
+  }
+  const unsetSortable = () => {
+    $sortableRef.current.sortable('destroy');
+  }
+  useEffect(() => {data
+    if (data.length === 0 ) return;
+    $sortableRef.current = $('.assignedTokenNode .sortable');
+    setSortable();
+    return unsetSortable;
+  }, [data]);
+  
   return (
     <>
       {data.map((node) => {
@@ -32,7 +56,7 @@ const AssignedTokenNodes: FC<T_AssignedTokenNodes> = ({
         return (
           <div
             key={_id}
-            id={_id}
+            data-id={_id}
             className="assignedTokenNode selected-node panel panel-default panel-collapse-shown"
           >
             <div
@@ -51,22 +75,7 @@ const AssignedTokenNodes: FC<T_AssignedTokenNodes> = ({
                 {useTokens.length ? (
                   useTokens.map((_token) => {
                     const token: Token = getToken(_token) as Token;
-                    return (
-                      <li
-                        key={`assignedTokenItem-${_id}-${token.id}`}
-                        className="token-item"
-                      >
-                        <span className="sortable-handler"></span>
-                        {token.propertyType !== Mixed && (
-                          <PropertyIcon
-                            options={getProperties(token.properties)}
-                            disabled={true}
-                            fromTokenList={true}
-                          ></PropertyIcon>
-                        )}
-                        <span className="token-key">{token.name}</span>
-                      </li>
-                    );
+                    return <TokenItem key={`assignedTokenItem-${_id}-${token.id}`} token={token} from={TokenActionEntry.ASSIGNED_LIST}></TokenItem>;
                   })
                 ) : (
                   <div className="no-node-selected">

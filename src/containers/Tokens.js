@@ -1,11 +1,11 @@
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import hash from 'hash.js';
 import useAPI from 'hooks/useAPI';
+import useTabs from 'hooks/useTabs';
 import useThemeModes from 'hooks/useThemeModes';
 import useGroups from 'hooks/useGroups';
 import useTokens from 'hooks/useTokens';
 import useProperties from 'hooks/useProperties';
-import { tokenSettingContext } from 'hooks/TokenSettingProvider';
 import GroupsListContainer from './GroupsListContainer';
 import TokenSetting from './TokenSetting';
 import ThemeModesContainer from './ThemeModesContainer';
@@ -13,16 +13,15 @@ import ThemeModesSetter from './ThemeModesSetter';
 import AssignedTokenNodes from './AssignedTokenNodes';
 import SelectText from 'utils/selectText';
 import PluginDestroy from 'utils/PluginDestroy';
-import { sendMessage, setVersion, restore } from 'model/DataManager';
+import { sendMessage, setVersion } from 'model/DataManager';
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
 import Group from 'model/Group';
 import Token from 'model/Token';
 import Properties from 'model/Properties';
 import MessageTypes from 'enums/MessageTypes';
-import BrowserEvents from 'enums/BrowserEvents';
-import preventEvent from 'utils/preventEvent';
-import { inputCheck } from 'utils/inputValidator';
+import Tabs from 'enums/Tabs';
+import useTokenSetting from 'hooks/useTokenSetting';
 SelectText(jQuery);
 PluginDestroy(jQuery);
 const Tokens = ({ data = {
@@ -32,12 +31,13 @@ const Tokens = ({ data = {
     properties: []
 } }) => {
     const { api: { admin } } = useAPI();
+    const { tab, setTab } = useTabs();
     const { fetchCurrentMode, setCurrentMode, themeModes, getThemeMode, defaultMode } = useThemeModes();
     const { setAllGroups } = useGroups();
-    const { getToken, setAllTokens } = useTokens();
-    const { getProperties, setAllProperties } = useProperties();
+    const { setAllTokens } = useTokens();
+    const { setAllProperties } = useProperties();
     const { setAllThemeModes } = useThemeModes();
-    const tokenSetting = useContext(tokenSettingContext);
+    const { setting, setTokenSetting, initialSetting } = useTokenSetting();
     let $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $themeModeList, $versionCreator, $versionList;
     const [assignTokenNodes, setAssignTokenNodes] = useState([]);
     const Renderer = {
@@ -60,28 +60,6 @@ const Tokens = ({ data = {
                 $remove
             })));
             return $version;
-        },
-        tokensAssigned: function (nodes) {
-            $assignedTokensNodeList.empty();
-            if (nodes.length) {
-                nodes.forEach(node => {
-                    let { id, name, useTokens } = node;
-                    const _id = id.replace(':', '-');
-                    const $node = $(``).data('id', id);
-                    const $heading = $('');
-                    const $title = $('');
-                    const $expend = $('');
-                    const $name = $('').text(name);
-                    const $tokenListPanel = $('').attr('id', `node-${_id}`);
-                    const $tokenList = $('');
-                    $assignedTokensNodeList.append($node
-                        .append($heading.append($title.append($expend).append($name)))
-                        .append());
-                });
-            }
-            else {
-                $assignedTokensNodeList.append(``);
-            }
         },
         updateThemeMode: function () {
             // $('#design-tokens-container .fill-color-icon').parent().each((index, item) => {
@@ -126,15 +104,20 @@ const Tokens = ({ data = {
         if (msg.type === MessageTypes.SELECTION_CHANGE) {
             const assignTokenNodes = msg.message.filter(selection => selection.useTokens.length);
             setAssignTokenNodes(assignTokenNodes);
-            // Renderer.tokensAssigned();
             // $('#design-tokens-container').trigger('click');
         }
     };
     const addPostMessageListener = () => {
         window.addEventListener("message", onMessageReceived, false);
+        $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+            const tabId = e.target.getAttribute('aria-controls');
+            setTab(tabId);
+            setTokenSetting(Object.assign({}, initialSetting));
+        });
     };
     const removePostMessageListener = () => {
         window.removeEventListener("message", onMessageReceived);
+        $('a[data-toggle="tab"]').off('shown.bs.tab');
     };
     useEffect(() => {
         $desiginSystemTabs = $('#desigin-system-tabs');
@@ -176,40 +159,11 @@ const Tokens = ({ data = {
         //     }
         //   })
         // );
-        $(document).on(BrowserEvents.CLICK, '.unassign-token', function (e) {
-            const $this = $(this);
-            const { group, token } = $this.closest('.token-item, .panel-heading, .group-item').data();
-            const _token = null; //getToken(token);
-            if ($this.is('.unassign-token')) {
-                sendMessage(MessageTypes.UNASSIGN_TOKEN, {
-                    nodeId: $this.closest('.selected-node').data('id'),
-                    tokenId: token
-                });
-            }
-            preventEvent(e);
-        });
         // done
-        $(document).on(BrowserEvents.DBCLICK, '.version-name', function (e) {
-            $(this).selectText();
-            preventEvent(e);
-        });
-        // need to update
-        $(document).on(`${BrowserEvents.CLICK} ${BrowserEvents.MOUSE_OVER}`, '#design-tokens-container.plugin-panel', function (e) {
-            const $target = $(e.target);
-            const type = e.type;
-            const $tokenItem = $target.closest('.token-item');
-            const $groupItem = $target.closest('.group-item');
-            // const $radiusSeparateBtns = $(event.target).closest('.separator-vals .btn-group');
-            if (type === BrowserEvents.CLICK) {
-                if ($tokenItem.length === 0) {
-                    $('.token-item').removeClass('token-item-selected');
-                }
-                // $('.open').removeClass('open');
-            }
-            else if (type === BrowserEvents.MOUSE_OVER && $tokenItem.length === 0 && $groupItem.length === 0) {
-                // $('.open').removeClass('open');
-            }
-        });
+        // $(document).on(BrowserEvents.DBCLICK, '.version-name', function (e) {
+        //   $(this).selectText();
+        //   preventEvent(e);
+        // });
         // done
         // $(document).on(`${BrowserEvents.BLUR}`, '.theme-mode-name, .version-name', function () {
         //   valChange.call(this);
@@ -227,32 +181,17 @@ const Tokens = ({ data = {
         //     }
         //   }, 400);
         // });
-        $(document).on(`${BrowserEvents.KEY_UP}`, '.version-name', inputCheck);
-        $(document).on(BrowserEvents.CLICK, '#version-creator', function (e) {
-            const $this = $(this);
-            if ($this.is('[disabled]'))
-                return;
-            createVersion();
-            $versionCreator.attr('disabled', true);
-            preventEvent(e);
-        });
-        $(document).on(BrowserEvents.CLICK, '.version-restore', function (e) {
-            restore($(this).closest('li').data('data'));
-        });
-        $(document).on("sortupdate", '.token-list', function (event, ui) {
-            // const $sortedItem = $(ui.item[0]);
-            // const $sortableContainer = $sortedItem.parent();
-            // const tokens = $.makeArray($sortableContainer.children()).map($token => {
-            //   const tokenId = $($token).data('token');
-            //   // return getToken(tokenId);;
-            // });
-            // if ($sortedItem.is('#assigned-tokens-node-list .token-item')) {
-            //   sendMessage(MessageTypes.REORDER_ASSIGN_TOKEN , {
-            //     nodeId: $sortedItem.closest('.selected-node').data('id'),
-            //     tokens: tokens.map(token => token.id)
-            //   });
-            // }
-        });
+        // $(document).on(`${BrowserEvents.KEY_UP}`, '.version-name', inputCheck);
+        // $(document).on(BrowserEvents.CLICK, '#version-creator', function (e) {
+        //   const $this = $(this);
+        //   if ($this.is('[disabled]')) return;
+        //   createVersion();
+        //   $versionCreator.attr('disabled', true);
+        //   preventEvent(e);
+        // });
+        // $(document).on(BrowserEvents.CLICK, '.version-restore', function (e) {
+        //   restore($(this).closest('li').data('data'));
+        // });
         return removePostMessageListener;
     }, []);
     useEffect(() => {
@@ -260,31 +199,35 @@ const Tokens = ({ data = {
         if (themeModes.length > 0) {
             fetchCurrentMode();
         }
-        return removePostMessageListener;
     }, [themeModes]);
     return (React.createElement(React.Fragment, null,
         React.createElement("ul", { id: "desigin-system-tabs", className: "nav nav-tabs", role: "tablist" },
             React.createElement("li", { role: "presentation", className: "active" },
-                React.createElement("a", { href: "#tokens", "aria-controls": "tokens", role: "tab", "data-toggle": "tab", "aria-expanded": "true" }, "Tokens")),
+                React.createElement("a", { href: `#${Tabs.TOKENS}`, "aria-controls": Tabs.TOKENS, role: "tab", "data-toggle": "tab", "aria-expanded": "true" }, "Tokens")),
             React.createElement("li", { role: "presentation" },
-                React.createElement("a", { href: "#tokens-assigned", "aria-controls": "selections", role: "tab", "data-toggle": "tab" }, "Assigned")),
+                React.createElement("a", { href: `#${Tabs.TOKENS_ASSIGNED}`, "aria-controls": Tabs.TOKENS_ASSIGNED, role: "tab", "data-toggle": "tab" }, "Assigned")),
             React.createElement("li", { role: "presentation" },
-                React.createElement("a", { href: "#modes", "aria-controls": "modes", role: "tab", "data-toggle": "tab" }, "Modes")),
+                React.createElement("a", { href: `#${Tabs.THEME_MODES}`, "aria-controls": Tabs.THEME_MODES, role: "tab", "data-toggle": "tab" }, "Modes")),
             admin && React.createElement("li", { role: "presentation" },
-                React.createElement("a", { href: "#io", "aria-controls": "io", role: "tab", "data-toggle": "tab" }, "I/O")),
+                React.createElement("a", { href: `#${Tabs.IO}`, "aria-controls": Tabs.IO, role: "tab", "data-toggle": "tab" }, "I/O")),
             React.createElement("div", { id: "export", title: "Export a JSON file", className: "export" },
                 React.createElement("span", { className: "tmicon tmicon-export" })),
             React.createElement(ThemeModesSetter, null)),
         React.createElement("div", { className: "tab-content" },
-            React.createElement("div", { role: "tabpanel", className: "tab-pane active", id: "tokens" }, tokenSetting.group ?
-                React.createElement(TokenSetting, null) :
-                React.createElement(GroupsListContainer, null)),
-            React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "tokens-assigned" },
-                React.createElement("div", { id: "assigned-tokens-node-list", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic" },
-                    React.createElement(AssignedTokenNodes, { data: assignTokenNodes }))),
-            React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "modes" },
+            React.createElement("div", { role: "tabpanel", className: "tab-pane active", id: Tabs.TOKENS }, tab === 'tokens' ?
+                setting.group ?
+                    React.createElement(TokenSetting, null) :
+                    React.createElement(GroupsListContainer, null) :
+                null),
+            React.createElement("div", { role: "tabpanel", className: "tab-pane", id: Tabs.TOKENS_ASSIGNED },
+                React.createElement("div", { id: "assigned-tokens-node-list", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic" }, tab === 'tokens-assigned' ?
+                    setting.group ?
+                        React.createElement(TokenSetting, null) :
+                        React.createElement(AssignedTokenNodes, { data: assignTokenNodes }) :
+                    null)),
+            React.createElement("div", { role: "tabpanel", className: "tab-pane", id: Tabs.THEME_MODES },
                 React.createElement(ThemeModesContainer, null)),
-            admin && (React.createElement("div", { role: "tabpanel", className: "tab-pane", id: "io" },
+            admin && (React.createElement("div", { role: "tabpanel", className: "tab-pane", id: Tabs.IO },
                 React.createElement("div", { className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic" },
                     React.createElement("div", { className: "setting-row" },
                         React.createElement("label", null, "Versions:"),

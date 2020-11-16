@@ -1,5 +1,6 @@
 import React, { ReactElement, FC, useState, useEffect, useRef } from "react";
 import useAPI from "hooks/useAPI";
+import useTabs from 'hooks/useTabs';
 import useTokenSetting from "hooks/useTokenSetting";
 import usePropertySetting from "hooks/usePropertySetting";
 import useData from "hooks/useData";
@@ -16,6 +17,7 @@ import { Mixed } from "symbols/index";
 import { inputCheck, valChange } from "utils/inputValidator";
 import SelectText from "utils/SelectText";
 import Properties from "model/Properties";
+import Tabs from 'enums/Tabs';
 
 declare var $: any;
 SelectText(jQuery);
@@ -80,6 +82,7 @@ const TokenSetting: FC = (): ReactElement => {
   const {
     api: { admin },
   } = useAPI();
+  const { tab } = useTabs();
   const {
     initialSetting,
     setting,
@@ -105,16 +108,16 @@ const TokenSetting: FC = (): ReactElement => {
   const $backButton = useRef();
 
   const focusHandler = (e) => {
-    if (!admin) return;
+    if (!admin || tab !== Tabs.TOKENS) return;
     setCreatable(false);
     $(e.target).selectText();
   };
   const inputHandler = (e) => {
-    if (!admin) return;
+    if (!admin || tab !== Tabs.TOKENS) return;
     inputCheck.call(e.target, e);
   };
   const blurHandler = (e) => {
-    if (!admin) return;
+    if (!admin || tab !== Tabs.TOKENS) return;
     const $target = e.target;
     const type = $target.getAttribute("prop-type");
     valChange
@@ -157,6 +160,8 @@ const TokenSetting: FC = (): ReactElement => {
     });
   }
   const saveTokenHandler = (e) => {
+    if (!admin || tab !== Tabs.TOKENS) return;
+
     const exist = group.tokens.find((_token: string) => _token === token.id);
     if (!exist) group.tokens.push(token.id);
     
@@ -174,6 +179,7 @@ const TokenSetting: FC = (): ReactElement => {
   };
 
   useEffect(() => {
+    if (!admin || tab !== Tabs.TOKENS) return;
     if (!token) {
       const newToken = new Token({ parent: group.id });
       setTokenSetting({
@@ -186,6 +192,7 @@ const TokenSetting: FC = (): ReactElement => {
   }, [token]);
 
   useEffect(() => {
+    if (!admin || tab !== Tabs.TOKENS) return;
     if (token) {
       const properties = [];
       if (propertiesSetting.length > 0) {
@@ -246,8 +253,8 @@ const TokenSetting: FC = (): ReactElement => {
         </div>
         <div id="property-view" className="setting-row"></div>
         <PropertyList></PropertyList>
-        <div className="setting-row">
-          {token && !showPropertySetting && (
+        {token && !showPropertySetting && tab === Tabs.TOKENS && (
+          <div className="setting-row">
             <button
               id="add-property"
               type="button"
@@ -256,15 +263,15 @@ const TokenSetting: FC = (): ReactElement => {
             >
               Create A Property
             </button>
-          )}
-        </div>
+          </div>
+        )}
         {showPropertySetting && (
           <PropertySetting
             token={token}
             hidePropertySetting={hidePropertySettingHandler}
           ></PropertySetting>
         )}
-        {propertiesSetting.length > 0 && (
+        {tab === Tabs.TOKENS && propertiesSetting.length > 0 && (
           <div className="setting-row">
             <button
               id="save-button-container"

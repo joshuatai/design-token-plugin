@@ -1,12 +1,14 @@
 import React, { useEffect, useRef } from "react";
 import PropertyItem from "./PropertyItem";
+import useTabs from 'hooks/useTabs';
 import usePropertySetting from "hooks/usePropertySetting";
+import Tabs from 'enums/Tabs';
 const PropertyList = () => {
+    const { tab } = useTabs();
     const { propertiesSetting, getPropertySetting, setPropertiesSetting, } = usePropertySetting();
     const $itemContainerRef = useRef(null);
     useEffect(() => {
-        // console.log(propertiesSetting);
-        if (propertiesSetting.length > 1) {
+        if (tab === Tabs.TOKENS && propertiesSetting.length > 1) {
             const $container = $($itemContainerRef.current);
             const sortable = $container.sortable('instance');
             sortable && $container.sortable('destroy');
