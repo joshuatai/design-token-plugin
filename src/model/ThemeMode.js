@@ -8,8 +8,7 @@ class ThemeMode {
         if (param) {
             const { id, name = "", isDefault = false } = param;
             this.id = id || v4();
-            if (name)
-                this.name = name;
+            this.name = name || this.name;
             if (isDefault !== undefined)
                 this.isDefault = isDefault;
         }

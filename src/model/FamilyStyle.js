@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 import PropertyType from 'enums/PropertyTypes';
 class FamilyStyle {
-    constructor(options) {
+    constructor({ id, parent, family, style, themeMode, useToken }) {
         this._type = PropertyType.FONT_FAMILY_STYLE;
         this.id = '';
         this.parent = '';
@@ -9,22 +9,12 @@ class FamilyStyle {
         this.family = 'Segoe UI';
         this.style = 'Regular';
         this.themeMode = '';
-        if (options) {
-            options.id ? this.id = options.id : this.id = v4();
-            if (options.parent)
-                this.parent = options.parent;
-            if (options.family)
-                this.family = options.family;
-            if (options.style)
-                this.style = options.style;
-            if (options.themeMode)
-                this.themeMode = options.themeMode;
-            if (options.useToken)
-                this.useToken = options.useToken;
-        }
-        else {
-            this.id = v4();
-        }
+        this.id = id || v4();
+        this.parent = parent || this.parent;
+        this.family = family || this.family;
+        this.style = style || this.style;
+        this.themeMode = themeMode || this.themeMode;
+        this.useToken = useToken || this.useToken;
     }
     get type() {
         return this._type;

@@ -1,5 +1,3 @@
-import { FunctionDeclaration } from "typescript";
-
 type Property = {
   type: string,
   id: string,

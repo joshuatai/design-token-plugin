@@ -52,6 +52,7 @@ const TokenAction = ({ token, showDropdown = false, setShowDropdown = null, from
         });
         setAllProperties(_properties);
         saveTokensProperties(_groups, _tokens, _properties);
+        preventEvent(e);
     };
     const cloneHandler = (e) => {
         const { key, name, description, parent, properties, propertyType } = token;
@@ -74,6 +75,7 @@ const TokenAction = ({ token, showDropdown = false, setShowDropdown = null, from
         saveTokensProperties(addGroup(group), addToken(cloneToken), addProperties(newProperties))
             .then((res) => { })
             .catch();
+        preventEvent(e);
     };
     const unassignHandler = (e) => {
         if (!admin)
@@ -83,6 +85,7 @@ const TokenAction = ({ token, showDropdown = false, setShowDropdown = null, from
             nodeId,
             tokenId: token.id
         });
+        preventEvent(e);
     };
     const deleteTokenProps = {
         className: "delete-token",

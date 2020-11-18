@@ -6,20 +6,17 @@ class Opacity implements Property {
   id: string = '';
   parent: string = '';
   opacity: number = 100;
-  themeMode: string = "";
+  themeMode: string = '';
   useToken: string = '';
 
-  constructor(options?: any) {
-    if (options) {
-      options.id ? this.id = options.id : this.id = v4();
-      if (options.parent) this.parent = options.parent;
-      if (options.useToken) this.useToken = options.useToken;
-      if (options.opacity != null) this.opacity = options.opacity;
-      if (options.themeMode) this.themeMode = options.themeMode;
-    } else {
-      this.id = v4();
-    }
+  constructor({ id, parent, useToken, opacity, themeMode }: any) {
+    this.id = id || v4();
+    this.parent = parent || this.parent;
+    this.useToken = useToken || this.useToken;
+    this.themeMode = themeMode || this.themeMode;
+    if (opacity !== null) this.opacity = opacity;
   }
+
   get type (): string {
     return this._type;
   }

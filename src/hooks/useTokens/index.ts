@@ -57,6 +57,12 @@ const useTokens = () => {
     setPureTokens(_pureTokens);
     sendMessage(MessageTypes.SET_TOKENS, toSaveTokens(_tokens));
   }
+  const _syncToken = (_token: Token) => {
+    sendMessage(
+      MessageTypes.SYNC_NODES,
+      _token
+    );
+  }
 
   return {
     tokens,
@@ -65,6 +71,7 @@ const useTokens = () => {
     getToken: _getToken,
     removeToken: _removeToken,
     addToken: _addToken,
+    syncToken: _syncToken,
     setAllTokens: _setAllTokens
   };
 };

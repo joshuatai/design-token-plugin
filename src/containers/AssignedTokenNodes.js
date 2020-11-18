@@ -47,9 +47,9 @@ const AssignedTokenNodes = ({ data, }) => {
                     React.createElement("span", { className: "tmicon tmicon-caret-right tmicon-hoverable" }),
                     React.createElement("span", { className: "node-name" }, name))),
             React.createElement("div", { id: `node-${_id}`, className: "panel-collapse collapse in", "aria-expanded": "true" },
-                React.createElement("ul", { className: "token-list sortable" }, useTokens.length ? (useTokens.map((_token) => {
-                    const token = getToken(_token);
-                    return React.createElement(TokenItem, { key: `assignedTokenItem-${_id}-${token.id}`, token: token, from: TokenActionEntry.ASSIGNED_LIST });
+                React.createElement("ul", { className: "token-list sortable" }, useTokens.length ? (useTokens.map(tokenId => {
+                    const token = getToken(tokenId);
+                    return token ? React.createElement(TokenItem, { key: `assignedTokenItem-${_id}-${token.id}`, token: token, from: TokenActionEntry.ASSIGNED_LIST }) : null;
                 })) : (React.createElement("div", { className: "no-node-selected" }, "Please select a node that has assigned at least one token."))))));
     })));
 };

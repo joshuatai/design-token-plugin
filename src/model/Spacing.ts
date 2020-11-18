@@ -9,18 +9,14 @@ class Spacing {
   useToken: string = '';
   themeMode: string = '';
 
-  constructor(options?: any) {
-    if (options) {
-      options.id ? this.id = options.id : this.id = v4();
-      if (options.id) this.id = options.id;
-      if (options.parent) this.parent = options.parent;
-      if (options.useToken) this.useToken = options.useToken;
-      if (options.value != null) this.value = options.value;
-      if (options.themeMode) this.themeMode = options.themeMode;
-    } else {
-      this.id = v4();
-    }
+  constructor({ id, parent, useToken, value, themeMode }: any) {
+    this.id = id || v4();
+    this.parent = parent || this.parent;
+    this.useToken = useToken || this.useToken;
+    this.value = value || this.value;
+    this.themeMode = themeMode || this.themeMode;
   }
+
   get type (): string {
     return this._type;
   }

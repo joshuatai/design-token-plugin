@@ -10,18 +10,15 @@ class FamilyStyle {
   style: string = 'Regular';
   themeMode = '';
 
-  constructor(options?: any) {
-    if (options) {
-      options.id ? this.id = options.id : this.id = v4();
-      if (options.parent) this.parent = options.parent;
-      if (options.family) this.family = options.family;
-      if (options.style) this.style = options.style;
-      if (options.themeMode) this.themeMode = options.themeMode;
-      if (options.useToken) this.useToken = options.useToken;
-    } else {
-      this.id = v4();
-    }
+  constructor({ id, parent, family, style, themeMode, useToken }: any) {
+    this.id = id || v4();
+    this.parent = parent || this.parent;
+    this.family = family || this.family;
+    this.style = style || this.style;
+    this.themeMode = themeMode || this.themeMode;
+    this.useToken = useToken || this.useToken;
   }
+
   get type (): string {
     return this._type;
   }

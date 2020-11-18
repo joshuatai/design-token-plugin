@@ -1,6 +1,7 @@
 import React, { ReactElement, FC, useState, useEffect, useRef } from "react";
 import useAPI from "hooks/useAPI";
 import useTabs from 'hooks/useTabs';
+import useThemeModes from 'hooks/useThemeModes';
 import useTokenSetting from "hooks/useTokenSetting";
 import usePropertySetting from "hooks/usePropertySetting";
 import useData from "hooks/useData";
@@ -83,6 +84,7 @@ const TokenSetting: FC = (): ReactElement => {
     api: { admin },
   } = useAPI();
   const { tab } = useTabs();
+  const { updateCurrentMode } = useThemeModes();
   const {
     initialSetting,
     setting,
@@ -97,7 +99,7 @@ const TokenSetting: FC = (): ReactElement => {
   } = usePropertySetting();
   const { saveTokensProperties } = useData();
   const { addGroup } = useGroups();
-  const { addToken, getToken } = useTokens();
+  const { addToken, syncToken } = useTokens();
   const { addProperties, referedProperties, getProperty } = useProperties();
   const [showPropertySetting, setShowPropertySetting] = useState(false);
   const [creatable, setCreatable] = useState(
@@ -173,6 +175,7 @@ const TokenSetting: FC = (): ReactElement => {
       addProperties(propertiesSetting)
     ).then((res) => {
       if (res.success) {
+        syncToken(token);
         ($backButton.current as HTMLElement).click();
       }
     });

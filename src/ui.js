@@ -1,17 +1,17 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import * as ReactDOM from 'react-dom';
-import useAPI from 'hooks/useAPI';
-import useFonts from 'hooks/useFonts';
 import Tokens from './containers/Tokens';
 import APISetting from './containers/APISetting';
 import Loader from './containers/Loader';
 import Logo from './containers/APISetting/Logo';
+import useAPI from 'hooks/useAPI';
+import useFonts from 'hooks/useFonts';
 import DataProvider from 'hooks/DataProvider';
+import MessageTypes from 'enums/MessageTypes';
 import './vendors/main.css';
 import './ui.scss';
 import './ui.css';
-import MessageTypes from 'enums/MessageTypes';
-const { useEffect } = React;
+;
 const Root = () => {
     const { api: { checked: apiChecked, apiKey, tokensID }, checkAPI, connectAPI, setAPI } = useAPI();
     const { fetchFonts, setFonts } = useFonts();
@@ -52,9 +52,6 @@ const Root = () => {
         }
         // if (msg.type === MessageTypes.GET_VERSIONS) {
         //   initVersion(msg.message);
-        // }
-        // if (msg.type === MessageTypes.GET_CURRENT_THEME_MODE) {
-        //   updateCurrentThemeMode();
         // }
         // if (msg.type === MessageTypes.SELECTION_CHANGE) {
         //   Renderer.tokensAssigned(msg.message.filter(selection => selection.useTokens.length));

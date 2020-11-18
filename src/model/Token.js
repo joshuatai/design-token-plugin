@@ -1,7 +1,7 @@
 import { v4 } from 'uuid';
 import { Mixed } from 'symbols/index';
 class Token {
-    constructor(param) {
+    constructor({ id, name, description, parent, properties, propertyType }) {
         this.type = 'Token';
         this.id = '';
         this.key = '';
@@ -10,7 +10,6 @@ class Token {
         this.parent = '';
         this.properties = [];
         this.propertyType = '';
-        const { id, name, description, parent, properties, propertyType } = param;
         this.id = id || v4();
         this.name = name || this.name;
         this.description = description || this.description;

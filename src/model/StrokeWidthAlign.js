@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 import PropertyType from 'enums/PropertyTypes';
 import StrokeAligns from 'enums/StrokeAligns';
 class StrokeWidthAlign {
-    constructor(options) {
+    constructor({ id, parent, useToken, width, align, themeMode }) {
         this._type = PropertyType.STROKE_WIDTH_ALIGN;
         this.id = '';
         this.parent = '';
@@ -10,22 +10,12 @@ class StrokeWidthAlign {
         this.align = StrokeAligns.INSIDE;
         this.useToken = '';
         this.themeMode = '';
-        if (options) {
-            options.id ? this.id = options.id : this.id = v4();
-            if (options.parent)
-                this.parent = options.parent;
-            if (options.useToken)
-                this.useToken = options.useToken;
-            if (options.width != null)
-                this.width = options.width;
-            if (options.align != null)
-                this.align = options.align;
-            if (options.themeMode)
-                this.themeMode = options.themeMode;
-        }
-        else {
-            this.id = v4();
-        }
+        this.id = id || v4();
+        this.parent = parent || this.parent;
+        this.useToken = useToken || this.useToken;
+        this.width = width || this.width;
+        this.align = align || this.align;
+        this.themeMode = themeMode || this.themeMode;
     }
     get type() {
         return this._type;

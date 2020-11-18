@@ -11,7 +11,7 @@ SelectText(jQuery);
 const ThemeModeItem = ({ data, creatable }) => {
     const { api: { admin } } = useAPI();
     const { saveThemeModes } = useData();
-    const { getThemeMode, addThemeMode, removeThemeMode } = useThemeModes();
+    const { getThemeMode, addThemeMode, removeThemeMode, updateCurrentMode } = useThemeModes();
     const $modeName = useRef();
     const removeHandler = (e) => {
         if (!data.isDefault) {
@@ -21,7 +21,6 @@ const ThemeModeItem = ({ data, creatable }) => {
                 creatable(true);
             });
         }
-        // updateCurrentThemeMode();
     };
     const blurHandler = (e) => {
         const $name = $modeName.current;

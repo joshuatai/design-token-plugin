@@ -1,21 +1,18 @@
-import React, { FC, useRef, useState } from 'react';
+import React, { FC, useRef, useState, useEffect } from 'react';
 import * as ReactDOM from 'react-dom';
-import useAPI from 'hooks/useAPI';
-import useFonts from 'hooks/useFonts';
-import Global from 'model/Global';
 import Tokens from './containers/Tokens';
 import APISetting from './containers/APISetting';
 import Loader from './containers/Loader';
 import Logo from './containers/APISetting/Logo';
+import useAPI from 'hooks/useAPI';
+import useFonts from 'hooks/useFonts';
 import DataProvider from 'hooks/DataProvider';
-
+import Global from 'model/Global';
+import MessageTypes from 'enums/MessageTypes';
 import './vendors/main.css';
 import './ui.scss';
 import './ui.css';
-import MessageTypes from 'enums/MessageTypes';
-
-const { useEffect } = React;
-
+;
 const Root:FC = () => {
   const { api: { checked: apiChecked, apiKey, tokensID }, checkAPI, connectAPI, setAPI } = useAPI(); 
   const { fetchFonts, setFonts } = useFonts();
@@ -56,9 +53,7 @@ const Root:FC = () => {
     // if (msg.type === MessageTypes.GET_VERSIONS) {
     //   initVersion(msg.message);
     // }
-    // if (msg.type === MessageTypes.GET_CURRENT_THEME_MODE) {
-    //   updateCurrentThemeMode();
-    // }
+
     // if (msg.type === MessageTypes.SELECTION_CHANGE) {
     //   Renderer.tokensAssigned(msg.message.filter(selection => selection.useTokens.length));
     //   $('#design-tokens-container').trigger('click');
@@ -67,7 +62,6 @@ const Root:FC = () => {
   const addPostMessageListener = () => {
     window.addEventListener("message", onMessageReceived, false);
   }
-    
   const removePostMessageListener = () => {
     window.removeEventListener("message", onMessageReceived);
   }

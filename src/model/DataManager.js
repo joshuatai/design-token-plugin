@@ -23,46 +23,7 @@ const fetchInitial = () => {
     // sendMessage(MessageTypes.GET_VERSIONS);
     // sendMessage(MessageTypes.GET_INIT_THEME_MODE);
 };
-const initialize = function (data) {
-    // console.log(data);
-    // console.log(APIKey, collectionID, tokensBinID, VersionsBinID, isAdmin);
-    // useThemeModes();
-};
-const getAPI = function () {
-    // return {
-    //   'api-key': APIKey,
-    //   'tokens-id': tokensBinID,
-    //   'collection-id': collectionID,
-    //   'versions-id': VersionsBinID,
-    //   'admin-id': adminBinID,
-    //   'admin': isAdmin
-    // }
-};
-const onMessageReceived = (event) => {
-    // const msg = event.data.pluginMessage;
-    // if (msg.type === MessageTypes.GET_API) {
-    //   const settings = msg.message;
-    //   APIKey = settings['api-key'];
-    //   tokensBinID = settings['tokens-bin-id'];
-    //   VersionsBinID = settings['versions-bin-id'];
-    //   isAdmin = settings['admin'];
-    // }
-};
-window.addEventListener("message", onMessageReceived, false);
 const getVersion = function (id) { return arguments.length ? versionMap[id] : versions; };
-const removeThemeMode = mode => {
-    delete themeModeMap[mode.id];
-    const index = themeModes.findIndex((_mode) => _mode.id === mode.id);
-    themeModes.splice(index, 1);
-};
-// const setCurrentThemeMode = themeMode => {
-//   currentThemeMode = themeMode;
-//   sendMessage(
-//     MessageTypes.SET_CURRENT_THEME_MODE,
-//     themeMode
-//   );
-// }
-const setProperty = property => propertiesMap[property.id] = property;
 const setVersion = (version) => {
     versions.push(version);
     versionMap[version.id] = version;
@@ -76,35 +37,10 @@ const saveVersion = () => {
 const restore = (id) => {
     sendMessage(MessageTypes.RESTRORE_VERSION, id);
 };
-const referByToken = (token) => null;
-//   getProperty()
-//     .filter((property: any) => property.useToken === token.id)
-//     .map((property: any) => getToken(property.parent));
-// const syncNode = (token: Token) => {
-//   sendMessage(
-//     MessageTypes.SYNC_NODES,
-//     token
-//   );
-// };
 const sendMessage = (type, message = "") => parent.postMessage({
     pluginMessage: {
         type,
         message: typeof message === 'string' ? message : JSON.stringify(message),
     },
 }, "*");
-export { 
-// checkApiKey,
-getAPI, fetchInitial, getVersion, 
-// getThemeMode,
-getFonts, 
-// getGroup,
-// getToken,
-setVersion, 
-// setThemeMode,
-// setCurrentThemeMode,
-removeThemeMode, 
-// setGroup,
-// setToken,
-setProperty, saveVersion, 
-// syncNode,
-restore, referByToken, sendMessage };
+export { fetchInitial, getVersion, getFonts, setVersion, saveVersion, restore, sendMessage };

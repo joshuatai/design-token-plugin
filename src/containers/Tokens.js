@@ -12,8 +12,7 @@ import ThemeModesContainer from './ThemeModesContainer';
 import ThemeModesSetter from './ThemeModesSetter';
 import AssignedTokenNodes from './AssignedTokenNodes';
 import SelectText from 'utils/selectText';
-import PluginDestroy from 'utils/PluginDestroy';
-import { sendMessage, setVersion } from 'model/DataManager';
+import { setVersion } from 'model/DataManager';
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
 import Group from 'model/Group';
@@ -23,7 +22,6 @@ import MessageTypes from 'enums/MessageTypes';
 import Tabs from 'enums/Tabs';
 import useTokenSetting from 'hooks/useTokenSetting';
 SelectText(jQuery);
-PluginDestroy(jQuery);
 const Tokens = ({ data = {
     themeModes: [],
     groups: [],
@@ -34,11 +32,11 @@ const Tokens = ({ data = {
     const { tab, setTab } = useTabs();
     const { fetchCurrentMode, setCurrentMode, themeModes, getThemeMode, defaultMode } = useThemeModes();
     const { setAllGroups } = useGroups();
-    const { setAllTokens } = useTokens();
+    const { setAllTokens, getToken } = useTokens();
     const { setAllProperties } = useProperties();
     const { setAllThemeModes } = useThemeModes();
     const { setting, setTokenSetting, initialSetting } = useTokenSetting();
-    let $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $themeModeList, $versionCreator, $versionList;
+    let $tokenSetting, $themeModeList, $versionCreator, $versionList;
     const [assignTokenNodes, setAssignTokenNodes] = useState([]);
     const Renderer = {
         version: function (version) {
@@ -84,9 +82,7 @@ const Tokens = ({ data = {
         setVersion(data);
     }
     function updateCurrentThemeMode() {
-        // Renderer.updateThemeMode();// change token icon
         // $tokenSetting.TokenSetting('changeThemeMode'); //change preview
-        sendMessage(MessageTypes.SYNC_CURRENT_THEME_MODE);
     }
     const onMessageReceived = (event) => {
         const msg = event.data.pluginMessage;
@@ -96,13 +92,11 @@ const Tokens = ({ data = {
         if (msg.type === MessageTypes.FETCH_CURRENT_THEME_MODE) {
             const themeId = msg.message;
             setCurrentMode(themeId ? getThemeMode(themeId) : defaultMode);
-            // updateCurrentThemeMode();
-        }
-        if (msg.type === MessageTypes.GET_CURRENT_THEME_MODE) {
-            updateCurrentThemeMode();
         }
         if (msg.type === MessageTypes.SELECTION_CHANGE) {
-            const assignTokenNodes = msg.message.filter(selection => selection.useTokens.length);
+            const assignTokenNodes = msg.message.filter(selection => {
+                return selection.useTokens.some(tokenId => getToken(tokenId));
+            });
             setAssignTokenNodes(assignTokenNodes);
             // $('#design-tokens-container').trigger('click');
         }
@@ -120,11 +114,9 @@ const Tokens = ({ data = {
         $('a[data-toggle="tab"]').off('shown.bs.tab');
     };
     useEffect(() => {
-        $desiginSystemTabs = $('#desigin-system-tabs');
         $tokenSetting = $('#token-setting');
         $themeModeList = $('#mode-list');
         // $tabTokensAssigned = $('[aria-controls="selections"]').parent();
-        $assignedTokensNodeList = $('#assigned-tokens-node-list');
         $versionCreator = $('#version-creator');
         $versionList = $('#version-list');
         if (data.themeModes) {
@@ -145,37 +137,16 @@ const Tokens = ({ data = {
             });
             setAllProperties(_properties);
         }
-        //done
-        // $(document).on(`${BrowserEvents.CLICK} ${BrowserEvents.MOUSE_OVER} ${BrowserEvents.MOUSE_OUT}`, '#design-tokens-container .token-item, #assigned-tokens-node-list .token-item, #design-tokens-container .group-item',
-        //   $.debounce(20, function ({ type, target }) {
-        //     const $item = $(this);
-        //     if ($item.is('.token-item')) {
-        //       const editBtn = $(target).closest('.token-edit-btn');
-        //       if (!editBtn.length && $item.is('#design-tokens-container .token-item') &&  type === BrowserEvents.CLICK) {
-        //         $('.token-item-selected').removeClass('token-item-selected');
-        //         $item.addClass('token-item-selected');
-        //         // 
-        //       }
-        //     }
-        //   })
-        // );
         // done
         // $(document).on(BrowserEvents.DBCLICK, '.version-name', function (e) {
         //   $(this).selectText();
         //   preventEvent(e);
         // });
         // done
-        // $(document).on(`${BrowserEvents.BLUR}`, '.theme-mode-name, .version-name', function () {
+        // $(document).on(`${BrowserEvents.BLUR}`, '.version-name', function () {
         //   valChange.call(this);
         //   const $this = $(this);
         //   setTimeout(() => {
-        //     if ($this.is('.theme-mode-name') && $this.text()) {
-        //       
-        //       // setTimeout(function() {
-        //         Renderer.themeModes();
-        //         updateCurrentThemeMode();
-        //       // }, 400);
-        //     }
         //     if ($this.is('.version-name') && $this.text()) {
         //       $versionCreator.removeAttr('disabled');
         //     }
@@ -199,7 +170,7 @@ const Tokens = ({ data = {
         if (themeModes.length > 0) {
             fetchCurrentMode();
         }
-    }, [themeModes]);
+    }, [themeModes.length]);
     return (React.createElement(React.Fragment, null,
         React.createElement("ul", { id: "desigin-system-tabs", className: "nav nav-tabs", role: "tablist" },
             React.createElement("li", { role: "presentation", className: "active" },

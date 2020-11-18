@@ -5,10 +5,11 @@ class StrokeFill extends FillColor {
   _type: string = PropertyType.STROKE_FILL;
   color: string = '000000';
 
-  constructor(options?: any) {
-    super(options);
-    if (options.color != null) this.color = options.color;
+  constructor(param: any) {
+    super(param);
+    if (param.color != null) this.color = param.color;
   }
+
   get type (): string {
     return this._type;
   }

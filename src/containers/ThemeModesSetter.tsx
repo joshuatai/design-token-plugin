@@ -9,7 +9,6 @@ const ThemeModesSetter: FC = (): ReactElement => {
   const setThemeMode = (e) => {
     const modeId: string = (e.target.closest('.theme-mode') as HTMLElement).dataset['id'];
     setCurrentMode(getThemeMode(modeId) as ThemeMode);
-
   }
   return currentMode ? <div className="dropdown theme-modes">
     <ThemeModeIcon title={currentMode.name}></ThemeModeIcon>

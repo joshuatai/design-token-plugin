@@ -3,8 +3,6 @@ import useTokens from "hooks/useTokens";
 import useProperties from "hooks/useProperties";
 import { sendMessage } from 'model/DataManager';
 import Token from "model/Token";
-import { Mixed } from "symbols/index";
-import PropertyIcon from "./property-components/PropertyIcon";
 import TokenItem from './TokenItem';
 import MessageTypes from 'enums/MessageTypes';
 import TokenActionEntry from 'enums/TokenActionEntry';
@@ -46,13 +44,13 @@ const AssignedTokenNodes: FC<T_AssignedTokenNodes> = ({
     setSortable();
     return unsetSortable;
   }, [data]);
-  
+
   return (
     <>
       {data.map((node) => {
         let { id, name, useTokens } = node;
         const _id = id.replace(":", "-");
-
+        
         return (
           <div
             key={_id}
@@ -73,9 +71,9 @@ const AssignedTokenNodes: FC<T_AssignedTokenNodes> = ({
             <div id={`node-${_id}`} className="panel-collapse collapse in" aria-expanded="true">
               <ul className="token-list sortable">
                 {useTokens.length ? (
-                  useTokens.map((_token) => {
-                    const token: Token = getToken(_token) as Token;
-                    return <TokenItem key={`assignedTokenItem-${_id}-${token.id}`} token={token} from={TokenActionEntry.ASSIGNED_LIST}></TokenItem>;
+                  useTokens.map(tokenId => {
+                    const token: Token = getToken(tokenId) as Token;
+                    return token ? <TokenItem key={`assignedTokenItem-${_id}-${token.id}`} token={token} from={TokenActionEntry.ASSIGNED_LIST}></TokenItem> : null;
                   })
                 ) : (
                   <div className="no-node-selected">

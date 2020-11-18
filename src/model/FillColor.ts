@@ -12,24 +12,21 @@ class FillColor {
   opacity: number = 100;
   visible: boolean = true;
   blendMode: BlendModes = BlendModes.NORMAL;
-  themeMode: string = "";
+  themeMode: string = '';
   useToken: string = '';
 
-  constructor(options?: any) {
-    if (options) {
-      options.id ? this.id = options.id : this.id = v4();
-      if (options.parent) this.parent = options.parent;
-      if (options.fillType != null) this.fillType = options.fillType;
-      if (options.color != null) this.color = options.color;
-      if (options.opacity != undefined) this.opacity = options.opacity;
-      if (options.visible != undefined) this.visible = options.visible;
-      if (options.blendMode != undefined) this.blendMode = options.blendMode;
-      if (options.useToken) this.useToken = options.useToken;
-      if (options.themeMode) this.themeMode = options.themeMode;
-    } else {
-      this.id = v4();
-    }
+  constructor({ id, parent, fillType, color, opacity, visible, blendMode, useToken, themeMode }: any) {
+    this.id = id || v4();
+    this.parent = parent || this.parent;
+    this.fillType = fillType || this.fillType;
+    this.color = color || this.color;
+    this.blendMode = blendMode || this.blendMode;
+    this.useToken = useToken || this.useToken;
+    this.themeMode = themeMode || this.themeMode;
+    if (opacity !== undefined) this.opacity = opacity;
+    if (visible !== undefined) this.visible = visible;
   }
+
   get type (): string {
     return this._type;
   }

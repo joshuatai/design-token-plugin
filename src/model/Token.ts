@@ -10,8 +10,7 @@ class Token {
   properties: string[] = [];
   propertyType: string | symbol = '';
 
-  constructor(param) {
-    const { id, name, description, parent, properties, propertyType } = param;
+  constructor({ id, name, description, parent, properties, propertyType }: any) {
     this.id = id || v4();
     this.name = name || this.name;
     this.description = description || this.description;

@@ -17,6 +17,7 @@ const useThemeModes = () => {
   const _removeThemeMode = (mode: ThemeMode) => {
     const nextThemeModes = themeModes.slice().filter(_mode => _mode.id != mode.id);
     _setAllThemeModes(nextThemeModes);
+    console.log(currentMode, mode);
     return nextThemeModes;
   }
   const _addThemeMode = (mode: ThemeMode) => {
@@ -48,6 +49,9 @@ const useThemeModes = () => {
       mode.id
     );
   }
+  const _updateCurrentMode = () => {
+    sendMessage(MessageTypes.SYNC_CURRENT_THEME_MODE);
+  }
 
   return {
     defaultMode,
@@ -55,6 +59,7 @@ const useThemeModes = () => {
     currentMode,
     fetchCurrentMode: _fetchCurrentMode,
     setCurrentMode: _setCurrentMode,
+    updateCurrentMode: _updateCurrentMode,
     getThemeMode: _getThemeMode,
     removeThemeMode: _removeThemeMode,
     addThemeMode: _addThemeMode,

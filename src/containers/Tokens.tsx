@@ -1,4 +1,4 @@
-import React, { useEffect, FC, useContext, useState } from 'react';
+import React, { useEffect, FC, useState } from 'react';
 import hash from 'hash.js';
 import _cloneDeep from 'lodash/cloneDeep';
 import useAPI from 'hooks/useAPI';
@@ -13,8 +13,7 @@ import ThemeModesContainer from './ThemeModesContainer';
 import ThemeModesSetter from './ThemeModesSetter';
 import AssignedTokenNodes from './AssignedTokenNodes';
 import SelectText from 'utils/selectText';
-import PluginDestroy from 'utils/PluginDestroy';
-import {getVersion, sendMessage, setVersion, restore } from 'model/DataManager';
+import { setVersion } from 'model/DataManager';
 import ThemeMode from 'model/ThemeMode';
 import Version from 'model/Version';
 import Group from 'model/Group';
@@ -22,15 +21,11 @@ import Token from 'model/Token';
 import Properties from 'model/Properties';
 import MessageTypes from 'enums/MessageTypes';
 import Tabs from 'enums/Tabs';
-import BrowserEvents from 'enums/BrowserEvents';
-import preventEvent from  'utils/preventEvent';
-import { inputCheck, valChange } from 'utils/inputValidator';
 import Property from 'model/Property';
 import useTokenSetting from 'hooks/useTokenSetting';
 
 declare var $: any;
 SelectText(jQuery);
-PluginDestroy(jQuery);
 
 type Props = {
   data: {
@@ -52,11 +47,11 @@ const Tokens:FC<Props> = ({
   const { tab, setTab } = useTabs();
   const { fetchCurrentMode, setCurrentMode, themeModes, getThemeMode, defaultMode } = useThemeModes();
   const { setAllGroups } = useGroups();
-  const { setAllTokens } = useTokens();
+  const { setAllTokens, getToken } = useTokens();
   const { setAllProperties } = useProperties();
   const { setAllThemeModes } = useThemeModes();
   const { setting, setTokenSetting, initialSetting} = useTokenSetting();
-  let $desiginSystemTabs, $assignedTokensNodeList, $tokenSetting, $themeModeList, $versionCreator, $versionList;
+  let $tokenSetting, $themeModeList, $versionCreator, $versionList;
 
   const [ assignTokenNodes, setAssignTokenNodes ] = useState([]);
 
@@ -114,9 +109,9 @@ const Tokens:FC<Props> = ({
     setVersion(data);
   }
   function updateCurrentThemeMode () {
-    // Renderer.updateThemeMode();// change token icon
+    
     // $tokenSetting.TokenSetting('changeThemeMode'); //change preview
-    sendMessage(MessageTypes.SYNC_CURRENT_THEME_MODE);
+    
   }
 
   const onMessageReceived = (event) => {
@@ -129,16 +124,13 @@ const Tokens:FC<Props> = ({
     if (msg.type === MessageTypes.FETCH_CURRENT_THEME_MODE) {
       const themeId = msg.message;
       setCurrentMode(themeId ? getThemeMode(themeId) as ThemeMode : defaultMode);
-      // updateCurrentThemeMode();
     }
 
-    if (msg.type === MessageTypes.GET_CURRENT_THEME_MODE) {
-      updateCurrentThemeMode();
-    }
     if (msg.type === MessageTypes.SELECTION_CHANGE) {
-      const assignTokenNodes = msg.message.filter(selection => selection.useTokens.length);
+      const assignTokenNodes = msg.message.filter(selection => {
+        return selection.useTokens.some(tokenId => getToken(tokenId));
+      });
       setAssignTokenNodes(assignTokenNodes);
-      
       // $('#design-tokens-container').trigger('click');
     }
   }
@@ -157,11 +149,9 @@ const Tokens:FC<Props> = ({
   }
 
   useEffect(() => {
-    $desiginSystemTabs = $('#desigin-system-tabs');
     $tokenSetting = $('#token-setting');
     $themeModeList = $('#mode-list');
     // $tabTokensAssigned = $('[aria-controls="selections"]').parent();
-    $assignedTokensNodeList = $('#assigned-tokens-node-list');
     $versionCreator = $('#version-creator');
     $versionList = $('#version-list');
 
@@ -184,20 +174,6 @@ const Tokens:FC<Props> = ({
       setAllProperties(_properties);
     }
     
-    //done
-    // $(document).on(`${BrowserEvents.CLICK} ${BrowserEvents.MOUSE_OVER} ${BrowserEvents.MOUSE_OUT}`, '#design-tokens-container .token-item, #assigned-tokens-node-list .token-item, #design-tokens-container .group-item',
-    //   $.debounce(20, function ({ type, target }) {
-    //     const $item = $(this);
-    //     if ($item.is('.token-item')) {
-    //       const editBtn = $(target).closest('.token-edit-btn');
-    //       if (!editBtn.length && $item.is('#design-tokens-container .token-item') &&  type === BrowserEvents.CLICK) {
-    //         $('.token-item-selected').removeClass('token-item-selected');
-    //         $item.addClass('token-item-selected');
-    //         // 
-    //       }
-    //     }
-    //   })
-    // );
     // done
     // $(document).on(BrowserEvents.DBCLICK, '.version-name', function (e) {
     //   $(this).selectText();
@@ -205,18 +181,10 @@ const Tokens:FC<Props> = ({
     // });
 
     // done
-    // $(document).on(`${BrowserEvents.BLUR}`, '.theme-mode-name, .version-name', function () {
+    // $(document).on(`${BrowserEvents.BLUR}`, '.version-name', function () {
     //   valChange.call(this);
     //   const $this = $(this);
     //   setTimeout(() => {
-    //     if ($this.is('.theme-mode-name') && $this.text()) {
-    //       
-    //       // setTimeout(function() {
-    //         Renderer.themeModes();
-    //         updateCurrentThemeMode();
-    //       // }, 400);
-    //     }
-        
     //     if ($this.is('.version-name') && $this.text()) {
     //       $versionCreator.removeAttr('disabled');
     //     }
@@ -244,7 +212,7 @@ const Tokens:FC<Props> = ({
     if (themeModes.length > 0) {
       fetchCurrentMode();
     }
-  }, [themeModes]);
+  }, [themeModes.length]);
   return (
     <>
       <ul id="desigin-system-tabs" className="nav nav-tabs" role="tablist">

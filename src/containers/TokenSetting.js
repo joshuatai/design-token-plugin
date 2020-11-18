@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import useAPI from "hooks/useAPI";
 import useTabs from 'hooks/useTabs';
+import useThemeModes from 'hooks/useThemeModes';
 import useTokenSetting from "hooks/useTokenSetting";
 import usePropertySetting from "hooks/usePropertySetting";
 import useData from "hooks/useData";
@@ -69,12 +70,13 @@ SelectText(jQuery);
 const TokenSetting = () => {
     const { api: { admin }, } = useAPI();
     const { tab } = useTabs();
+    const { updateCurrentMode } = useThemeModes();
     const { initialSetting, setting, setToken, setTokenSetting, } = useTokenSetting();
     const { group, token } = setting;
     const { propertiesSetting, setPropertiesSetting, setPropertyEdit, } = usePropertySetting();
     const { saveTokensProperties } = useData();
     const { addGroup } = useGroups();
-    const { addToken, getToken } = useTokens();
+    const { addToken, syncToken } = useTokens();
     const { addProperties, referedProperties, getProperty } = useProperties();
     const [showPropertySetting, setShowPropertySetting] = useState(false);
     const [creatable, setCreatable] = useState(token && token.name ? true : false);
@@ -146,6 +148,7 @@ const TokenSetting = () => {
         traversingUpdate(token.id);
         saveTokensProperties(addGroup(group), addToken(token), addProperties(propertiesSetting)).then((res) => {
             if (res.success) {
+                syncToken(token);
                 $backButton.current.click();
             }
         });

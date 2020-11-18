@@ -63,17 +63,16 @@ const TokenAction: FC<T_TokenAction> = ({
     const _removeProperties = token.properties;
     const index = _group.tokens.indexOf(token.id);
     if (index > -1) _group.tokens.splice(index, 1);
-
     let _groups = addGroup(_group);
     let _tokens = removeToken(token);
     let _properties = properties.slice();
-
     _removeProperties.forEach((_propId) => {
       const index = _properties.findIndex((_prop) => _prop.id === _propId);
       if (index > -1) _properties.splice(index, 1);
     });
     setAllProperties(_properties);
     saveTokensProperties(_groups, _tokens, _properties);
+    preventEvent(e);
   };
   const cloneHandler = (e) => {
     const { key, name, description, parent, properties, propertyType } = token;
@@ -100,6 +99,8 @@ const TokenAction: FC<T_TokenAction> = ({
     )
       .then((res) => {})
       .catch();
+    
+    preventEvent(e);
   };
   const unassignHandler = (e) => {
     if (!admin) return;
@@ -108,6 +109,7 @@ const TokenAction: FC<T_TokenAction> = ({
       nodeId,
       tokenId: token.id
     });
+    preventEvent(e);
   }
   const deleteTokenProps = {
     className: "delete-token",

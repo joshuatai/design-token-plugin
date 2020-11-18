@@ -23,10 +23,10 @@ type T_ThemeModeItem = {
 const ThemeModeItem:FC<T_ThemeModeItem> = ({
   data,
   creatable
-}: T_ThemeModeItem) => {
+}: T_ThemeModeItem): ReactElement => {
   const { api: { admin } } = useAPI();
   const { saveThemeModes } = useData();
-  const { getThemeMode, addThemeMode, removeThemeMode } = useThemeModes();
+  const { getThemeMode, addThemeMode, removeThemeMode, updateCurrentMode } = useThemeModes();
   const $modeName = useRef();
 
   const removeHandler = (e) => {
@@ -37,7 +37,6 @@ const ThemeModeItem:FC<T_ThemeModeItem> = ({
           creatable(true);
         });
     }
-    // updateCurrentThemeMode();
   }
   const blurHandler = (e) => {
     const $name = $modeName.current as HTMLElement;

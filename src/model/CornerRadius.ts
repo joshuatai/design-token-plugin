@@ -13,6 +13,7 @@ interface I_CornerRadius {
   useToken: string,
   themeMode: string
 }
+
 class CornerRadius implements I_CornerRadius {
   private _type: string = PropertyType.CORNER_RADIUS;
   id: string = '';
@@ -25,21 +26,18 @@ class CornerRadius implements I_CornerRadius {
   useToken: string = '';
   themeMode: string = '';
 
-  constructor(options?: any) {
-    if (options) {
-      options.id ? this.id = options.id : this.id = v4();
-      if (options.parent) this.parent = options.parent;
-      if (options.useToken) this.useToken = options.useToken;
-      if (options.radius != null) this.radius = options.radius === 'Mixed' ? Mixed : options.radius;
-      if (options.topLeft != null) this.topLeft = options.topLeft;
-      if (options.topRight != null) this.topRight = options.topRight;
-      if (options.bottomRight != null) this.bottomRight = options.bottomRight;
-      if (options.bottomLeft != null) this.bottomLeft = options.bottomLeft;
-      if (options.themeMode) this.themeMode = options.themeMode;
-    } else {
-      this.id = v4();
-    }
+  constructor({ id, parent, useToken, radius, topLeft, topRight, bottomRight, bottomLeft, themeMode }: any) {
+    this.id = id || v4();
+    this.parent = parent || this.parent;
+    this.useToken = useToken || this.useToken;
+    this.radius = radius ? radius === 'Mixed' ? Mixed : radius : this.radius;
+    this.topLeft = topLeft || this.topLeft;
+    this.topRight = topRight || this.topRight;
+    this.bottomRight = bottomRight || this.bottomRight;
+    this.bottomLeft = bottomLeft || this.bottomLeft;
+    this.themeMode = themeMode || this.themeMode;
   }
+
   get type (): string {
     return this._type;
   }

@@ -2,7 +2,7 @@ import { v4 } from 'uuid';
 import PropertyType from 'enums/PropertyTypes';
 import { Mixed } from 'symbols/index';
 class CornerRadius {
-    constructor(options) {
+    constructor({ id, parent, useToken, radius, topLeft, topRight, bottomRight, bottomLeft, themeMode }) {
         this._type = PropertyType.CORNER_RADIUS;
         this.id = '';
         this.parent = '';
@@ -13,28 +13,15 @@ class CornerRadius {
         this.bottomLeft = 0;
         this.useToken = '';
         this.themeMode = '';
-        if (options) {
-            options.id ? this.id = options.id : this.id = v4();
-            if (options.parent)
-                this.parent = options.parent;
-            if (options.useToken)
-                this.useToken = options.useToken;
-            if (options.radius != null)
-                this.radius = options.radius === 'Mixed' ? Mixed : options.radius;
-            if (options.topLeft != null)
-                this.topLeft = options.topLeft;
-            if (options.topRight != null)
-                this.topRight = options.topRight;
-            if (options.bottomRight != null)
-                this.bottomRight = options.bottomRight;
-            if (options.bottomLeft != null)
-                this.bottomLeft = options.bottomLeft;
-            if (options.themeMode)
-                this.themeMode = options.themeMode;
-        }
-        else {
-            this.id = v4();
-        }
+        this.id = id || v4();
+        this.parent = parent || this.parent;
+        this.useToken = useToken || this.useToken;
+        this.radius = radius ? radius === 'Mixed' ? Mixed : radius : this.radius;
+        this.topLeft = topLeft || this.topLeft;
+        this.topRight = topRight || this.topRight;
+        this.bottomRight = bottomRight || this.bottomRight;
+        this.bottomLeft = bottomLeft || this.bottomLeft;
+        this.themeMode = themeMode || this.themeMode;
     }
     get type() {
         return this._type;

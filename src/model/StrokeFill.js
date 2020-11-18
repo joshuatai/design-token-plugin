@@ -1,12 +1,12 @@
 import PropertyType from 'enums/PropertyTypes';
 import FillColor from 'model/FillColor';
 class StrokeFill extends FillColor {
-    constructor(options) {
-        super(options);
+    constructor(param) {
+        super(param);
         this._type = PropertyType.STROKE_FILL;
         this.color = '000000';
-        if (options.color != null)
-            this.color = options.color;
+        if (param.color != null)
+            this.color = param.color;
     }
     get type() {
         return this._type;

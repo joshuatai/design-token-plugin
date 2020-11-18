@@ -1,14 +1,13 @@
 import { v4 } from 'uuid';
 class Group {
-    constructor(param) {
+    constructor({ id, name, tokens = [] }) {
         this.type = 'Group';
         this.id = '';
         this.name = '';
         this.tokens = [];
-        const { id, name, tokens = [] } = param;
         this.id = id || v4();
-        this.name = name;
-        this.tokens = tokens;
+        this.name = name || this.name;
+        this.tokens = tokens || this.tokens;
     }
 }
 export default Group;
