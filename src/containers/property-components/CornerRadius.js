@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import PropertyIcon from "./PropertyIcon";
 import PureTokens from "./PureTokens";
-import useThemeModes from 'hooks/useThemeModes';
+import useThemeModes from "hooks/useThemeModes";
 import useTokens from "hooks/useTokens";
 import useTokenSetting from "hooks/useTokenSetting";
 import usePropertySetting from "hooks/usePropertySetting";
@@ -19,7 +19,8 @@ const CornerRadius = ({ value = null }) => {
     const { setting: tokenSetting } = useTokenSetting();
     const { getProperty } = useProperties();
     const { setPropertySetting } = usePropertySetting();
-    const [setting, setSetting] = useState(value || new Model({ parent: tokenSetting.token.id, themeMode: defaultMode.id }));
+    const [setting, setSetting] = useState(value ||
+        new Model({ parent: tokenSetting.token.id, themeMode: defaultMode.id }));
     const [separateType, setSeparateType] = useState(defaultSeparateType);
     const { radius, topLeft, topRight, bottomLeft, bottomRight, useToken, } = setting;
     const pureTokens = getPureTokensByProperty(setting);

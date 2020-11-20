@@ -1,10 +1,8 @@
-import { useContext, useRef } from 'react';
+import { useContext } from 'react';
 import { propertyContext, propertySetterContext, propertiesContext, propertiesSetterContext, propertyEditContext, propertyEditSetterContext } from '../PropertySettingProvider';
-import useAPI from 'hooks/useAPI';
 import Property from 'model/Property';
 
 const usePropertySetting = () => {
-  const { api } = useAPI();
   const property: Property = useContext(propertyContext);
   const propertyEdit: Property = useContext(propertyEditContext);
   const properties: Array<Property> = useContext(propertiesContext);

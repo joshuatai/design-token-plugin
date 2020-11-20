@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useState } from "react";
 import PropertyIcon from "./PropertyIcon";
 import PureTokens from "./PureTokens";
-import useThemeModes from 'hooks/useThemeModes';
+import useThemeModes from "hooks/useThemeModes";
 import useTokens from "hooks/useTokens";
 import useTokenSetting from "hooks/useTokenSetting";
 import usePropertySetting from "hooks/usePropertySetting";
@@ -15,12 +15,6 @@ import SelectText from "utils/SelectText";
 
 declare var $: any;
 SelectText(jQuery);
-// var Radius = function (element, options) {
-//   $(document).trigger('property-preview', [this.options]);
-// }
-// $(document).on(`${BrowserEvents.BLUR} `, `[property-component="Radius"] .separator-vals [data-separate-type], [property-component="Radius"] .corner-radius-val[contenteditable="true"]`, function (event) {
-//   $(document).trigger('property-preview', [options]);
-// });
 
 type T_CornerRadius = {
   value: Model;
@@ -33,7 +27,8 @@ const CornerRadius: FC<T_CornerRadius> = ({ value = null }: T_CornerRadius) => {
   const { getProperty } = useProperties();
   const { setPropertySetting } = usePropertySetting();
   const [setting, setSetting] = useState(
-    value || new Model({ parent: tokenSetting.token.id, themeMode: defaultMode.id })
+    value ||
+      new Model({ parent: tokenSetting.token.id, themeMode: defaultMode.id })
   );
   const [separateType, setSeparateType] = useState(defaultSeparateType);
   const {

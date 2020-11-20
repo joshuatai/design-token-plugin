@@ -21,11 +21,9 @@ const GroupProvider = ({ value = initialGroups, children }) => {
     </groupsContext.Provider>
   );
 };
-
 GroupProvider.propTypes = {
   value: PropTypes.array,
 };
-
 GroupProvider.displayName = "GroupProvider";
 
 export default GroupProvider;

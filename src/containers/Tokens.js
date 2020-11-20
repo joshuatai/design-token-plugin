@@ -36,7 +36,7 @@ const Tokens = ({ data = {
     const { setAllProperties } = useProperties();
     const { setAllThemeModes } = useThemeModes();
     const { setting, setTokenSetting, initialSetting } = useTokenSetting();
-    let $tokenSetting, $themeModeList, $versionCreator, $versionList;
+    let $versionCreator, $versionList;
     const [assignTokenNodes, setAssignTokenNodes] = useState([]);
     const Renderer = {
         version: function (version) {
@@ -58,12 +58,6 @@ const Tokens = ({ data = {
                 $remove
             })));
             return $version;
-        },
-        updateThemeMode: function () {
-            // $('#design-tokens-container .fill-color-icon').parent().each((index, item) => {
-            //   const { token } = $(item).data();
-            //   this.token(getToken(token));
-            // });
         }
     };
     function initVersion(versions) {
@@ -81,9 +75,6 @@ const Tokens = ({ data = {
         $name.selectText();
         setVersion(data);
     }
-    function updateCurrentThemeMode() {
-        // $tokenSetting.TokenSetting('changeThemeMode'); //change preview
-    }
     const onMessageReceived = (event) => {
         const msg = event.data.pluginMessage;
         if (msg.type === MessageTypes.GET_VERSIONS) {
@@ -98,7 +89,6 @@ const Tokens = ({ data = {
                 return selection.useTokens.some(tokenId => getToken(tokenId));
             });
             setAssignTokenNodes(assignTokenNodes);
-            // $('#design-tokens-container').trigger('click');
         }
     };
     const addPostMessageListener = () => {
@@ -114,9 +104,6 @@ const Tokens = ({ data = {
         $('a[data-toggle="tab"]').off('shown.bs.tab');
     };
     useEffect(() => {
-        $tokenSetting = $('#token-setting');
-        $themeModeList = $('#mode-list');
-        // $tabTokensAssigned = $('[aria-controls="selections"]').parent();
         $versionCreator = $('#version-creator');
         $versionList = $('#version-list');
         if (data.themeModes) {
@@ -152,7 +139,6 @@ const Tokens = ({ data = {
         //     }
         //   }, 400);
         // });
-        // $(document).on(`${BrowserEvents.KEY_UP}`, '.version-name', inputCheck);
         // $(document).on(BrowserEvents.CLICK, '#version-creator', function (e) {
         //   const $this = $(this);
         //   if ($this.is('[disabled]')) return;
@@ -171,7 +157,7 @@ const Tokens = ({ data = {
             fetchCurrentMode();
         }
     }, [themeModes.length]);
-    return (React.createElement(React.Fragment, null,
+    return (React.createElement("div", { className: admin ? 'admin' : '' },
         React.createElement("ul", { id: "desigin-system-tabs", className: "nav nav-tabs", role: "tablist" },
             React.createElement("li", { role: "presentation", className: "active" },
                 React.createElement("a", { href: `#${Tabs.TOKENS}`, "aria-controls": Tabs.TOKENS, role: "tab", "data-toggle": "tab", "aria-expanded": "true" }, "Tokens")),
@@ -181,8 +167,6 @@ const Tokens = ({ data = {
                 React.createElement("a", { href: `#${Tabs.THEME_MODES}`, "aria-controls": Tabs.THEME_MODES, role: "tab", "data-toggle": "tab" }, "Modes")),
             admin && React.createElement("li", { role: "presentation" },
                 React.createElement("a", { href: `#${Tabs.IO}`, "aria-controls": Tabs.IO, role: "tab", "data-toggle": "tab" }, "I/O")),
-            React.createElement("div", { id: "export", title: "Export a JSON file", className: "export" },
-                React.createElement("span", { className: "tmicon tmicon-export" })),
             React.createElement(ThemeModesSetter, null)),
         React.createElement("div", { className: "tab-content" },
             React.createElement("div", { role: "tabpanel", className: "tab-pane active", id: Tabs.TOKENS }, tab === 'tokens' ?
@@ -190,12 +174,11 @@ const Tokens = ({ data = {
                     React.createElement(TokenSetting, null) :
                     React.createElement(GroupsListContainer, null) :
                 null),
-            React.createElement("div", { role: "tabpanel", className: "tab-pane", id: Tabs.TOKENS_ASSIGNED },
-                React.createElement("div", { id: "assigned-tokens-node-list", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic" }, tab === 'tokens-assigned' ?
-                    setting.group ?
-                        React.createElement(TokenSetting, null) :
-                        React.createElement(AssignedTokenNodes, { data: assignTokenNodes }) :
-                    null)),
+            React.createElement("div", { role: "tabpanel", className: "tab-pane", id: Tabs.TOKENS_ASSIGNED }, tab === 'tokens-assigned' ?
+                setting.group ?
+                    React.createElement(TokenSetting, null) :
+                    React.createElement(AssignedTokenNodes, { data: assignTokenNodes }) :
+                null),
             React.createElement("div", { role: "tabpanel", className: "tab-pane", id: Tabs.THEME_MODES },
                 React.createElement(ThemeModesContainer, null)),
             admin && (React.createElement("div", { role: "tabpanel", className: "tab-pane", id: Tabs.IO },

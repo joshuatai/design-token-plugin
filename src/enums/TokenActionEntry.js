@@ -1,6 +1,6 @@
 var TokenActionEntry;
 (function (TokenActionEntry) {
-    TokenActionEntry[TokenActionEntry["TOKEN_LIST"] = 0] = "TOKEN_LIST";
-    TokenActionEntry[TokenActionEntry["ASSIGNED_LIST"] = 1] = "ASSIGNED_LIST";
+    TokenActionEntry["TOKEN_LIST"] = "Token List";
+    TokenActionEntry["ASSIGNED_LIST"] = "Assigned List";
 })(TokenActionEntry || (TokenActionEntry = {}));
 export default TokenActionEntry;

@@ -21,11 +21,9 @@ const PropertyProvider = ({ value = initialProperties, children }) => {
     </propertiesContext.Provider>
   );
 };
-
 PropertyProvider.propTypes = {
   value: PropTypes.array,
 };
-
 PropertyProvider.displayName = "PropertyProvider";
 
 export default PropertyProvider;

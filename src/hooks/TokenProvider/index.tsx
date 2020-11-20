@@ -35,11 +35,9 @@ const TokenProvider = ({ value = initialTokens, children }) => {
     </tokensContext.Provider>
   );
 };
-
 TokenProvider.propTypes = {
   value: PropTypes.array,
 };
-
 TokenProvider.displayName = "TokenProvider";
 
 export default TokenProvider;

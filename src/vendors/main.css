@@ -10055,6 +10055,7 @@ fieldset[disabled] .navbar-inverse .btn-link:focus {
 }
 .panel-group-collapse-basic > .panel > .panel-heading {
   background-color: #f4f4f4;
+  min-height: 32px;
 }
 .panel-group-collapse-basic > .panel > .panel-heading:hover {
   background-color: #eee;

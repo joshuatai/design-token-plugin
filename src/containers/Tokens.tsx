@@ -1,6 +1,5 @@
 import React, { useEffect, FC, useState } from 'react';
 import hash from 'hash.js';
-import _cloneDeep from 'lodash/cloneDeep';
 import useAPI from 'hooks/useAPI';
 import useTabs from 'hooks/useTabs';
 import useThemeModes from 'hooks/useThemeModes';
@@ -51,7 +50,7 @@ const Tokens:FC<Props> = ({
   const { setAllProperties } = useProperties();
   const { setAllThemeModes } = useThemeModes();
   const { setting, setTokenSetting, initialSetting} = useTokenSetting();
-  let $tokenSetting, $themeModeList, $versionCreator, $versionList;
+  let $versionCreator, $versionList;
 
   const [ assignTokenNodes, setAssignTokenNodes ] = useState([]);
 
@@ -85,12 +84,6 @@ const Tokens:FC<Props> = ({
         );
   
       return $version;
-    },
-    updateThemeMode: function () {
-      // $('#design-tokens-container .fill-color-icon').parent().each((index, item) => {
-      //   const { token } = $(item).data();
-      //   this.token(getToken(token));
-      // });
     }
   };
   function initVersion (versions: Array<Version>) {
@@ -108,30 +101,21 @@ const Tokens:FC<Props> = ({
     $name.selectText();
     setVersion(data);
   }
-  function updateCurrentThemeMode () {
-    
-    // $tokenSetting.TokenSetting('changeThemeMode'); //change preview
-    
-  }
-
   const onMessageReceived = (event) => {
     const msg = event.data.pluginMessage;
     
     if (msg.type === MessageTypes.GET_VERSIONS) {
       initVersion(msg.message);
     }
-    
     if (msg.type === MessageTypes.FETCH_CURRENT_THEME_MODE) {
       const themeId = msg.message;
       setCurrentMode(themeId ? getThemeMode(themeId) as ThemeMode : defaultMode);
     }
-
     if (msg.type === MessageTypes.SELECTION_CHANGE) {
       const assignTokenNodes = msg.message.filter(selection => {
         return selection.useTokens.some(tokenId => getToken(tokenId));
       });
       setAssignTokenNodes(assignTokenNodes);
-      // $('#design-tokens-container').trigger('click');
     }
   }
   const addPostMessageListener = () => {
@@ -142,16 +126,12 @@ const Tokens:FC<Props> = ({
       setTokenSetting(Object.assign({}, initialSetting));
     });
   }
-    
   const removePostMessageListener = () => {
     window.removeEventListener("message", onMessageReceived);
     $('a[data-toggle="tab"]').off('shown.bs.tab');
   }
 
   useEffect(() => {
-    $tokenSetting = $('#token-setting');
-    $themeModeList = $('#mode-list');
-    // $tabTokensAssigned = $('[aria-controls="selections"]').parent();
     $versionCreator = $('#version-creator');
     $versionList = $('#version-list');
 
@@ -190,7 +170,6 @@ const Tokens:FC<Props> = ({
     //     }
     //   }, 400);
     // });
-    // $(document).on(`${BrowserEvents.KEY_UP}`, '.version-name', inputCheck);
     // $(document).on(BrowserEvents.CLICK, '#version-creator', function (e) {
     //   const $this = $(this);
     //   if ($this.is('[disabled]')) return;
@@ -214,7 +193,7 @@ const Tokens:FC<Props> = ({
     }
   }, [themeModes.length]);
   return (
-    <>
+    <div className={admin ? 'admin' : ''}>
       <ul id="desigin-system-tabs" className="nav nav-tabs" role="tablist">
         <li role="presentation" className="active"><a href={`#${Tabs.TOKENS}`} aria-controls={Tabs.TOKENS} role="tab" data-toggle="tab" aria-expanded="true">Tokens</a></li>
         <li role="presentation"><a href={`#${Tabs.TOKENS_ASSIGNED}`} aria-controls={Tabs.TOKENS_ASSIGNED} role="tab" data-toggle="tab">Assigned</a></li>
@@ -222,7 +201,7 @@ const Tokens:FC<Props> = ({
         {
           admin && <li role="presentation"><a href={`#${Tabs.IO}`} aria-controls={Tabs.IO} role="tab" data-toggle="tab">I/O</a></li>
         }
-        <div id="export" title="Export a JSON file" className="export"><span className="tmicon tmicon-export"></span></div>
+        {/* <div id="export" title="Export a JSON file" className="export"><span className="tmicon tmicon-export"></span></div> */}
         <ThemeModesSetter></ThemeModesSetter>
       </ul>
       <div className="tab-content">
@@ -236,15 +215,13 @@ const Tokens:FC<Props> = ({
           }
         </div>
         <div role="tabpanel" className="tab-pane" id={Tabs.TOKENS_ASSIGNED}>
-          <div id="assigned-tokens-node-list" className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic">
-            {
-              tab === 'tokens-assigned' ?
-              setting.group ?
-              <TokenSetting></TokenSetting>:
-              <AssignedTokenNodes data={assignTokenNodes}></AssignedTokenNodes>:
-              null
-            }
-          </div>     
+          {
+            tab === 'tokens-assigned' ?
+            setting.group ?
+            <TokenSetting></TokenSetting>:
+            <AssignedTokenNodes data={assignTokenNodes}></AssignedTokenNodes>:
+            null
+          }
         </div>
         <div role="tabpanel" className="tab-pane" id={Tabs.THEME_MODES}>
           <ThemeModesContainer></ThemeModesContainer>
@@ -268,7 +245,7 @@ const Tokens:FC<Props> = ({
           )
         }
       </div>
-    </>
+    </div>
   );
 };
 

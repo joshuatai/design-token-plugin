@@ -14,7 +14,6 @@ const initialThemeModes: Array<ThemeMode> = [];
 const initialThemeModesSetter = {
   setThemeModes: null
 };
-
 const currentModeContext = React.createContext(currentPageMode);
 const currentModeSetterContext = React.createContext(currentPageModeSetter);
 const defaultModeContext = React.createContext(initialDefaultMode);
@@ -50,11 +49,9 @@ const ThemeModesProvider = ({ value = initialThemeModes, children }) => {
     </ThemeModesContext.Provider>
   );
 };
-
 ThemeModesProvider.propTypes = {
   value: PropTypes.array,
 };
-
 ThemeModesProvider.displayName = "ThemeModesProvider";
 
 export default ThemeModesProvider;

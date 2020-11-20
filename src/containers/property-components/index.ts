@@ -1,11 +1,9 @@
-import BrowserEvents from 'enums/BrowserEvents';
 import PropertyTypes from 'enums/PropertyTypes';
 import CornerRadius from './CornerRadius';
 import FillColor from './FillColor';
 import StrokeWidthAlign from './StrokeWidthAlign';
 import Opacity from './Opacity';
 import FamilyStyle from './FontFamilyStyle';
-
 import Spacing from './Spacing';
 
 $(document).on(
@@ -34,7 +32,6 @@ $(document).on(
     }
   }
 );
-
 
 export default {
   [PropertyTypes.CORNER_RADIUS]: CornerRadius,

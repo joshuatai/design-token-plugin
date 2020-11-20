@@ -20,11 +20,9 @@ const FontProvider = ({ value = initialFonts, children }) => {
     </fontsContext.Provider>
   );
 };
-
 FontProvider.propTypes = {
   value: PropTypes.array,
 };
-
 FontProvider.displayName = "FontProvider";
 
 export default FontProvider;

@@ -1,4 +1,4 @@
-import React, { FC, ReactElement, useEffect, useState } from "react";
+import React, { FC, ReactElement, useState } from "react";
 import TokenAction from "./TokenAction";
 import PropertyIcon from "./property-components/PropertyIcon";
 import { sendMessage } from "model/DataManager";
@@ -9,6 +9,7 @@ import usePropertyInfo from "hooks/usePropertyInfo";
 import MessageTypes from "enums/MessageTypes";
 import TokenActionEntry from "enums/TokenActionEntry";
 import { Mixed } from "symbols/index";
+import Property from "model/Property";
 
 type T_TokenItem = {
   token: Token;
@@ -24,14 +25,14 @@ const TokenItem: FC<T_TokenItem> = ({
   const { id, name, properties, propertyType } = token;
   const [contextmenu, setContextmenu] = useState(false);
   const { getProperty } = useProperties();
-  const propertyIconOptions = properties.map((prop) => getProperty(prop));
+  const propertyIconOptions = properties.map(propId => (getProperty(propId) as Property));
   const { type } = usePropertyInfo(propertyIconOptions, true);
   const contextMenuHandler = (e) => {
-    if (!admin) return;
-    setContextmenu(true);
+    if (admin || (!admin && from === TokenActionEntry.ASSIGNED_LIST)) {
+      setContextmenu(true);
+    }
   };
   const mouseLeaveHandler = (e) => {
-    if (!admin) return;
     setContextmenu(false);
   };
   const assignTokenHandler = (e) => {
@@ -47,7 +48,9 @@ const TokenItem: FC<T_TokenItem> = ({
       onMouseLeave={mouseLeaveHandler}
       onClick={assignTokenHandler}
     >
-      <span className="sortable-handler"></span>
+      {
+        admin && <span className="sortable-handler ui-sortable-handle"></span>
+      }
       {propertyType !== Mixed && (
         <PropertyIcon
           options={propertyIconOptions}

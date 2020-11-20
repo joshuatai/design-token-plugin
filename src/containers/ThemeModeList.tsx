@@ -11,6 +11,7 @@ import InputStatus from 'enums/InputStatus';
 
 declare var $: any;
 SelectText(jQuery);
+
 type T_ThemeModeItem = {
   data: {
     id: string,
@@ -19,7 +20,6 @@ type T_ThemeModeItem = {
   },
   creatable
 }
-
 const ThemeModeItem:FC<T_ThemeModeItem> = ({
   data,
   creatable
@@ -28,7 +28,6 @@ const ThemeModeItem:FC<T_ThemeModeItem> = ({
   const { saveThemeModes } = useData();
   const { getThemeMode, addThemeMode, removeThemeMode, updateCurrentMode } = useThemeModes();
   const $modeName = useRef();
-
   const removeHandler = (e) => {
     if (!data.isDefault) {
       const themeModes = removeThemeMode(data as ThemeMode);

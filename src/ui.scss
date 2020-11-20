@@ -291,6 +291,12 @@ body {
     background-color: #e5f4ff;
   }
 }
+.token-list > li {
+  padding-left: 0;
+  .admin & {
+    padding-left: 12px;
+  }
+}
 #version-list li {
   padding: 0;
 }
@@ -359,9 +365,6 @@ body {
       &:hover {
         background: #f4f4f4;
       }
-      &.editable {
-        cursor: pointer;
-      }
       .property-name {
         width: 75px;
       }
@@ -373,6 +376,9 @@ body {
     }
 
   }
+}
+.admin #property-list li.editable {
+  cursor: pointer;
 }
 #property-setting {
   border-bottom: 1px dashed #aaa;

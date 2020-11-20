@@ -1,4 +1,4 @@
-import React, { FC, ReactElement, useEffect, useRef, useState } from "react";
+import React, { FC, ReactElement, useRef } from "react";
 import Group from "model/Group";
 import Token from "model/Token";
 import Properties from "model/Properties";
@@ -44,7 +44,6 @@ const TokenAction: FC<T_TokenAction> = ({
   } = useProperties();
   const $tokenActionRef = useRef();
   const tokenLinks = referedTokens(token.id).flat();
-
   const editHandler = (e) => {
     const _properties = token.properties.map((propId) => {
       const property = properties.find((prop) => prop.id === propId);
@@ -75,6 +74,7 @@ const TokenAction: FC<T_TokenAction> = ({
     preventEvent(e);
   };
   const cloneHandler = (e) => {
+    if (!admin) return;
     const { key, name, description, parent, properties, propertyType } = token;
     const group: Group = getGroup(parent) as Group;
     const newProperties = properties.map((_propId) => {
@@ -103,18 +103,20 @@ const TokenAction: FC<T_TokenAction> = ({
     preventEvent(e);
   };
   const unassignHandler = (e) => {
-    if (!admin) return;
-    const nodeId = e.target.closest('.assignedTokenNode').dataset['id'].replace('-', ':');
-    sendMessage(MessageTypes.UNASSIGN_TOKEN , {
-      nodeId,
-      tokenId: token.id
-    });
-    preventEvent(e);
+    if (admin || (!admin && from === TokenActionEntry.ASSIGNED_LIST)) {
+      const nodeId = e.target.closest('.assignedTokenNode').dataset['id'].replace('-', ':');
+      sendMessage(MessageTypes.UNASSIGN_TOKEN , {
+        nodeId,
+        tokenId: token.id
+      });
+      preventEvent(e);
+    }
   }
   const deleteTokenProps = {
     className: "delete-token",
     onClick: removeHandler,
   };
+
   if (tokenLinks.length) {
     delete deleteTokenProps.onClick;
     Object.assign(deleteTokenProps, {

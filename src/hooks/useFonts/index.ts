@@ -6,7 +6,6 @@ import MessageTypes from 'enums/MessageTypes';
 const useFonts = () => {
   const fonts: Array<Font> = useContext(fontsContext);
   const { setFonts } = useContext(fontsSetterContext);
-  
   const _getFont = (name?: string): Font | Array<Font> => {
     const font = fonts.slice().find(font => font.fontName.family  === name);
     return font || fonts;
@@ -14,11 +13,9 @@ const useFonts = () => {
   const _setFonts = (_fonts: Array<Font> = []) => {
     setFonts(_fonts);
   }
-
   const _fetchFonts = () => {
     sendMessage(MessageTypes.GET_FONTS);
   }
-
   return {
     fonts,
     getFont: _getFont,

@@ -1,13 +1,11 @@
 import { useContext } from 'react';
 import { propertiesContext, propertiesSetterContext } from '../PropertyProvider';
-import useAPI from 'hooks/useAPI';
 import { toSaveProperties } from 'hooks/useData';
 import useThemeModes from 'hooks/useThemeModes';
 import useTokens from 'hooks/useTokens';
 import { sendMessage } from 'model/DataManager';
 import MessageTypes from 'enums/MessageTypes';
 const useProperties = () => {
-    const { api } = useAPI();
     const { defaultMode } = useThemeModes();
     const { getToken } = useTokens();
     const properties = useContext(propertiesContext);
@@ -26,13 +24,18 @@ const useProperties = () => {
             return _properties.some(_propId => property.id === _propId);
         });
     };
-    const _removeProperty = (property) => {
-        const nextProperties = properties.slice().filter(_property => _property.id != property.id);
+    const _removeProperties = (_properties) => {
+        const nextProperties = properties.slice().filter(_property => !_properties.some(_prop => _prop.id === _property.id));
         _setAllProperties(nextProperties);
         return nextProperties;
     };
     const _addProperties = (_properties) => {
-        const nextProperties = properties.slice();
+        const relatedTokens = Object.keys(_properties.reduce((calc, prop) => (calc[prop.parent] = prop, calc), {}));
+        let nextProperties = properties.slice();
+        nextProperties = _removeProperties(relatedTokens.map(tokenId => {
+            const existProps = nextProperties.filter(prop => prop.parent === tokenId);
+            return existProps.filter(prop => !_properties.some(_prop => _prop.id === prop.id));
+        }).flat());
         const existIndex = _properties.map(_prop => nextProperties.findIndex(_property => _property.id === _prop.id));
         existIndex.forEach((existIndex, index) => {
             existIndex > -1 ? nextProperties.splice(existIndex, 1, _properties[index]) : nextProperties.push(_properties[index]);
@@ -45,7 +48,6 @@ const useProperties = () => {
         sendMessage(MessageTypes.SET_PROPERTIES, toSaveProperties(properties));
     };
     const _traversing = (token, applyMode) => {
-        // const useThemeMode = formTokenList ? getCurrentThemeMode() : applyModes;
         const useThemeMode = applyMode ? applyMode : defaultMode;
         const existCurrentModePropId = token.properties.find(id => _getProperty(id).themeMode === useThemeMode.id);
         const defaultModePropId = token.properties.find(id => _getProperty(id).themeMode === defaultMode.id);
@@ -63,7 +65,7 @@ const useProperties = () => {
         referedTokens: _referedTokens,
         getProperty: _getProperty,
         getProperties: _getProperties,
-        removeProperty: _removeProperty,
+        removeProperties: _removeProperties,
         addProperties: _addProperties,
         setAllProperties: _setAllProperties,
         traversing: _traversing

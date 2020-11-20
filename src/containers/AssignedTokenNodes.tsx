@@ -1,4 +1,5 @@
 import React, { useEffect, FC, ReactElement, useRef } from "react";
+import useAPI from 'hooks/useAPI';
 import useTokens from "hooks/useTokens";
 import useProperties from "hooks/useProperties";
 import { sendMessage } from 'model/DataManager';
@@ -15,7 +16,6 @@ const AssignedTokenNodes: FC<T_AssignedTokenNodes> = ({
   data,
 }: T_AssignedTokenNodes): ReactElement => {
   const { getToken } = useTokens();
-  const { getProperties } = useProperties();
   const $sortableRef = useRef(null);
   const setSortable = () => {
     $sortableRef.current
@@ -38,7 +38,7 @@ const AssignedTokenNodes: FC<T_AssignedTokenNodes> = ({
   const unsetSortable = () => {
     $sortableRef.current.sortable('destroy');
   }
-  useEffect(() => {data
+  useEffect(() => {
     if (data.length === 0 ) return;
     $sortableRef.current = $('.assignedTokenNode .sortable');
     setSortable();
@@ -46,7 +46,7 @@ const AssignedTokenNodes: FC<T_AssignedTokenNodes> = ({
   }, [data]);
 
   return (
-    <>
+    <div id="assigned-tokens-node-list" className="plugin-panel panel-group panel-group-collapse panel-group-collapse-basic">
       {data.map((node) => {
         let { id, name, useTokens } = node;
         const _id = id.replace(":", "-");
@@ -85,7 +85,7 @@ const AssignedTokenNodes: FC<T_AssignedTokenNodes> = ({
           </div>
         );
       })}
-    </>
+    </div>
   );
 };
 

@@ -14,11 +14,6 @@ import { inputCheck, valChange } from 'utils/inputValidator';
 
 declare var $: any;
 SelectText(jQuery);
-//   }
-//   $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .spacing-val[contenteditable="true"]`, function (event) {
-//     $(document).trigger('property-preview', [options]);
-//   });
-// }(jQuery);
 
 type T_Spacing = {
   value: Model
@@ -37,7 +32,6 @@ const Spacing: FC<T_Spacing> = ({
   const $spacingRef = useRef();
   const _useToken = getToken(useToken) as Token;
   const spacingValue = _useToken ? _useToken.name : spacing.toString();
-
   const focusHandler = (e) => {
     if (_useToken) return;
     const $target = e.target;
@@ -45,11 +39,9 @@ const Spacing: FC<T_Spacing> = ({
     $($target).selectText();
     if ($valContainer) $valContainer.classList.add('focus');
   }
-
   const keyUpHandler = (e) => {
     inputCheck.call(e.target, e);
   }
-
   const blurHandler = (e) => {
     const $target = e.target;
     const $valContainer = $target.closest('.val-container');
@@ -71,7 +63,6 @@ const Spacing: FC<T_Spacing> = ({
       });
       if ($valContainer) $valContainer.classList.remove('focus');
   }
-
   const useTokenHandler = (token) => {
     const usedToken: Token = getToken(token.id) as Token;
     const usedProperty: Model = getProperty(usedToken.properties[0]) as Model;
@@ -79,7 +70,6 @@ const Spacing: FC<T_Spacing> = ({
     setting.value = usedProperty.value;
     setSetting(new Model(setting));
   }
-
   const detachTokenHandler = () => {
     setting.useToken = '';
     setSetting(new Model(setting));
@@ -99,4 +89,5 @@ const Spacing: FC<T_Spacing> = ({
     </div>
   </div> : <></>
 }
+
 export default Spacing;

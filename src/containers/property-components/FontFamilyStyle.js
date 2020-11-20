@@ -197,9 +197,7 @@ const Font = ({ value = null }) => {
     };
     const detachTokenHandler = () => {
         const usedProperties = traversing(getToken(setting.useToken));
-        setting.useToken = '';
-        // if (usedProperties instanceof Array) {
-        // }
+        setting.useToken = "";
         setSetting(new Model(setting));
     };
     useEffect(() => {

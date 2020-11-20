@@ -29,7 +29,6 @@ const TokenSettingProvider = ({ value = initialTokenSetting, children }) => {
     </tokenSettingContext.Provider>
   );
 };
-
 TokenSettingProvider.propTypes = {
   value: PropTypes.object
 };

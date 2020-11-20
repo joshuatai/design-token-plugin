@@ -1,23 +1,8 @@
 import MessageTypes from 'enums/MessageTypes';
-import PropertyTypes from 'enums/PropertyTypes';
 export const JSONBIN_URL = `https://api.jsonbin.io`;
 const versions = [];
-const themeModes = [];
-const groups = [];
 const versionMap = {};
-const themeModeMap = {};
-const groupMap = {};
-const tokenMap = {};
-let APIKey;
-let collectionID;
-let tokensBinID;
-let VersionsBinID;
-let isAdmin = false;
-let saveData;
 let fonts = {};
-let propertiesMap = {};
-let currentThemeMode;
-const pureToken = Object.keys(PropertyTypes).reduce((calc, type) => (calc[PropertyTypes[type]] = {}, calc), {});
 const getFonts = () => fonts;
 const fetchInitial = () => {
     // sendMessage(MessageTypes.GET_VERSIONS);

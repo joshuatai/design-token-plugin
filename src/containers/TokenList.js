@@ -1,9 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import TokenItem from "./TokenItem";
+import useAPI from 'hooks/useAPI';
 import useData from "hooks/useData";
 import useGroups from "hooks/useGroups";
 import useTokens from "hooks/useTokens";
 const TokenList = ({ group = null }) => {
+    const { api: { admin } } = useAPI();
     const { saveGroups } = useData();
     const { addGroup } = useGroups();
     const { getToken } = useTokens();
@@ -30,10 +32,10 @@ const TokenList = ({ group = null }) => {
         }
     };
     useEffect(() => {
-        if (tokens.length > 1) {
+        if (tokens.length > 1 && admin) {
             setSortable();
+            return unsetSortable;
         }
-        return unsetSortable;
     }, []);
     return (React.createElement("ul", { ref: $tokensContainerRef, className: "token-list" }, tokens.map((token) => {
         return (React.createElement(TokenItem, { key: token.id, token: token }));

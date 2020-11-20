@@ -1,6 +1,7 @@
 import React from "react";
 import PropertySetting from "./PropertySetting";
 import PropertyIcon from "./property-components/PropertyIcon";
+import useAPI from 'hooks/useAPI';
 import useTabs from "hooks/useTabs";
 import useTokenSetting from "hooks/useTokenSetting";
 import usePropertySetting from "hooks/usePropertySetting";
@@ -25,6 +26,7 @@ const RemoveIcon = ({ referedTokens = [], removeHandler = null, }) => {
             React.createElement("path", { d: "M11.5 3.5H.5v-1h11v1z", fillRule: "nonzero", fillOpacity: "1", fill: "#000", stroke: "none" }))));
 };
 const PropertyItem = ({ property, }) => {
+    const { api: { admin } } = useAPI();
     const { tab } = useTabs();
     const { setting } = useTokenSetting();
     const { token } = setting;
@@ -33,12 +35,10 @@ const PropertyItem = ({ property, }) => {
     const { resetPropertySetting, propertyEdit, setPropertyEdit, } = usePropertySetting();
     const refereds = referedTokens(property.parent);
     const removeHandler = () => {
-        if (tab !== Tabs.TOKENS)
-            return;
         resetPropertySetting(property);
     };
     const showPropertySettingHandler = () => {
-        if (tab !== Tabs.TOKENS)
+        if (!admin || tab !== Tabs.TOKENS)
             return;
         setPropertyEdit(new Properties[property.type](property));
     };
@@ -53,7 +53,7 @@ const PropertyItem = ({ property, }) => {
             React.createElement("span", { className: "property-value", title: title }, value),
             secondValue && (React.createElement("span", { className: "property-second-value", title: title }, secondValue)),
             thridValue && (React.createElement("span", { className: "property-third-value", title: title }, thridValue)),
-            tab === Tabs.TOKENS && (React.createElement(RemoveIcon, { referedTokens: refereds, removeHandler: removeHandler }))),
-        propertyEdit && propertyEdit.id === property.id && (React.createElement(PropertySetting, { token: token, property: propertyEdit, hidePropertySetting: hidePropertySetting }))));
+            admin && tab === Tabs.TOKENS && (React.createElement(RemoveIcon, { referedTokens: refereds, removeHandler: removeHandler }))),
+        admin && propertyEdit && propertyEdit.id === property.id && (React.createElement(PropertySetting, { token: token, property: propertyEdit, hidePropertySetting: hidePropertySetting }))));
 };
 export default PropertyItem;

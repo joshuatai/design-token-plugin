@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+import BackButton from "./BackButton";
+import PropertyList from "./PropertyList";
+import PropertySetting from "./PropertySetting";
 import useAPI from "hooks/useAPI";
 import useTabs from 'hooks/useTabs';
-import useThemeModes from 'hooks/useThemeModes';
 import useTokenSetting from "hooks/useTokenSetting";
 import usePropertySetting from "hooks/usePropertySetting";
 import useData from "hooks/useData";
@@ -9,32 +11,19 @@ import useGroups from "hooks/useGroups";
 import useTokens from "hooks/useTokens";
 import useProperties from "hooks/useProperties";
 import Token from "model/Token";
-import BackButton from "./BackButton";
-import PropertyList from "./PropertyList";
-import PropertySetting from "./PropertySetting";
+import Tabs from 'enums/Tabs';
 import InputStatus from "enums/InputStatus";
 import { Mixed } from "symbols/index";
 import { inputCheck, valChange } from "utils/inputValidator";
 import SelectText from "utils/SelectText";
-import Tabs from 'enums/Tabs';
 SelectText(jQuery);
 // import _cloneDeep from 'lodash/cloneDeep';
 // import _findIndex from 'lodash/findIndex';
-// import BrowserEvents from '../enums/BrowserEvents';
-// import { getGroup, getToken, setToken, syncToken, save, syncNode } from '../model/DataManager';
 // import PropertyView from './PropertyView';
-//
-// PropertyView(jQuery);
-// export default function ($) {
-//     this.$element = $(element)
-//       .append($propertyView)
 //     if (this.token.properties.length > 0) {
 //       this.$propertyView.propertyView(this.token.properties);
 //     }
 //   TokenSetting.prototype.choosePropertyType = function (param) {
-//     let type = param;
-//     let settings;
-//     this.$propertySettingSections.empty();
 //     if (typeof param === 'object') {
 //       type = param[0].type;
 //       this.$settingUpdateBtn.show();
@@ -56,28 +45,19 @@ SelectText(jQuery);
 //     }
 //     this.$propertyView.propertyView(tmpProperties);
 //   }
-//   TokenSetting.prototype.changeThemeMode = function () {
-//     this.$propertyView.propertyView('rerender');
-//   }
-//   $(document).on('property-sort', '#property-list', function (event, properties) {
-//     hostData.token.properties = properties;
-//     hostData.updateProperty();
-//   });
 //   $(document).on('property-preview', function (event, property) {
 //     hostData.propertyView(property);
 //   });
-// }(jQuery);
 const TokenSetting = () => {
     const { api: { admin }, } = useAPI();
     const { tab } = useTabs();
-    const { updateCurrentMode } = useThemeModes();
     const { initialSetting, setting, setToken, setTokenSetting, } = useTokenSetting();
     const { group, token } = setting;
     const { propertiesSetting, setPropertiesSetting, setPropertyEdit, } = usePropertySetting();
     const { saveTokensProperties } = useData();
     const { addGroup } = useGroups();
     const { addToken, syncToken } = useTokens();
-    const { addProperties, referedProperties, getProperty } = useProperties();
+    const { addProperties, referedProperties } = useProperties();
     const [showPropertySetting, setShowPropertySetting] = useState(false);
     const [creatable, setCreatable] = useState(token && token.name ? true : false);
     const $name = useRef();
@@ -198,10 +178,10 @@ const TokenSetting = () => {
             React.createElement("span", { ref: $description, className: "token-description", "prop-type": "description", placeholder: "Description", contentEditable: "false", suppressContentEditableWarning: true, onClick: focusHandler, onKeyUp: inputHandler, onBlur: blurHandler }, token.description)),
         React.createElement("div", { id: "property-view", className: "setting-row" }),
         React.createElement(PropertyList, null),
-        token && !showPropertySetting && tab === Tabs.TOKENS && (React.createElement("div", { className: "setting-row" },
+        admin && token && !showPropertySetting && tab === Tabs.TOKENS && (React.createElement("div", { className: "setting-row" },
             React.createElement("button", { id: "add-property", type: "button", disabled: !creatable, onClick: showPropertySettingHandler }, "Create A Property"))),
-        showPropertySetting && (React.createElement(PropertySetting, { token: token, hidePropertySetting: hidePropertySettingHandler })),
-        tab === Tabs.TOKENS && propertiesSetting.length > 0 && (React.createElement("div", { className: "setting-row" },
+        admin && showPropertySetting && (React.createElement(PropertySetting, { token: token, hidePropertySetting: hidePropertySettingHandler })),
+        admin && tab === Tabs.TOKENS && propertiesSetting.length > 0 && (React.createElement("div", { className: "setting-row" },
             React.createElement("button", { id: "save-button-container", type: "button", className: "btn btn-sm btn-primary", disabled: token.name === "", onClick: saveTokenHandler }, "Save"))))));
 };
 export default TokenSetting;

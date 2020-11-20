@@ -50,7 +50,6 @@ const PropertySettingProvider = ({ value = initialProperties, children }) => {
     </propertiesContext.Provider>
   );
 };
-
 PropertySettingProvider.propTypes = {
   value: PropTypes.object
 };

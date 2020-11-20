@@ -55,6 +55,8 @@ const TokenAction = ({ token, showDropdown = false, setShowDropdown = null, from
         preventEvent(e);
     };
     const cloneHandler = (e) => {
+        if (!admin)
+            return;
         const { key, name, description, parent, properties, propertyType } = token;
         const group = getGroup(parent);
         const newProperties = properties.map((_propId) => {
@@ -78,14 +80,14 @@ const TokenAction = ({ token, showDropdown = false, setShowDropdown = null, from
         preventEvent(e);
     };
     const unassignHandler = (e) => {
-        if (!admin)
-            return;
-        const nodeId = e.target.closest('.assignedTokenNode').dataset['id'].replace('-', ':');
-        sendMessage(MessageTypes.UNASSIGN_TOKEN, {
-            nodeId,
-            tokenId: token.id
-        });
-        preventEvent(e);
+        if (admin || (!admin && from === TokenActionEntry.ASSIGNED_LIST)) {
+            const nodeId = e.target.closest('.assignedTokenNode').dataset['id'].replace('-', ':');
+            sendMessage(MessageTypes.UNASSIGN_TOKEN, {
+                nodeId,
+                tokenId: token.id
+            });
+            preventEvent(e);
+        }
     };
     const deleteTokenProps = {
         className: "delete-token",

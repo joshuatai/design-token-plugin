@@ -2,7 +2,6 @@ import React, { FC, ReactElement } from "react";
 import { ThemeModeIcon } from './property-components/ThemeModes';
 import useThemeModes from 'hooks/useThemeModes';
 import ThemeMode from 'model/ThemeMode';
-// import { setCurrentThemeMode } from "model/DataManager";
 
 const ThemeModesSetter: FC = (): ReactElement => {
   const { themeModes, currentMode, getThemeMode, setCurrentMode } = useThemeModes();
@@ -11,7 +10,7 @@ const ThemeModesSetter: FC = (): ReactElement => {
     setCurrentMode(getThemeMode(modeId) as ThemeMode);
   }
   return currentMode ? <div className="dropdown theme-modes">
-    <ThemeModeIcon title={currentMode.name}></ThemeModeIcon>
+    <ThemeModeIcon title={`Current page's theme mode: ${currentMode.name}`}></ThemeModeIcon>
     <ul className="dropdown-menu dropdown-menu-multi-select pull-right">
       {
         themeModes.map((mode: ThemeMode) =>

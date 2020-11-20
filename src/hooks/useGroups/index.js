@@ -1,11 +1,7 @@
 import { useContext } from 'react';
 import { groupsContext, groupsSetterContext } from '../GroupProvider';
-import useAPI from 'hooks/useAPI';
-import useData from 'hooks/useData';
 import Group from 'model/Group';
 const useGroups = () => {
-    const { api } = useAPI();
-    const { saveGroups } = useData();
     const groups = useContext(groupsContext);
     const { setGroups } = useContext(groupsSetterContext);
     const _getGroup = (id) => {

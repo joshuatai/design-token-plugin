@@ -14,7 +14,7 @@ import PropertyTypes from "enums/PropertyTypes";
 type T_PropertySetting = {
   token: Token;
   property?: Property;
-  hidePropertySetting?: React.MouseEventHandler;
+  hidePropertySetting?: MouseEventHandler;
 };
 const PropertySetting: FC<T_PropertySetting> = ({
   token = null,
@@ -27,7 +27,6 @@ const PropertySetting: FC<T_PropertySetting> = ({
     setPropertySetting,
     createPropertySetting,
   } = usePropertySetting();
-
   const [choosedType, setChoosedType] = useState(
     property ? property.type : undefined
   );

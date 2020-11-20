@@ -16,6 +16,7 @@ const ThemeModesContainer: FC = () => {
     setCreateEnable(false);
     addThemeMode(newMode);
   };
+
   return <div id="mode-setting" className="plugin-panel">
     <ThemeModeList creatable={setCreateEnable}></ThemeModeList>
     {

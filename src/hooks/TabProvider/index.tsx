@@ -22,11 +22,9 @@ const TabProvider = ({ value = initialTab, children }) => {
     </tabContext.Provider>
   );
 };
-
 TabProvider.propTypes = {
   value: PropTypes.string,
 };
-
 TabProvider.displayName = "TabProvider";
 
 export default TabProvider;

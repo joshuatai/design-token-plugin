@@ -12,7 +12,6 @@ const GroupsContainer: FC = () => {
   const { saveGroups } = useData();
   const { addGroup } = useGroups();
   const [ createEnable, setCreateEnable ] = useState(true);
-
   const createGroupHandler = (e) => {
     if (!admin) return;
     const newGroup = new Group({

@@ -1,6 +1,7 @@
 import React, { FC, ReactElement, MouseEventHandler } from "react";
 import PropertySetting from "./PropertySetting";
 import PropertyIcon from "./property-components/PropertyIcon";
+import useAPI from 'hooks/useAPI';
 import useTabs from "hooks/useTabs";
 import useTokenSetting from "hooks/useTokenSetting";
 import usePropertySetting from "hooks/usePropertySetting";
@@ -58,6 +59,7 @@ type T_PropertyItem = {
 const PropertyItem: FC<T_PropertyItem> = ({
   property,
 }: T_PropertyItem): ReactElement => {
+  const { api: { admin } } = useAPI();
   const { tab } = useTabs();
   const { setting } = useTokenSetting();
   const { token } = setting;
@@ -70,18 +72,16 @@ const PropertyItem: FC<T_PropertyItem> = ({
   } = usePropertySetting();
   const refereds = referedTokens(property.parent) as Array<Token>;
   const removeHandler = () => {
-    if (tab !== Tabs.TOKENS) return;
     resetPropertySetting(property);
   };
   const showPropertySettingHandler = () => {
-    if (tab !== Tabs.TOKENS) return;
+    if (!admin || tab !== Tabs.TOKENS) return;
     setPropertyEdit(new Properties[property.type](property));
   };
-
   const hidePropertySetting = () => {
     setPropertyEdit(null);
   };
-  
+
   return (
     <>
       <li
@@ -105,14 +105,14 @@ const PropertyItem: FC<T_PropertyItem> = ({
             {thridValue}
           </span>
         )}
-        {tab === Tabs.TOKENS && (
+        {admin && tab === Tabs.TOKENS && (
           <RemoveIcon
             referedTokens={refereds}
             removeHandler={removeHandler}
           ></RemoveIcon>
         )}
       </li>
-      {propertyEdit && propertyEdit.id === property.id && (
+      {admin && propertyEdit && propertyEdit.id === property.id && (
         <PropertySetting
           token={token}
           property={propertyEdit}

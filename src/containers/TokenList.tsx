@@ -2,6 +2,7 @@ import React, { useEffect, FC, useRef, ReactElement } from "react";
 import TokenItem from "./TokenItem";
 import Group from "model/Group";
 import Token from "model/Token";
+import useAPI from 'hooks/useAPI';
 import useData from "hooks/useData";
 import useGroups from "hooks/useGroups";
 import useTokens from "hooks/useTokens";
@@ -12,12 +13,12 @@ type T_TokenList = {
 const TokenList: FC<T_TokenList> = ({
   group = null
 }: T_TokenList): ReactElement => {
+  const { api: { admin } } = useAPI();
   const { saveGroups } = useData();
   const { addGroup } = useGroups();
   const { getToken } = useTokens();
   const tokens = group.tokens.map((id) => getToken(id));
   const $tokensContainerRef = useRef();
-
   const setSortable = () => {
     $($tokensContainerRef.current)
       .sortable({
@@ -40,11 +41,12 @@ const TokenList: FC<T_TokenList> = ({
       $($tokensContainerRef.current).sortable('destroy');
     }
   }
+
   useEffect(() => {
-    if (tokens.length > 1) {
+    if (tokens.length > 1 && admin) {
       setSortable();
+      return unsetSortable;
     }
-    return unsetSortable;
   }, []);
 
   return (

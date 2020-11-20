@@ -8,15 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 import React, { useRef, useEffect, useState } from "react";
-import { inputCheck, valChange } from 'utils/inputValidator';
-import preventEvent from 'utils/preventEvent';
-import useAPI from 'hooks/useAPI';
-import SelectText from 'utils/SelectText';
+import { inputCheck, valChange } from "utils/inputValidator";
+import preventEvent from "utils/preventEvent";
+import useAPI from "hooks/useAPI";
+import SelectText from "utils/SelectText";
 import BrowserEvents from "enums/BrowserEvents";
-import './index.scss';
+import "./index.scss";
 SelectText(jQuery);
 const APISetting = ({ dataRef }) => {
-    const { api: { apiKey, tokensID }, connectAPI, setAPI } = useAPI();
+    const { api: { apiKey, tokensID }, connectAPI, setAPI, } = useAPI();
     const [processing, setProcessing] = useState(false);
     const [savable, setSavable] = useState(false);
     const apiKeyRef = useRef(null);
@@ -41,7 +41,9 @@ const APISetting = ({ dataRef }) => {
             const input = e.target;
             if (inputs.indexOf(input) > -1) {
                 inputCheck.call(input, e);
-                if (_apiKeyInput.getAttribute('invalid') || _binIDInput.getAttribute('invalid') || _adminPWDInput.getAttribute('invalid')) {
+                if (_apiKeyInput.getAttribute("invalid") ||
+                    _binIDInput.getAttribute("invalid") ||
+                    _adminPWDInput.getAttribute("invalid")) {
                     setSavable(false);
                 }
                 else {
@@ -56,10 +58,10 @@ const APISetting = ({ dataRef }) => {
         _inputBlur = (e) => {
             const input = e.target;
             if (inputs.indexOf(input) > -1) {
-                valChange.call(input)
-                    .then(res => { })
-                    .catch(res => {
-                });
+                valChange
+                    .call(input)
+                    .then((res) => { })
+                    .catch((res) => { });
             }
         };
         document.addEventListener(BrowserEvents.CLICK, _inputEdit);
@@ -76,11 +78,11 @@ const APISetting = ({ dataRef }) => {
         _binIDInput = binIDRef.current;
         _adminPWDInput = adminPWDRef.current;
         errorTarget = {
-            'Invalid secret key provided': _apiKeyInput,
-            'Invalid secret key provided.': _apiKeyInput,
-            'Invalid secret-key provided': _apiKeyInput,
-            'Invalid Record ID': _binIDInput,
-            'Invalid password': _adminPWDInput
+            "Invalid secret key provided": _apiKeyInput,
+            "Invalid secret key provided.": _apiKeyInput,
+            "Invalid secret-key provided": _apiKeyInput,
+            "Invalid Record ID": _binIDInput,
+            "Invalid password": _adminPWDInput,
         };
         addInputListener([_apiKeyInput, _binIDInput, _adminPWDInput]);
         if (!apiKey)
@@ -93,7 +95,7 @@ const APISetting = ({ dataRef }) => {
         const _password = _adminPWDInput.textContent;
         setProcessing(true);
         connectAPI(_apiKey, _tokensID, _password)
-            .then(res => {
+            .then((res) => {
             setProcessing(false);
             if (res.success) {
                 dataRef.current = res.data;
@@ -104,27 +106,27 @@ const APISetting = ({ dataRef }) => {
                     versionsID: res.vid,
                     lastVersion: res.lastV,
                     adminID: res.aid,
-                    admin: res.admin
+                    admin: res.admin,
                 });
             }
         })
-            .catch(e => {
+            .catch((e) => {
             setProcessing(false);
             const $target = errorTarget[e.message];
             if ($target) {
                 $($target).selectText();
-                $target.setAttribute('invalid', true);
+                $target.setAttribute("invalid", true);
             }
         });
     });
     return (React.createElement("div", { className: "api-setting-panel" },
         React.createElement("label", null, "API Key"),
-        React.createElement("div", { ref: apiKeyRef, className: `api-key ${processing ? 'disabled' : ''}`, "prop-name": "key", "is-required": "true", contentEditable: "true", suppressContentEditableWarning: true }, apiKey),
+        React.createElement("div", { ref: apiKeyRef, className: `api-key ${processing ? "disabled" : ""}`, "prop-name": "key", "is-required": "true", contentEditable: "true", suppressContentEditableWarning: true }, apiKey),
         React.createElement("label", null, "Bin ID"),
-        React.createElement("div", { ref: binIDRef, className: `bin-id ${processing ? 'disabled' : ''}`, "prop-name": "bin-id", contentEditable: "false", suppressContentEditableWarning: true }, tokensID),
+        React.createElement("div", { ref: binIDRef, className: `bin-id ${processing ? "disabled" : ""}`, "prop-name": "bin-id", contentEditable: "false", suppressContentEditableWarning: true }, tokensID),
         React.createElement("span", { className: "text-muted" }, "Enter an existing Bin ID or leave it blank to generate a new Bin."),
         React.createElement("label", null, "Admin Password"),
-        React.createElement("div", { ref: adminPWDRef, className: `admin-pwd ${processing ? 'disabled' : ''}`, "prop-name": "password", contentEditable: "false", suppressContentEditableWarning: true }),
+        React.createElement("div", { ref: adminPWDRef, className: `admin-pwd ${processing ? "disabled" : ""}`, "prop-name": "password", contentEditable: "false", suppressContentEditableWarning: true }),
         React.createElement("span", { className: "text-muted" }, "Required for the first time setup or the administrator. For password, it is at least 8-16 characters."),
         React.createElement("button", { className: "btn btn-primary", onClick: settingHandler, disabled: processing || !savable },
             processing && React.createElement("span", { className: "loader loader-small" }),

@@ -35,7 +35,6 @@ const PureTokens: FC<T_PureTokens> = ({
     traversing(referId, itemId);
     return hasRefer;
   }
-  
   const $pureTokens = pureTokens
     .map((token) => {
       let selected = false;

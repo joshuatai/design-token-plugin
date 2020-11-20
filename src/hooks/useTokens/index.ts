@@ -1,16 +1,14 @@
 import { useContext } from 'react';
-import { tokensContext, tokensSetterContext, purePropertyTokensContext, purePropertyTokensSetterContext } from '../TokenProvider';
-import useAPI from 'hooks/useAPI';
+import { tokensContext, tokensSetterContext, purePropertyTokensContext, purePropertyTokensSetterContext } from 'hooks/TokenProvider';
 import { toSaveTokens } from 'hooks/useData';
 import Token from 'model/Token';
+import Property from 'model/Property';
 import { Mixed } from 'symbols/index';
 import PropertyTypes from 'enums/PropertyTypes';
-import MessageTypes from 'enums/MessageTypes'
-;import { sendMessage } from 'model/DataManager';
-import Property from 'model/Property';
+import MessageTypes from 'enums/MessageTypes';
+import { sendMessage } from 'model/DataManager';
 
 const useTokens = () => {
-  const { api } = useAPI();
   const tokens: Array<Token> = useContext(tokensContext);
   const { setTokens } = useContext(tokensSetterContext);
   const pureTokens = useContext(purePropertyTokensContext);
@@ -18,7 +16,6 @@ const useTokens = () => {
 
   const _getPureTokensByProperty = (property: Property) => {
     const types = property.type === PropertyTypes.STROKE_FILL ? [PropertyTypes.FILL_COLOR, PropertyTypes.STROKE_FILL] : [property.type];
-
     return types
       .map(type => pureTokens[type])
       .filter(tokens => tokens)

@@ -32,7 +32,6 @@ const DataProvider = ({ children }) => {
     </APIProvider>
   );
 };
-
 DataProvider.propTypes = {
 };
 DataProvider.displayName = "DataProvider";

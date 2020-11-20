@@ -103,6 +103,7 @@ const GroupItem:FC<T_Group> = ({
     className: 'delete-group',
     onClick: removeGroupHandler
   };
+
   if (tokenLinks.length) {
     delete deleteGroupProps.onClick;
     Object.assign(deleteGroupProps, {
@@ -139,7 +140,7 @@ const GroupItem:FC<T_Group> = ({
           </button>
         }
         {
-          admin && 
+          admin &&
           <ul className="contextmenu dropdown-menu pull-right">
             <li {...deleteGroupProps}><a href="#">Delete Group</a></li>
           </ul>
@@ -155,7 +156,6 @@ const GroupItem:FC<T_Group> = ({
 type T_GroupsList = {
   creatable
 }
-
 const GroupsList: FC<T_GroupsList> = ({
   creatable
 }: T_GroupsList) => {

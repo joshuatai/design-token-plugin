@@ -1,6 +1,6 @@
 enum TokenActionEntry {
-  TOKEN_LIST,
-  ASSIGNED_LIST
+  TOKEN_LIST = 'Token List',
+  ASSIGNED_LIST = 'Assigned List'
 }
 
 export default TokenActionEntry;

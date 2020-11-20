@@ -15,11 +15,6 @@ import { inputCheck, valChange } from 'utils/inputValidator';
 
 declare var $: any;
 SelectText(jQuery);
-// function t() {
-//   $(document).on(`${BrowserEvents.BLUR} ${BrowserEvents.KEY_UP}`, `[property-component="${NAME}"] .opacity-val[contenteditable="true"]`, function (event) {
-//     $(document).trigger('property-preview', [options]);
-//   });
-// }
 
 type T_Opacity = {
   value: Model
@@ -38,7 +33,6 @@ const Opacity: FC<T_Opacity> = ({
   const $opacityRef = useRef();
   const _useToken = getToken(useToken) as Token;
   const opacityValue: string = _useToken ? _useToken.name : `${opacity}%`;
-
   const focusHandler = (e) => {
     if (_useToken) return;
     const $target = e.target;

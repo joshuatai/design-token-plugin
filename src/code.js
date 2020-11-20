@@ -94,7 +94,7 @@ function traversingUseToken(token) {
 //Done
 function assignProperty(properties, node) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log(properties, node);
+        // console.log(properties, node);
         const defaultMode = defaultThemeMode.id;
         const useThemeMode = figma.currentPage.getPluginData('themeMode');
         const cornerRadius = properties[PropertyTypes.CORNER_RADIUS];

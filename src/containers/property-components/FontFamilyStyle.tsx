@@ -14,7 +14,6 @@ import { inputCheck, valChange } from "utils/inputValidator";
 import InputStatus from "enums/InputStatus";
 import FontStyls from "enums/FontStyles";
 
-declare function require(path: string): any;
 declare var $: any;
 SelectText(jQuery);
 
@@ -204,9 +203,7 @@ const Font: FC<T_Font> = ({ value = null }: T_Font) => {
   };
   const detachTokenHandler = () => {
     const usedProperties = traversing(getToken(setting.useToken));
-    setting.useToken = '';
-    // if (usedProperties instanceof Array) {
-    // }
+    setting.useToken = "";
     setSetting(new Model(setting));
   };
 

@@ -1,10 +1,8 @@
 import { useContext } from 'react';
 import { ThemeModesContext, ThemeModesSetterContext, defaultModeContext, defaultModeContextSetterContext, currentModeContext, currentModeSetterContext } from '../ThemeModeProvider';
-import useAPI from 'hooks/useAPI';
 import MessageTypes from 'enums/MessageTypes';
 import { sendMessage } from 'model/DataManager';
 const useThemeModes = () => {
-    const { api } = useAPI();
     const defaultMode = useContext(defaultModeContext);
     const { setDefaultMode } = useContext(defaultModeContextSetterContext);
     const currentMode = useContext(currentModeContext);
@@ -15,7 +13,6 @@ const useThemeModes = () => {
     const _removeThemeMode = (mode) => {
         const nextThemeModes = themeModes.slice().filter(_mode => _mode.id != mode.id);
         _setAllThemeModes(nextThemeModes);
-        console.log(currentMode, mode);
         return nextThemeModes;
     };
     const _addThemeMode = (mode) => {

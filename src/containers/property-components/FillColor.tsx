@@ -45,7 +45,6 @@ const FillColor: FC<T_FillColor> = ({
   const _useToken = getToken(useToken) as Token;
   const colorValue: string = _useToken ? _useToken.name : color;
   const opacityValue: string = opacity.toString();
-
   const focusHandler = (e) => {
     if (_useToken) return;
     const $target = e.target;
@@ -53,11 +52,9 @@ const FillColor: FC<T_FillColor> = ({
     $($target).selectText();
     if ($valContainer) $valContainer.classList.add('focus');
   }
-
   const keyUpHandler = (e) => {
     inputCheck.call(e.target, e);
   }
-
   const blurHandler = (e) => {
     const $target = e.target;
     const $valContainer = $target.closest('.val-container');
@@ -89,12 +86,10 @@ const FillColor: FC<T_FillColor> = ({
       
       if ($valContainer) $valContainer.classList.remove('focus');
   }
-
   const useThemeHandler = (mode) => {
     setting.themeMode = mode.id;
     setSetting(new Model(setting));
   }
-
   const useTokenHandler = (usedToken) => {
     const usedProperty = propType === PropertyTypes.FILL_COLOR ? traversing(usedToken, getThemeMode(setting.themeMode)) as FillColorModel : traversing(usedToken, getThemeMode(setting.themeMode)) as StrokeColorModel;
     setting.useToken = usedToken.id;
@@ -105,7 +100,6 @@ const FillColor: FC<T_FillColor> = ({
     setting.visible = usedProperty.visible;
     setSetting(new Model(setting));
   }
-
   const detachTokenHandler = () => {
     const usedProperties = traversing(getToken(setting.useToken), getThemeMode(setting.themeMode));
     setting.useToken = '';
@@ -114,7 +108,6 @@ const FillColor: FC<T_FillColor> = ({
     }
     setSetting(new Model(setting));
   }
-
   function colorPicker (e) {
     const $icon = $(this);
     if (!$icon.is('[data-disabled=true')) {
@@ -130,7 +123,6 @@ const FillColor: FC<T_FillColor> = ({
     setting.opacity = picker.opacity;
     setSetting(new Model(setting));
   }
-
   const addPicker = () => {
     $(document).on(BrowserEvents.CLICK, `.fill-color-icon, .stroke-fill-icon`, colorPicker);
     $(document).on('color-picker-change', colorPickerChange);

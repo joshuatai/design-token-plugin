@@ -1,31 +1,13 @@
 import _cloneDeep from 'lodash/cloneDeep';
 import MessageTypes from 'enums/MessageTypes';
-import PropertyTypes from 'enums/PropertyTypes';
-import { Mixed } from 'symbols/index';
-import ThemeMode from './ThemeMode';
-import Group from './Group';
-import Token from './Token';
 import Version from './Version';
 
 export const JSONBIN_URL = `https://api.jsonbin.io`;
 const versions: Array<Version> = [];
-const themeModes: Array<ThemeMode> = [];
-const groups: Array<Group> = [];
 const versionMap = {};
-const themeModeMap = {};
-const groupMap = {};
-const tokenMap = {};
-let APIKey;
-let collectionID;
-let tokensBinID;
-let VersionsBinID;
-let isAdmin = false;
-let saveData;
-let fonts = {};
-let propertiesMap = {};
-let currentThemeMode;
 
-const pureToken = Object.keys(PropertyTypes).reduce((calc, type) => (calc[PropertyTypes[type]] = {}, calc), {});
+let fonts = {};
+
 const getFonts = () => fonts;
 const fetchInitial = () => {
   

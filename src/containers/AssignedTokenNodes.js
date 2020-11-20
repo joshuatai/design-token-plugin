@@ -1,13 +1,11 @@
 import React, { useEffect, useRef } from "react";
 import useTokens from "hooks/useTokens";
-import useProperties from "hooks/useProperties";
 import { sendMessage } from 'model/DataManager';
 import TokenItem from './TokenItem';
 import MessageTypes from 'enums/MessageTypes';
 import TokenActionEntry from 'enums/TokenActionEntry';
 const AssignedTokenNodes = ({ data, }) => {
     const { getToken } = useTokens();
-    const { getProperties } = useProperties();
     const $sortableRef = useRef(null);
     const setSortable = () => {
         $sortableRef.current
@@ -31,14 +29,13 @@ const AssignedTokenNodes = ({ data, }) => {
         $sortableRef.current.sortable('destroy');
     };
     useEffect(() => {
-        data;
         if (data.length === 0)
             return;
         $sortableRef.current = $('.assignedTokenNode .sortable');
         setSortable();
         return unsetSortable;
     }, [data]);
-    return (React.createElement(React.Fragment, null, data.map((node) => {
+    return (React.createElement("div", { id: "assigned-tokens-node-list", className: "plugin-panel panel-group panel-group-collapse panel-group-collapse-basic" }, data.map((node) => {
         let { id, name, useTokens } = node;
         const _id = id.replace(":", "-");
         return (React.createElement("div", { key: _id, "data-id": _id, className: "assignedTokenNode selected-node panel panel-default panel-collapse-shown" },
