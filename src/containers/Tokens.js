@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import hash from 'hash.js';
 import useAPI from 'hooks/useAPI';
+import useData from 'hooks/useData';
 import useTabs from 'hooks/useTabs';
 import useThemeModes from 'hooks/useThemeModes';
 import useGroups from 'hooks/useGroups';
@@ -29,6 +30,7 @@ const Tokens = ({ data = {
     properties: []
 } }) => {
     const { api: { admin } } = useAPI();
+    const { exportData } = useData();
     const { tab, setTab } = useTabs();
     const { fetchCurrentMode, setCurrentMode, themeModes, getThemeMode, defaultMode } = useThemeModes();
     const { setAllGroups } = useGroups();
@@ -36,6 +38,7 @@ const Tokens = ({ data = {
     const { setAllProperties } = useProperties();
     const { setAllThemeModes } = useThemeModes();
     const { setting, setTokenSetting, initialSetting } = useTokenSetting();
+    const $exportRef = useRef();
     let $versionCreator, $versionList;
     const [assignTokenNodes, setAssignTokenNodes] = useState([]);
     const Renderer = {
@@ -167,6 +170,9 @@ const Tokens = ({ data = {
                 React.createElement("a", { href: `#${Tabs.THEME_MODES}`, "aria-controls": Tabs.THEME_MODES, role: "tab", "data-toggle": "tab" }, "Modes")),
             admin && React.createElement("li", { role: "presentation" },
                 React.createElement("a", { href: `#${Tabs.IO}`, "aria-controls": Tabs.IO, role: "tab", "data-toggle": "tab" }, "I/O")),
+            React.createElement("div", { id: "export", title: "Export JSON File", className: "export", onClick: exportData($exportRef.current) },
+                React.createElement("span", { className: "tmicon tmicon-export" }),
+                React.createElement("a", { ref: $exportRef, style: { 'display': 'none' } })),
             React.createElement(ThemeModesSetter, null)),
         React.createElement("div", { className: "tab-content" },
             React.createElement("div", { role: "tabpanel", className: "tab-pane active", id: Tabs.TOKENS }, tab === 'tokens' ?

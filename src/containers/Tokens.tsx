@@ -1,6 +1,7 @@
-import React, { useEffect, FC, useState } from 'react';
+import React, { useEffect, FC, useState, useRef } from 'react';
 import hash from 'hash.js';
 import useAPI from 'hooks/useAPI';
+import useData from 'hooks/useData';
 import useTabs from 'hooks/useTabs';
 import useThemeModes from 'hooks/useThemeModes';
 import useGroups from 'hooks/useGroups';
@@ -43,6 +44,7 @@ const Tokens:FC<Props> = ({
   }
 }: Props) => {
   const { api: { admin }} = useAPI();
+  const { exportData } = useData();
   const { tab, setTab } = useTabs();
   const { fetchCurrentMode, setCurrentMode, themeModes, getThemeMode, defaultMode } = useThemeModes();
   const { setAllGroups } = useGroups();
@@ -50,6 +52,7 @@ const Tokens:FC<Props> = ({
   const { setAllProperties } = useProperties();
   const { setAllThemeModes } = useThemeModes();
   const { setting, setTokenSetting, initialSetting} = useTokenSetting();
+  const $exportRef = useRef();
   let $versionCreator, $versionList;
 
   const [ assignTokenNodes, setAssignTokenNodes ] = useState([]);
@@ -201,7 +204,10 @@ const Tokens:FC<Props> = ({
         {
           admin && <li role="presentation"><a href={`#${Tabs.IO}`} aria-controls={Tabs.IO} role="tab" data-toggle="tab">I/O</a></li>
         }
-        {/* <div id="export" title="Export a JSON file" className="export"><span className="tmicon tmicon-export"></span></div> */}
+        <div id="export" title="Export JSON File" className="export" onClick={exportData($exportRef.current)}>
+          <span className="tmicon tmicon-export"></span>
+          <a ref={$exportRef} style={{'display': 'none'}}></a>
+        </div>
         <ThemeModesSetter></ThemeModesSetter>
       </ul>
       <div className="tab-content">

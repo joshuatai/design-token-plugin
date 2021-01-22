@@ -19,8 +19,10 @@ $(document).on("shown.bs.dropdown hidden.bs.dropdown", ".input-group-btn, .dropd
         const matchedOptions = dropdownMenu.find(`a:contains(${value})`);
         const exactlyMatched = Array.from(matchedOptions).filter(option => option.innerText === value);
         const targetOption = exactlyMatched.length > 0 ? exactlyMatched[0] : matchedOptions[0];
-        if (targetOption)
+        if (targetOption) {
+            $(targetOption).trigger('focus');
             dropdownMenu.scrollTop($(targetOption).parent().data("index") * 28);
+        }
     }
     else {
         if (input && input.is(":focus")) {

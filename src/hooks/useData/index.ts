@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import useAPI from 'hooks/useAPI';
+import _cloneDeep from 'lodash/cloneDeep';
 import { ThemeModesContext } from '../ThemeModeProvider';
 import { groupsContext } from '../GroupProvider';
 import { tokensContext } from '../TokenProvider';
@@ -11,7 +12,8 @@ import Property from 'model/Property';
 import Properties from 'model/Properties';
 import PropertyTypes from 'enums/PropertyTypes';
 import { Mixed } from 'symbols/index';
-
+import useTokens from 'hooks/useTokens';
+import useProperties from 'hooks/useProperties';
 export const JSONBIN_URL = `https://api.jsonbin.io`;
 export const toSaveTokens = (tokens: Array<Token>) => {
   const _tokens = tokens.map((token: Token) => {
@@ -31,6 +33,8 @@ export const toSaveProperties = (properties) => {
 }
 const useData = () => {
   const { api } = useAPI();
+  const { getToken } = useTokens();
+  const { getProperty } = useProperties();
   const themeModes: Array<ThemeMode> = useContext(ThemeModesContext);
   const groups: Array<Group> = useContext(groupsContext);
   const tokens: Array<Token> = useContext(tokensContext);
@@ -279,13 +283,41 @@ const useData = () => {
     return fetch(`${JSONBIN_URL}/b/${api.tokensID}`, options)
       .then(res => Promise.resolve(res.json()));
   }
+  const exportData = (link) => {
+    return function (e) {
+      const data = groups.map(({ id, name, tokens }) => {
+        return {
+          id,
+          name,
+          tokens: tokens.map(tokenId => {
+            const { name, propertyType, properties } = getToken(tokenId) as Token;
+            return {
+              name,
+              propertyType,
+              properties: properties.map(propId => {
+                const property = _cloneDeep(Object.assign({}, (getProperty(propId) as Property)));
+                property.type = property._type;
+                delete property.parent;
+                delete property.id;
+                delete property._type;
+                return property.useToken ? (getToken(property.useToken) as Token).name : property;
+              })
+            }
+          })
+        }
+      });
+      var json = JSON.stringify(data);
+      alert(json);
+    };
+  }
 
   return {
     saveThemeModes,
     saveGroups,
     saveTokensProperties,
     saveTokens,
-    saveProperties
+    saveProperties,
+    exportData
   };
 };
 
